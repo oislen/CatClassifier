@@ -109,8 +109,9 @@ if __name__ == '__main__':
 
     print('Starting programme ...')
     # execute main webscrapping programme
-    main(search = 'cats',
-         n_images = 3, 
+    search = 'cats'
+    main(search = search,
+         n_images = 1000, 
          image_size = 'small', 
-         output_dir = 'C:\\Users\\oisin\\Pictures\\cats'
+         output_dir = f'E:\\GitHub\\playwright_webscraper\\data\\{search}'
          )
