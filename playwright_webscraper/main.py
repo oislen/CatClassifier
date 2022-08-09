@@ -42,12 +42,13 @@ def main(search, n_images, image_size, output_dir, headless = True):
         page.locator(cons.search_button_selector).click()
         page.wait_for_load_state()
 
+        # extract page url
+        page_url = page.url
+
         # while still downloading images
         while scrap_images:
             
             print(f'Working on page {page_idx} ...')
-            # extract page url
-            page_url = page.url
             # update url with number of skipped images
             skip = page_idx * cons.images_per_page
             mod_page_url = f'{page_url}&skip={skip}'
