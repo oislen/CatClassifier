@@ -114,5 +114,5 @@ if __name__ == '__main__':
     main(search = search,
          n_images = 1000, 
          image_size = 'small', 
-         output_dir = f'E:\\GitHub\\playwright_webscraper\\data\\{search}'
+         output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
          )
