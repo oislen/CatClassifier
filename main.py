@@ -6,13 +6,20 @@
 
 import os
 import requests
-import re
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 import cons
   
+# define main webscraping programme
 def main(search, n_images, image_size, output_dir, headless = True):
+
+    # run playwright in a syncronised fashion
     with sync_playwright() as p:
+
+        print('Checking output directory ...')
+        # if output directory does not exist
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok = True)
 
         print('Loading programme constants ...')
         # create a counter for the number of pages pulled
@@ -82,6 +89,7 @@ def main(search, n_images, image_size, output_dir, headless = True):
 
                 # if number of desired images has been collected
                 if image_idx >= n_images:
+                    print('Scraped all images ...')
                     scrap_images = False
                     new_page.close()
                     break
@@ -92,14 +100,17 @@ def main(search, n_images, image_size, output_dir, headless = True):
     
             # update image index
             page_idx = page_idx + 1
-            
+        
+        print('Closing browser ...')
         browser.close()
-  
-if __name__ == '__main__':
-    print('Starting programme ...')
 
+# if running as main programme
+if __name__ == '__main__':
+
+    print('Starting programme ...')
+    # execute main webscrapping programme
     main(search = 'cats',
          n_images = 3, 
          image_size = 'small', 
-         output_dir = 'C:\\Users\\oisin\\Pictures'
+         output_dir = 'C:\\Users\\oisin\\Pictures\\cats'
          )
