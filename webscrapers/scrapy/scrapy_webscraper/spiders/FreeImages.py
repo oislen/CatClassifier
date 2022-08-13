@@ -4,7 +4,7 @@
 from urllib.parse import urljoin
 import scrapy
 import sys
-sys.path.append('E:\\GitHub\\\cat_classifier\\scrapy_webscraper')
+sys.path.append('E:\\GitHub\\\cat_classifier\\webscrapers\\scrapy_webscraper')
 from scrapy_webscraper.items import ImageItem
 
 class FreeImages(scrapy.Spider):
