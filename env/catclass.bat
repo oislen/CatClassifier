@@ -8,6 +8,7 @@ call conda update -n base conda --yes
 
 :: pip install required packages
 call pip install playwright
+call pip install Pillow
 
 :: conda install required webscraping packages
 call conda install -c conda-forge requests --yes
