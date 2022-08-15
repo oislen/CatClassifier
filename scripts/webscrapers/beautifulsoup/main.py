@@ -7,11 +7,13 @@ from bs4 import BeautifulSoup
 
 def scrape_urls(n_images, home_url, search):
     """"""
+    print('Scraping urls ...')
     # create list of urls for scraping
     urls = []
     skip = 100
     npages = int(np.ceil(n_images / skip))
     for i in range(npages):
+        print(i)
         skip_param = str(i * skip)
         html_query = f'search/?q={search}&skip={skip_param}'
         url = urljoin(home_url, html_query)
@@ -20,10 +22,12 @@ def scrape_urls(n_images, home_url, search):
 
 def scrape_srcs(n_images, home_url, urls):
     """"""
+    print('Scraping srcs ...')
     # parse image sources from urls
     image_cnt = 0
+    srcs= []
     for url in urls:
-        srcs= []
+        print(url)
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
         root_table_level = soup.find("div", {"id":"spiccont"})
@@ -35,13 +39,15 @@ def scrape_srcs(n_images, home_url, urls):
             if image_cnt == n_images:
                 return srcs
 
-def download_srcs(srcs, delay = 3):
+def download_srcs(srcs, delay = 0.5):
     """"""
+    print('Downloading srcs ...')
     # download images
     for src in srcs:
         img_data = requests.get(src).content
         image_fname = src.split('/')[-1]
         image_fpath = os.path.join(output_dir, image_fname)
+        print(image_fpath)
         with open(image_fpath, 'wb') as handler:
             handler.write(img_data)
         time.sleep(delay)
@@ -53,7 +59,7 @@ if __name__ == '__main__':
     # set script constants
     search = 'dogs'
     n_images = 10000
-    output_dir = f'C:\\Users\\oisin\\Downloads\\{search}'
+    output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
     home_url = 'https://free-images.com'
 
     # if output directory does not exist
@@ -65,4 +71,4 @@ if __name__ == '__main__':
     # run function and scrape srcs
     srcs = scrape_srcs(n_images, home_url, urls)
     # run function to download srcs
-    download_srcs(srcs, delay = 3)
+    download_srcs(srcs)
