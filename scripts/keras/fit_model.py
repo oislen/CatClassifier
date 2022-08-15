@@ -8,7 +8,6 @@ Created on Sun Jan 31 15:31:42 2021
 import os
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
-from plot_model import plot_model_fit
 
 def fit_model(model,
               X_train, 
@@ -121,6 +120,4 @@ def fit_model(model,
                           validation_steps = validation_steps
                           )  
     
-    plot_model_fit(model_fit = model_fit)
-    
-    return 0
+    return model_fit
