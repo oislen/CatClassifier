@@ -7,6 +7,8 @@ import cons
 from utilities.load_image import load_image
 from utilities.greyscale_image import greyscale_image
 from utilities.pad_image import pad_image
+from utilities.plot_image import plot_image
+from utilities.resize_image import resize_image
 
 def data_prep(data_fdir):
 
@@ -51,8 +53,19 @@ def data_prep(data_fdir):
     max_height = image_dataframe['image_shape'].apply(lambda x: x[0]).max() # height
     max_width = image_dataframe['image_shape'].apply(lambda x: x[1]).max() # width
 
+    # set padded shape
+    pad_shape = (max_width, max_height)
+
     # apply padding to standardize all images shapes
-    image_dataframe['pad_image_array'] = image_dataframe['image_array'].apply(lambda x: pad_image(x, pad_shape_wh = (max_width, max_height)))
+    image_dataframe['pad_image_array'] = image_dataframe['image_array'].apply(lambda x: pad_image(x, pad_shape_wh = pad_shape))
+
+    print('Down sizing image ...')
+
+    # set down size shape
+    downsize_shape = tuple([round(dim * 3/4) for dim in pad_shape])
+    
+    # apply resizing to downsize image shapes
+    image_dataframe['pad_image_array'] = image_dataframe['pad_image_array'].apply(lambda x: resize_image(x, reshape_wh = downsize_shape))
 
     print("Pickling processed output data ...")
 
