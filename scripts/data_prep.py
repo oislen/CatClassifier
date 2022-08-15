@@ -3,21 +3,18 @@ import os
 import pandas as pd
 
 # load custom modules
-import sys
 import cons
-sys.path.append(os.path.join(cons.root_fdir, 'scripts'))
 from utilities.load_image import load_image
 from utilities.greyscale_image import greyscale_image
 from utilities.pad_image import pad_image
 
-def data_prep(root_fdir):
+def data_prep(data_fdir):
 
     """"""
 
     print("Generating image file paths and classes ...")
 
     # set image file directories
-    data_fdir = os.path.join(root_fdir, 'data')
     cat_image_fdir = os.path.join(data_fdir, 'cats')
     dog_image_fdir = os.path.join(data_fdir, 'dogs')
 
@@ -71,4 +68,4 @@ def data_prep(root_fdir):
 if __name__ == "__main__":
 
     # run data prep
-    data_prep(root_fdir = cons.root_fdir)
+    data_prep(data_fdir = cons.data_fdir)
