@@ -1,0 +1,1 @@
+root_fdir = 'E:\\GitHub\\cat_classifier'
