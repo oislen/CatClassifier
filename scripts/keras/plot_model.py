@@ -40,7 +40,7 @@ def plot_model_fit(model_fit):
     """
     
     #-- Accuracy Plot --#
-    
+    print(model_fit.history.keys())
     # plot training and validation accuracy
     plt.plot(model_fit.history['accuracy'])
     plt.plot(model_fit.history['val_accuracy'])
