@@ -18,22 +18,12 @@ COPY requirements.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
 RUN playwright install
 
-# install nvidia cuda toolkit when using tensorflow or tensorflow-gpu
-#RUN apt-get install nvidia-cuda-toolkit
-
 # set up home environment
 RUN useradd ${user}
 RUN mkdir -p /home/${user} && chown -R ${user}: /home/${user}
 
-# copy across credientials
-ADD .creds /root/.kaggle 
-RUN chmod -R 600 /root/.kaggle
-
-# set git username and email
-RUN git config --global user.name "oislen"
-RUN git config --global user.email "oisin.leonard@gmail.com"
 # clone cat-classifier git repo
-RUN git clone https://oislen:`cat /root/.kaggle/git_repos`@github.com/oislen/cat_classifier.git /home/${user}/cat_classifier
+RUN git clone https://github.com/oislen/cat_classifier.git /home/${user}/cat_classifier
 
 # make data directory
 RUN mkdir /home/${user}/cat_classifier/data
