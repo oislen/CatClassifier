@@ -1,6 +1,6 @@
 # ignore sub repos
 data
-perms
+.creds
 checkpoints
 
 # python cache
