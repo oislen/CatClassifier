@@ -2,7 +2,8 @@ import os
 import sys
 
 # set file directories
-root_fdir = 'E:\\GitHub\\cat_classifier'
+#root_fdir = 'E:\\GitHub\\cat_classifier'
+root_fdir = '/home/ubuntu/cat_classifier'
 data_fdir = os.path.join(root_fdir, 'data')
 train_fdir = os.path.join(data_fdir, 'train')
 test_fdir = os.path.join(data_fdir, 'test1')
