@@ -29,10 +29,10 @@ RUN chmod -R 600 /root/.creds
 RUN git config --global user.name "oislen"
 RUN git config --global user.email "oisin.leonard@gmail.com"
 # clone cat-classifier git repo
-RUN git clone https://oislen:`cat /root/.creds/git_repos`@github.com/oislen/cat_classifier.git /home/ubuntu/cat_classifier
+RUN git clone https://oislen:`cat /root/.creds/git_repos`@github.com/oislen/cat_classifier.git /home/${user}/cat_classifier
 
-# create data directories
-RUN cd /home/ubuntu/... && python3 gen_data_dirs.py 
+# make data directory
+RUN mkdir /home/${user}/cat_classifier/data
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]

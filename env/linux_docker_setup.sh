@@ -66,8 +66,8 @@ sudo systemctl start docker
 sudo chmod 666 /var/run/docker.sock
 docker login --username oislen --password `cat ~/.creds/docker`
 # pull docker container
-docker pull oislen/cat-class:$docker_tag
+docker pull oislen/catclass:$docker_tag
 # run pulled docker container
-docker run --shm-size=512m -p 8889:8888 -it oislen/cat-class:$docker_tag
-#docker run --shm-size=512m -p 8889:8888 -d oislen/cat-class:$docker_tag
+docker run --shm-size=512m -p 8889:8888 -it oislen/catclass:$docker_tag
+#docker run --shm-size=512m -p 8889:8888 -d oislen/catclass:$docker_tag
 #docker run -it -d <container_id_or_name> /bin/bash
