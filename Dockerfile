@@ -12,6 +12,7 @@ RUN apt-get install -y apt-utils vim curl wget unzip git python3 python3-pip
 # install required python packages
 COPY requirements.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
+RUN playwright install
 
 # install nvidia cuda toolkit when using tensorflow or tensorflow-gpu
 #RUN apt-get install nvidia-cuda-toolkit
