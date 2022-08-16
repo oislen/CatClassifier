@@ -50,10 +50,11 @@ learning_rate_reduction = ReduceLROnPlateau(monitor = 'accuracy',
 
 # Attention: Windows implementation may cause an error here. In that case use model_name=None.
 model_fit = fit_model(model = lenet_model, 
-                     epochs = 3,
+                     epochs = 20,
                      loss = 'binary_crossentropy',
                      starting_epoch = None,
-                     batch_size = 32,
+                     batch_size = None,
+                     valid_batch_size = None,
                      optimizer = optimizer,
                      lrate_red = learning_rate_reduction,
                      datagen = None, 
