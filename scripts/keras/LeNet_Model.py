@@ -135,7 +135,7 @@ def LeNet_Model(image_shape,
 
     # set prediction layer
     dense_layer_3 = Dense(units = n_targets, 
-                          activation = 'softmax'
+                          activation = 'sigmoid'
                           )(drop_layer_2)
     
     # create level
