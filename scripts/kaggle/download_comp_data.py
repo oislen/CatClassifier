@@ -71,6 +71,8 @@ def download_comp_data(comp_name,
     
     # create file paths
     zip_data_fpath = os.path.join(data_dir, zip_data_fname)
+    zip_train_fpath = os.path.join(data_dir, 'train.zip')
+    zip_test_fpath = os.path.join(data_dir, 'test1.zip')
     
     print('checking for data directory ...')
         
@@ -116,6 +118,18 @@ def download_comp_data(comp_name,
                 # extract files
                 zip_ref.extractall(data_dir)
     
+            # read zip file
+            with zipfile.ZipFile(zip_train_fpath, "r") as zip_ref:
+                
+                # extract files
+                zip_ref.extractall(data_dir)
+
+            # read zip file
+            with zipfile.ZipFile(zip_test_fpath, "r") as zip_ref:
+                
+                # extract files
+                zip_ref.extractall(data_dir)
+
     # if deleting zip file
     if del_zip == True:
         
@@ -123,5 +137,7 @@ def download_comp_data(comp_name,
         
         # delete zip file
         os.remove(path = zip_data_fpath)
+        os.remove(path = zip_train_fpath)
+        os.remove(path = zip_test_fpath)
         
     return 0

@@ -10,29 +10,42 @@ from utilities.pad_image import pad_image
 from utilities.plot_image import plot_image
 from utilities.resize_image import resize_image
 
-def data_prep(data_fdir):
+def data_prep(cons):
 
     """"""
 
     print("Generating image file paths and classes ...")
 
-    # set image file directories
-    cat_image_fdir = os.path.join(data_fdir, 'cats')
-    dog_image_fdir = os.path.join(data_fdir, 'dogs')
 
-    # create image file paths and classes
-    cat_image_fpaths = {os.path.join(cat_image_fdir, cat_image_fname):'cat' for cat_image_fname in os.listdir(cat_image_fdir)}
-    dog_image_fpaths = {os.path.join(dog_image_fdir, dog_image_fname):'dog' for dog_image_fname in os.listdir(dog_image_fdir)}
+    if False:
 
-    # combine image file paths and classes
-    comb_image_fpaths = {**cat_image_fpaths, **dog_image_fpaths}
+        # set image file directories
+        cat_image_fdir = os.path.join(cons.data_fdir, 'cats')
+        dog_image_fdir = os.path.join(cons.data_fdir, 'dogs')
+
+        # create image file paths and classes
+        cat_image_fpaths = {os.path.join(cat_image_fdir, cat_image_fname):'cat' for cat_image_fname in os.listdir(cat_image_fdir)}
+        dog_image_fpaths = {os.path.join(dog_image_fdir, dog_image_fname):'dog' for dog_image_fname in os.listdir(dog_image_fdir)}
+        
+        # combine image file paths and classes
+        train_image_fpaths = {**cat_image_fpaths, **dog_image_fpaths}
+    
+    else :
+
+        # set image file directories
+        train_image_fdir = cons.train_fdir
+        test_image_fdir = cons.test_fdir
+
+        # create image file paths and classes
+        shuffled_image_fnames = pd.Series(os.listdir(train_image_fdir)).sample(n = cons.sample_size, replace = False)
+        train_image_fpaths = {os.path.join(train_image_fdir, image_fname):image_fname.split('.')[0] for image_fname in shuffled_image_fnames}
 
     print("Creating image dataframe ...")
 
     # create list to hold image data
     image_data = []
     # iterate over image fpaths and classes to create image data object
-    for image_fpath, target_class in comb_image_fpaths.items():
+    for idx, (image_fpath, target_class) in enumerate(train_image_fpaths.items()):
         # load in rgb image array
         rgb_image_array = load_image(image_fpath)
         # convert image to grey scale
@@ -62,7 +75,7 @@ def data_prep(data_fdir):
     print('Down sizing image ...')
 
     # set down size shape
-    downsize_shape = tuple([round(dim * 3/4) for dim in pad_shape])
+    downsize_shape = tuple([round(dim * 1/2) for dim in pad_shape])
     
     # apply resizing to downsize image shapes
     image_dataframe['pad_image_array'] = image_dataframe['pad_image_array'].apply(lambda x: resize_image(x, reshape_wh = downsize_shape))
@@ -73,7 +86,7 @@ def data_prep(data_fdir):
     output = image_dataframe[['image_fpath', 'pad_image_array', 'target']]
 
     # save processed data as a pickle file
-    output.to_pickle(os.path.join(data_fdir, 'model_data.pickle'))
+    output.to_pickle(os.path.join(cons.data_fdir, 'model_data.pickle'))
 
     return 0
 
@@ -81,4 +94,4 @@ def data_prep(data_fdir):
 if __name__ == "__main__":
 
     # run data prep
-    data_prep(data_fdir = cons.data_fdir)
+    data_prep(cons = cons)
