@@ -23,4 +23,4 @@ unzip_data = True
 del_zip = True
 
 # set sample size
-sample_size = 1000
+sample_size = 5000
