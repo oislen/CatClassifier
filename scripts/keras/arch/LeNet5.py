@@ -7,7 +7,7 @@ Created on Sun Jan 31 15:22:57 2021
 # load in relevant libraries
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, AveragePooling2D
 
 def LeNet5(input_shape = (28, 28, 1), 
            n_classes = 10,
@@ -93,11 +93,11 @@ def LeNet5(input_shape = (28, 28, 1),
     
     # first convulation and pooling layer
     conv_layer_1 = Conv2D(filters = 6, kernel_size = (5, 5), strides = (1, 1), activation = 'relu', padding = 'valid')(inputs)
-    pool_layer_1 = MaxPooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_1)
+    pool_layer_1 = AveragePooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_1)
     
     # second convolution and pooling layer, with flattening layer
     conv_layer_2 = Conv2D(filters = 16, kernel_size = (5, 5), strides = (1, 1), activation = 'relu', padding = 'valid')(pool_layer_1)
-    pool_layer_2 = MaxPooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_2)
+    pool_layer_2 = AveragePooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_2)
     flat_layer = Flatten()(pool_layer_2)
     
     # first dense layer with dropout regularization
