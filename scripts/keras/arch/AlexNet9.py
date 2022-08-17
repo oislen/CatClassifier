@@ -3,7 +3,7 @@ from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
-def AlexNet(input_shape = (227, 227, 3), 
+def AlexNet9(input_shape = (227, 227, 3), 
             n_classes = 1000,
             output_activation = 'softmax',
             name = 'AlexNet'
