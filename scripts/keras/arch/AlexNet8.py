@@ -6,7 +6,7 @@ from keras.layers import Conv2D, MaxPooling2D
 def AlexNet8(input_shape = (227, 227, 3), 
             n_classes = 1000,
             output_activation = 'softmax',
-            name = 'AlexNet'
+            name = 'AlexNet8'
             ):
     
     """
@@ -30,7 +30,7 @@ def AlexNet8(input_shape = (227, 227, 3),
     pool_layer_3 = MaxPooling2D(pool_size = (3, 3), strides = (2, 2))(con_layer_3)
     flat_layer_3 = Flatten()(pool_layer_3)
 
-    # second dense layer with dropout regularization
+    # forst dense layer with dropout regularization
     dense_layer_1 = Dense(units = 4096, activation = 'relu')(flat_layer_3)
     drop_layer_1 = Dropout(0.25)(dense_layer_1)
     
@@ -38,7 +38,7 @@ def AlexNet8(input_shape = (227, 227, 3),
     dense_layer_2 = Dense(units = 4096, activation = 'relu')(drop_layer_1)
     drop_layer_2 = Dropout(0.25)(dense_layer_2)
     
-    # fourth dense layer for prediction
+    # third dense layer for prediction
     dense_layer_3 = Dense(units = n_classes, activation = output_activation)(drop_layer_2)
     
     # wrap architecture within keras Model
