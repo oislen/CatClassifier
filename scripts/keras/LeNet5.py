@@ -10,7 +10,7 @@ from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
 def LeNet5(input_shape = (28, 28, 1), 
-           n_classes = 9,
+           n_classes = 10,
            output_activation = 'softmax',
            name = 'LeNet5'
            ):
@@ -64,7 +64,7 @@ def LeNet5(input_shape = (28, 28, 1),
     Defaults
     
     LeNet5(input_shape = (28, 28, 1), 
-           n_classes = 9,
+           n_classes = 10,
            output_activation = 'softmax',
            name = 'LeNet5'
            )
@@ -80,7 +80,11 @@ def LeNet5(input_shape = (28, 28, 1),
     
     Example
     
-    LeNet_Model(input_shape = (28, 28, 1), n_classes = 9, output_activation = 'softmax')
+    LeNet5(input_shape = (28, 28, 1), 
+           n_classes = 10, 
+           output_activation = 'softmax', 
+           name = 'LeNet5'
+           )
     
     """
     
@@ -88,22 +92,22 @@ def LeNet5(input_shape = (28, 28, 1),
     inputs = Input(shape = input_shape)
     
     # first convulation and pooling layer
-    conv_layer_1 = Conv2D(filters = 32, kernel_size = (5, 5), activation = 'relu', padding = 'same')(inputs)
-    pool_layer_1 = MaxPooling2D((2, 2))(conv_layer_1)
+    conv_layer_1 = Conv2D(filters = 6, kernel_size = (5, 5), strides = (1, 1), activation = 'relu', padding = 'valid')(inputs)
+    pool_layer_1 = MaxPooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_1)
     
     # second convolution and pooling layer, with flattening layer
-    conv_layer_2 = Conv2D(filters = 32, kernel_size = (5, 5), activation = 'relu', padding = 'same')(pool_layer_1)
-    pool_layer_2 = MaxPooling2D((2, 2))(conv_layer_2)
+    conv_layer_2 = Conv2D(filters = 16, kernel_size = (5, 5), strides = (1, 1), activation = 'relu', padding = 'valid')(pool_layer_1)
+    pool_layer_2 = MaxPooling2D(pool_size = (2, 2), strides = (2, 2))(conv_layer_2)
     flat_layer = Flatten()(pool_layer_2)
     
     # first dense layer with dropout regularization
-    dense_layer_1 = Dense(units = 128, activation = 'relu')(flat_layer)
+    dense_layer_1 = Dense(units = 120, activation = 'relu')(flat_layer)
     drop_layer_1 = Dropout(0.25)(dense_layer_1)
     
     # second dense layer with dropout regularization
-    dense_layer_2 = Dense(units = 64, activation = 'relu')(drop_layer_1)
+    dense_layer_2 = Dense(units = 84, activation = 'relu')(drop_layer_1)
     drop_layer_2 = Dropout(0.25)(dense_layer_2)
-
+    
     # third dense layer for prediction
     dense_layer_3 = Dense(units = n_classes, activation = output_activation)(drop_layer_2)
     
