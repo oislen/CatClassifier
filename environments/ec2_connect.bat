@@ -2,7 +2,7 @@
 SET EC2_USER=ec2-user
 SET EC2_PEM_FPATH="C:\Users\oisin\.aws\kaggle.pem"
 SET EC2_CREDS_FDIR=E:\GitHub\cat_classifier\.creds
-SET EC2_SETUP_FPATH=E:\GitHub\cat_classifier\env\linux_docker_setup.sh
+SET EC2_SETUP_FPATH=E:\GitHub\cat_classifier\environments\linux_docker_setup.sh
 SET EC2_DNS_FPATH=%EC2_CREDS_FDIR%\ec2_dns
 
 :: enable delyaed expansion to allow parsing of the %EC2_DNS_FPATH% file
