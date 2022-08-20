@@ -1,4 +1,9 @@
 # load relevant libraries
+import os
+import sys
+
+# load custom modules
+sys.path.append(os.getcwd())
 import cons
 from download_comp_data import download_comp_data
      

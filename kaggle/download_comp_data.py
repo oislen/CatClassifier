@@ -18,7 +18,7 @@ def download_comp_data(comp_name,
     
     This function downloads the relevant competition data using the kaggle api.
     The data is downloaded as a .zip file and extracted to a specified location.
-    The .zip file can be deleted once file extraction is compeleted.
+    The .zip file can be deleted once file extraction is completed.
     
     Defaults 
     
