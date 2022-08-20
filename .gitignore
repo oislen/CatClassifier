@@ -2,6 +2,7 @@
 data
 .creds
 checkpoints
+report
 
 # python cache
 __pycache__
