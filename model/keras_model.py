@@ -1,10 +1,15 @@
+# load relevant libraries
 import os
+import sys
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from keras.optimizers import RMSprop
 from keras.callbacks import ReduceLROnPlateau
 
+
+# load custom modules
+sys.path.append(os.getcwd())
 import cons
 from utilities.plot_image import plot_image
 from LeNet_Model import LeNet_Model
