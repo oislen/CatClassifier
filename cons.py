@@ -5,15 +5,20 @@ import sys
 root_fdir = 'E:\\GitHub\\Cat-Classifier'
 #root_fdir = '/home/ubuntu/Cat-Classifier'
 data_fdir = os.path.join(root_fdir, 'data')
-train_fdir = os.path.join(data_fdir, 'train')
-test_fdir = os.path.join(data_fdir, 'test1')
-model_fdir = os.path.join(root_fdir, 'model')
-keras_fdir = os.path.join(root_fdir, 'keras')
+dataprep_fdir = os.path.join(root_fdir, 'data_prep')
+env_fdir = os.path.join(root_fdir, 'environments')
 kaggle_fdir = os.path.join(root_fdir, 'kaggle')
-webscrapers_fdir_fdir = os.path.join(root_fdir, 'webscrapers')
+keras_fdir = os.path.join(root_fdir, 'keras')
+report_fdir = os.path.join(root_fdir, 'report')
+test_fdir = os.path.join(data_fdir, 'test1')
+train_fdir = os.path.join(data_fdir, 'train')
+webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
+
+# set list containing all required directories
+fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, keras_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
 
 # append directories to path
-for fdir in [root_fdir, data_fdir, model_fdir, keras_fdir, kaggle_fdir, webscrapers_fdir_fdir]:
+for fdir in fdirs:
     sys.path.append(fdir)
 
 # set kaggle competition name
