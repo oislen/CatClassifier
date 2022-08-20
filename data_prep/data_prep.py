@@ -1,8 +1,10 @@
 # load relevant libraries
 import os
+import sys
 import pandas as pd
 
 # load custom modules
+sys.path.append(os.getcwd())
 import cons
 from utilities.load_image import load_image
 from utilities.greyscale_image import greyscale_image
