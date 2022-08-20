@@ -23,14 +23,15 @@ RUN useradd ${user}
 RUN mkdir -p /home/${user} && chown -R ${user}: /home/${user}
 
 # clone cat-classifier git repo
-RUN git clone https://github.com/oislen/cat_classifier.git /home/${user}/cat_classifier
+RUN git clone https://github.com/oislen/Cat-Classifier.git /home/${user}/Cat-Classifier
 
 # make data directory
-RUN mkdir /home/${user}/cat_classifier/data
-RUN mkdir /home/${user}/cat_classifier/scripts/checkpoints
+RUN mkdir /home/${user}/Cat-Classifier/data
+RUN mkdir /home/${user}/Cat-Classifier/report
+RUN mkdir /home/${user}/Cat-Classifier/model/checkpoints
 
 # copy kaggle .zip file to data directory
-COPY /home/${user}/cat_classifier/data/dogs-vs-cats.zip /home/${user}/cat_classifier/data
+COPY /home/${user}/Cat-Classifier/data/dogs-vs-cats.zip /home/${user}/Cat-Classifier/data
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
