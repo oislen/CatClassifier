@@ -29,5 +29,8 @@ RUN git clone https://github.com/oislen/cat_classifier.git /home/${user}/cat_cla
 RUN mkdir /home/${user}/cat_classifier/data
 RUN mkdir /home/${user}/cat_classifier/scripts/checkpoints
 
+# copy kaggle .zip file to data directory
+COPY /home/${user}/cat_classifier/data/dogs-vs-cats.zip /home/${user}/cat_classifier/data
+
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]

@@ -18,9 +18,9 @@ for fdir in [root_fdir, data_fdir, scripts_fdir, utilities_fdir, keras_fdir, kag
 
 # set kaggle competition name
 comp_name = 'dogs-vs-cats'
-download_data = True
+download_data = False
 unzip_data = True
-del_zip = True
+del_zip = False
 
 # set sample size
 sample_size = 5000
