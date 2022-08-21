@@ -67,9 +67,12 @@ docker_image=$docker_user/$docker_repo:$docker_tag
 sudo gpasswd -a $USER 
 sudo systemctl start docker
 sudo chmod 666 /var/run/docker.sock
-docker login --username oislen --password `cat ~/.creds/docker`
+#export PATH="$HOME/.docker/config.json:$PATH"
+#echo '{"credsStore":"osxkeychain"}' > ~/.docker/config.json
+#docker login --username oislen --password `cat ~/.creds/docker`
+cat ~/.creds/docker | docker login --username oislen --password-stdin
 # pull docker container
-docker pull oislen/catclass:$docker_tag
+docker pull $docker_image
 # run pulled docker container
 docker run --shm-size=512m -p 8889:8888 -it $docker_image
 #docker run --shm-size=512m -p 8889:8888 -d $docker_image
