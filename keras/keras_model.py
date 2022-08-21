@@ -3,6 +3,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import pickle
 from sklearn.model_selection import train_test_split
 from keras.optimizers import RMSprop
 from keras.callbacks import ReduceLROnPlateau
@@ -12,7 +13,7 @@ from keras.callbacks import ReduceLROnPlateau
 sys.path.append(os.getcwd())
 import cons
 from utilities.plot_image import plot_image
-from LeNet_Model import LeNet_Model
+from arch.LeNet5 import LeNet5
 from fit_model import fit_model
 from plot_model import plot_model_fit
 
@@ -36,7 +37,10 @@ X_train = X_train / 255
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size = 0.1)
 
 # initiate lenet model
-lenet_model = LeNet_Model(image_shape = X_train[0].shape, n_targets = 1)
+lenet_model = LeNet5(input_shape = X_train[0].shape, 
+                     n_classes = 1, 
+                     output_activation = 'sigmoid'
+                     )
 
 # intiate rms prop optimiser
 optimizer = RMSprop(learning_rate = 0.001, 
@@ -55,7 +59,7 @@ learning_rate_reduction = ReduceLROnPlateau(monitor = 'accuracy',
 
 # Attention: Windows implementation may cause an error here. In that case use model_name=None.
 model_fit = fit_model(model = lenet_model, 
-                     epochs = 20,
+                     epochs = 3,
                      loss = 'binary_crossentropy',
                      starting_epoch = None,
                      batch_size = None,
@@ -66,8 +70,13 @@ model_fit = fit_model(model = lenet_model,
                      X_train = X_train,
                      X_val = X_valid, 
                      Y_train = y_train, 
-                     Y_val = y_valid
+                     Y_val = y_valid,
+                     output_dir = cons.checkpoints_fdir
                      )
 
+# save model fit
+with open(cons.model_fit_pickle_fpath, 'wb') as handle:
+    pickle.dump(model_fit, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 # plot model fits
-plot_model_fit(model_fit = model_fit)
+plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
