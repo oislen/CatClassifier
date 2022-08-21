@@ -60,7 +60,7 @@ sudo yum autoremove
 
 #set docker tag
 docker_user='oislen'
-docker_repo='Cat-Classifier'
+docker_repo='cat-classifier'
 docker_tag='latest'
 docker_image=$docker_user/$docker_repo:$docker_tag
 # login to docker

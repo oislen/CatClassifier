@@ -1,6 +1,6 @@
 :: set docker settings
 SET DOCKER_USER=oislen
-SET DOCKER_REPO=Cat-Classifier
+SET DOCKER_REPO=cat-classifier
 SET DOCKER_TAG=latest
 SET DOCKER_IMAGE=%DOCKER_USER%/%DOCKER_REPO%:%DOCKER_TAG%
 
