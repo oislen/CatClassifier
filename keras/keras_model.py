@@ -17,15 +17,18 @@ from arch.LeNet5 import LeNet5
 from fit_model import fit_model
 from plot_model import plot_model_fit
 
+print('Loading data ...')
+
 # set data file directory
 data_fdir = cons.data_fdir
 
 # load in processed data
 data = pd.read_pickle(os.path.join(data_fdir, 'model_data.pickle'))
 
+print('Splitting train set ...')
+
 # split into training and test dataset
 train = data.loc[data['dataset'] == 'train', :]
-test = data.loc[data['dataset'] == 'test', :]
 
 # randomly shuffle training data
 train = train.sample(frac = 1.0, replace = False)
@@ -33,13 +36,14 @@ train = train.sample(frac = 1.0, replace = False)
 # extract out X dataframe and y series
 y_train = train['target'].values
 X_train = np.stack(train['pad_image_array'].values)
-X_test = np.stack(test['pad_image_array'].values)
 
 # standardise values between 0 and 1
 X_train = X_train / 255
 
 # split data into training and validation sets
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size = 0.1)
+
+print('Training Keras model ...')
 
 # initiate lenet model
 keras_model = LeNet5(input_shape = X_train[0].shape, 
@@ -89,8 +93,12 @@ keras_model.save(cons.keras_model_pickle_fpath, save_format = "h5")
 # plot model fits
 plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
 
-# make model predictions
-test.loc[:, 'preds'] = pd.Series(keras_model.predict(X_test).reshape(cons.test_sample_size,), index = test.index).round()
-
-# save predictions to disk
-test.to_pickel(cons.test_preds_pickle_fpath)
+if cons.test_sample_size > 0:
+    # making test set predictions
+    print('Making test predictions ...')
+    test = data.loc[data['dataset'] == 'test', :]
+    X_test = np.stack(test['pad_image_array'].values)
+    # make model predictions
+    test.loc[:, 'preds'] = pd.Series(keras_model.predict(X_test).reshape(cons.test_sample_size,), index = test.index).round()
+    # save predictions to disk
+    test.to_pickel(cons.test_preds_pickle_fpath)
