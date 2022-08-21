@@ -1,7 +1,7 @@
 import os
 import sys
 
-# set file directories
+# set root file directories
 #root_fdir = 'E:\\GitHub\\Cat-Classifier'
 root_fdir = '/home/ubuntu/Cat-Classifier'
 data_fdir = os.path.join(root_fdir, 'data')
@@ -14,11 +14,18 @@ test_fdir = os.path.join(data_fdir, 'test1')
 train_fdir = os.path.join(data_fdir, 'train')
 webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
 
+# set subdirectories
+checkpoints_fdir = os.path.join(keras_fdir, 'checkpoints')
+
+# set file paths
+model_fit_pickle_fpath = os.path.join(report_fdir, 'model_fit.pickle')
+
 # set list containing all required directories
-fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, keras_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
+root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, keras_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
+sub_fdirs = [checkpoints_fdir]
 
 # append directories to path
-for fdir in fdirs:
+for fdir in root_fdirs + sub_fdirs:
     sys.path.append(fdir)
 
 # set kaggle competition name
