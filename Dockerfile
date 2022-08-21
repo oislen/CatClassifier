@@ -10,7 +10,6 @@ RUN apt-get update
 RUN apt-get install -y apt-utils vim curl wget unzip git python3 python3-pip
 
 # added cv2 dependencies
-RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 # install required python packages
@@ -31,7 +30,7 @@ RUN mkdir /home/${user}/Cat-Classifier/report
 RUN mkdir /home/${user}/Cat-Classifier/keras/checkpoints
 
 # copy kaggle .zip file to data directory
-COPY /home/${user}/Cat-Classifier/data/dogs-vs-cats.zip /home/${user}/Cat-Classifier/data
+COPY data/dogs-vs-cats.zip /home/${user}/Cat-Classifier/data
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
