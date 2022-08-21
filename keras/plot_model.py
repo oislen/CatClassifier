@@ -5,9 +5,10 @@ Created on Tue Feb  2 11:37:53 2021
 """
 
 # load relevant libraries
+import os
 from matplotlib import pyplot as plt
  
-def plot_model_fit(model_fit):
+def plot_model_fit(model_fit, output_fdir = None):
     
     """
     
@@ -55,8 +56,12 @@ def plot_model_fit(model_fit):
     # assign plot legend
     plt.legend(['train', 'val'], loc='upper left')
     
-    #  show plot
+    #  show save, plot and close
+    if output_fdir != None:
+        accuracy_output_fpath = os.path.join(output_fdir, 'model_accuracy.png')
+        plt.savefig(accuracy_output_fpath)
     plt.show()
+    plt.close()
     
     #-- Loss Plot --#
     
@@ -74,7 +79,13 @@ def plot_model_fit(model_fit):
     # assign plot legend
     plt.legend(['train', 'val'], loc='upper left')
     
-    # show plot
+    #  show save, plot and close
+    if output_fdir != None:
+        loss_output_fpath = os.path.join(output_fdir, 'model_loss.png')
+        plt.savefig(loss_output_fpath)
     plt.show()
+    plt.close()
     
+
+
     return 0
