@@ -59,7 +59,10 @@ sudo yum autoremove
 #-- Pull and Run Docker Contianer --#
 
 #set docker tag
+docker_user='oislen'
+docker_repo='Cat-Classifier'
 docker_tag='latest'
+docker_image=$docker_user/$docker_repo:$docker_tag
 # login to docker
 sudo gpasswd -a $USER 
 sudo systemctl start docker
@@ -68,6 +71,6 @@ docker login --username oislen --password `cat ~/.creds/docker`
 # pull docker container
 docker pull oislen/catclass:$docker_tag
 # run pulled docker container
-docker run --shm-size=512m -p 8889:8888 -it oislen/catclass:$docker_tag
-#docker run --shm-size=512m -p 8889:8888 -d oislen/catclass:$docker_tag
+docker run --shm-size=512m -p 8889:8888 -it $docker_image
+#docker run --shm-size=512m -p 8889:8888 -d $docker_image
 #docker run -it -d <container_id_or_name> /bin/bash
