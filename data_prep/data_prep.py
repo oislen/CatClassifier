@@ -43,9 +43,12 @@ def data_prep(cons):
         shuffled_train_image_fnames = pd.Series(os.listdir(train_image_fdir)).sample(n = cons.train_sample_size, replace = False)
         train_image_fpaths = {os.path.join(train_image_fdir, image_fname):[image_fname.split('.')[0], 'train'] for image_fname in shuffled_train_image_fnames}
 
-        # create test image file paths and classes
-        shuffled_test_image_fnames = pd.Series(os.listdir(test_image_fdir)).sample(n = cons.test_sample_size, replace = False)
-        test_image_fpaths = {os.path.join(test_image_fdir, image_fname):[np.nan, 'test'] for image_fname in shuffled_test_image_fnames}
+        if cons.test_sample_size > 0:
+            # create test image file paths and classes
+            shuffled_test_image_fnames = pd.Series(os.listdir(test_image_fdir)).sample(n = cons.test_sample_size, replace = False)
+            test_image_fpaths = {os.path.join(test_image_fdir, image_fname):[np.nan, 'test'] for image_fname in shuffled_test_image_fnames}
+        else:
+            test_image_fpaths = {}
 
         # combine train and test files
         image_fpaths = {**train_image_fpaths, **test_image_fpaths}

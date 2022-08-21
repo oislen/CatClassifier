@@ -37,5 +37,5 @@ unzip_data = True
 del_zip = False
 
 # set sample size
-train_sample_size = 10000
-test_sample_size = 1000
+train_sample_size = 7500
+test_sample_size = 0
