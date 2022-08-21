@@ -19,6 +19,8 @@ checkpoints_fdir = os.path.join(keras_fdir, 'checkpoints')
 
 # set file paths
 model_fit_pickle_fpath = os.path.join(report_fdir, 'model_fit.pickle')
+keras_model_pickle_fpath = os.path.join(report_fdir, 'keras_model.h5')
+test_preds_pickle_fpath = os.path.join(report_fdir, 'test_preds.pickle')
 
 # set list containing all required directories
 root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, keras_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
@@ -35,4 +37,5 @@ unzip_data = True
 del_zip = False
 
 # set sample size
-sample_size = 5000
+train_sample_size = 10000
+test_sample_size = 1000
