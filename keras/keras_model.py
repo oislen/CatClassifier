@@ -29,6 +29,8 @@ train = train.sample(frac = 1.0, replace = False)
 
 print('Training Keras model ...')
 
+print('Training Keras model ...')
+
 # initiate lenet model
 keras_model = LeNet5(input_shape = X_train[0].shape, 
                      n_classes = 1, 
