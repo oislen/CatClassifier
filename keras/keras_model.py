@@ -4,7 +4,6 @@ import sys
 import numpy as np
 import pandas as pd
 import pickle
-from sklearn.model_selection import train_test_split
 from keras.optimizers import RMSprop
 from keras.callbacks import ReduceLROnPlateau
 
@@ -17,27 +16,21 @@ from arch.LeNet5 import LeNet5
 from fit_model import fit_model
 from plot_model import plot_model_fit
 
+print('Loading data ...')
+
 # set data file directory
 data_fdir = cons.data_fdir
 
 # load in processed data
 data = pd.read_pickle(os.path.join(data_fdir, 'model_data.pickle'))
 
-# randomly shuffle data
-data = data.sample(frac = 1.0, replace = False)
+# randomly shuffle training data
+train = train.sample(frac = 1.0, replace = False)
 
-# extract out X dataframe and y series
-y_train = data['target'].values
-X_train = np.stack(data['pad_image_array'].values)
-
-# standardise values between 0 and 1
-X_train = X_train / 255
-
-# split data into training and validation sets
-X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size = 0.1)
+print('Training Keras model ...')
 
 # initiate lenet model
-lenet_model = LeNet5(input_shape = X_train[0].shape, 
+keras_model = LeNet5(input_shape = X_train[0].shape, 
                      n_classes = 1, 
                      output_activation = 'sigmoid'
                      )
@@ -58,8 +51,8 @@ learning_rate_reduction = ReduceLROnPlateau(monitor = 'accuracy',
                                             )
 
 # Attention: Windows implementation may cause an error here. In that case use model_name=None.
-model_fit = fit_model(model = lenet_model, 
-                     epochs = 3,
+model_fit = fit_model(model = keras_model, 
+                     epochs = 30,
                      loss = 'binary_crossentropy',
                      starting_epoch = None,
                      batch_size = None,
@@ -74,9 +67,20 @@ model_fit = fit_model(model = lenet_model,
                      output_dir = cons.checkpoints_fdir
                      )
 
-# save model fit
+# save trained keras model
 with open(cons.model_fit_pickle_fpath, 'wb') as handle:
     pickle.dump(model_fit, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+# save model fit
+keras_model.save(cons.keras_model_pickle_fpath, save_format = "h5")
+
 # plot model fits
 plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
+
+if cons.test_sample_size > 0:
+    # making test set predictions
+    print('Making test predictions ...')
+    # make model predictions
+    test.loc[:, 'preds'] = pd.Series(keras_model.predict(X_test).reshape(cons.test_sample_size,), index = test.index).round()
+    # save predictions to disk
+    test.to_pickel(cons.test_preds_pickle_fpath)
