@@ -1,3 +1,4 @@
+# TODO: apply multiprocessing to for loops
 import os
 import time
 import requests
@@ -5,8 +6,10 @@ import numpy as np
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
-def scrape_urls(n_images, home_url, search):
-    """"""
+def gen_urls(n_images, home_url, search):
+    """
+    This function generates all relevant page urls for scraping
+    """
     print('Scraping urls ...')
     # create list of urls for scraping
     urls = []
@@ -21,7 +24,9 @@ def scrape_urls(n_images, home_url, search):
     return urls
 
 def scrape_srcs(n_images, home_url, urls):
-    """"""
+    """
+    This function scrapes image scrs from the given urls
+    """
     print('Scraping srcs ...')
     # parse image sources from urls
     image_cnt = 0
@@ -40,7 +45,9 @@ def scrape_srcs(n_images, home_url, urls):
                 return srcs
 
 def download_srcs(srcs, delay = 0.5):
-    """"""
+    """
+    This function downloads all scraped image sources
+    """
     print('Downloading srcs ...')
     # download images
     for src in srcs:
@@ -58,7 +65,7 @@ if __name__ == '__main__':
     
     # set script constants
     search = 'dogs'
-    n_images = 10000
+    n_images = 100
     output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
     home_url = 'https://free-images.com'
 
@@ -67,7 +74,7 @@ if __name__ == '__main__':
         os.makedirs(output_dir, exist_ok = True)
 
     # run function and scrape urls
-    urls = scrape_urls(n_images, home_url, search)
+    urls = gen_urls(n_images, home_url, search)
     # run function and scrape srcs
     srcs = scrape_srcs(n_images, home_url, urls)
     # run function to download srcs
