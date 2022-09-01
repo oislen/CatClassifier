@@ -1,10 +1,10 @@
 # TODO: apply multiprocessing to for loops
 import os
-import time
 import requests
 import numpy as np
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+from multiprocessing import Pool
 
 def gen_urls(n_images, home_url, search):
     """
@@ -44,21 +44,26 @@ def scrape_srcs(n_images, home_url, urls):
             if image_cnt == n_images:
                 return srcs
 
-def download_srcs(srcs, delay = 0.5):
+def download_src(src, output_dir):
     """
-    This function downloads all scraped image sources
+    This function downloads a scraped image sources
     """
-    print('Downloading srcs ...')
-    # download images
-    for src in srcs:
-        img_data = requests.get(src).content
-        image_fname = src.split('/')[-1]
-        image_fpath = os.path.join(output_dir, image_fname)
-        print(image_fpath)
-        with open(image_fpath, 'wb') as handler:
-            handler.write(img_data)
-        time.sleep(delay)
+    img_data = requests.get(src).content
+    image_fname = src.split('/')[-1]
+    image_fpath = os.path.join(output_dir, image_fname)
+    print(image_fpath)
+    with open(image_fpath, 'wb') as handler:
+        handler.write(img_data)
     return 0
+
+def multiprocess(func, args, ncpu = os.cpu_count()):
+    """
+    This utility function applyies another function in parallel given a specified number of cpus
+    """
+    pool = Pool(ncpu)
+    results = pool.starmap(func, args)
+    pool.close()
+    return results
 
 # if running script as main programme
 if __name__ == '__main__':
@@ -66,8 +71,8 @@ if __name__ == '__main__':
     # set script constants
     search = 'dogs'
     n_images = 100
-    output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
     home_url = 'https://free-images.com'
+    output_dir = f'E:\\GitHub\\Cat-Classifier\\data\\{search}'
 
     # if output directory does not exist
     if not os.path.exists(output_dir):
@@ -77,5 +82,6 @@ if __name__ == '__main__':
     urls = gen_urls(n_images, home_url, search)
     # run function and scrape srcs
     srcs = scrape_srcs(n_images, home_url, urls)
-    # run function to download srcs
-    download_srcs(srcs)
+
+    # run function to download src
+    results = multiprocess(download_src, [(src, output_dir) for src in srcs])
