@@ -5,7 +5,7 @@ from webscrapers.beautifulsoup.main import main
 if __name__ == '__main__':
     
     # set number of images constants
-    n_images = 100
+    n_images = 1000
     # set search constants
     cats_search = 'cats'
     dogs_search = 'dogs'
