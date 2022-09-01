@@ -42,3 +42,7 @@ del_zip = False
 # set sample size
 train_sample_size = 1
 test_sample_size = 1
+
+# webscraping constants
+home_url = 'https://free-images.com'
+output_dir =  os.path.join(data_fdir, '{search}')

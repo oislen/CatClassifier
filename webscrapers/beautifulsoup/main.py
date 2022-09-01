@@ -65,23 +65,16 @@ def multiprocess(func, args, ncpu = os.cpu_count()):
     pool.close()
     return results
 
-# if running script as main programme
-if __name__ == '__main__':
-    
-    # set script constants
-    search = 'dogs'
-    n_images = 100
-    home_url = 'https://free-images.com'
-    output_dir = f'E:\\GitHub\\Cat-Classifier\\data\\{search}'
-
+def main(search, n_images, home_url, output_dir):
+    """
+    """
     # if output directory does not exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok = True)
-
     # run function and scrape urls
     urls = gen_urls(n_images, home_url, search)
     # run function and scrape srcs
     srcs = scrape_srcs(n_images, home_url, urls)
-
     # run function to download src
-    results = multiprocess(download_src, [(src, output_dir) for src in srcs])
+    multiprocess(download_src, [(src, output_dir) for src in srcs])
+    return 0
