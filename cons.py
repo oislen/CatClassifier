@@ -46,3 +46,11 @@ test_sample_size = 1
 # webscraping constants
 home_url = 'https://free-images.com'
 output_dir =  os.path.join(data_fdir, '{search}')
+
+FAST_RUN = True
+IMAGE_WIDTH=128
+IMAGE_HEIGHT=128
+IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
+IMAGE_CHANNELS=3
+input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS)
+batch_size=16

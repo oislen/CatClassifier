@@ -44,12 +44,13 @@ def scrape_srcs(n_images, home_url, urls):
             if image_cnt == n_images:
                 return srcs
 
-def download_src(src, output_dir):
+def download_src(src, output_dir, search):
     """
     This function downloads a scraped image sources
     """
     img_data = requests.get(src).content
-    image_fname = src.split('/')[-1]
+    image_fstem = src.split('/')[-1]
+    image_fname = f'{search}.{image_fstem}'
     image_fpath = os.path.join(output_dir, image_fname)
     print(image_fpath)
     with open(image_fpath, 'wb') as handler:
@@ -76,5 +77,5 @@ def main(search, n_images, home_url, output_dir):
     # run function and scrape srcs
     srcs = scrape_srcs(n_images, home_url, urls)
     # run function to download src
-    multiprocess(download_src, [(src, output_dir) for src in srcs])
+    multiprocess(download_src, [(src, output_dir, search) for src in srcs])
     return 0
