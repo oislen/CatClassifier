@@ -26,9 +26,9 @@ df = pd.DataFrame({'filename': filenames, 'category': categories})
 df['category'].value_counts()
 
 # random image plot
-sample = random.choice(filenames)
-image = load_img(os.path.join(cons.train_fdir, sample))
-plot_image(image)
+#sample = random.choice(filenames)
+#image = load_img(os.path.join(cons.train_fdir, sample))
+#plot_image(image)
 
 # initiate LeNet5 architecture
 keras_model = LeNet5(input_shape = cons.input_shape, n_classes = 2, output_activation = 'softmax', name = 'LeNet5')
@@ -87,7 +87,7 @@ validation_generator = validation_datagen.flow_from_dataframe(dataframe = valida
 #plt.show()
 
 # fit model
-epochs=3 if cons.FAST_RUN else 50
+epochs=3 if cons.FAST_RUN else 25
 model_fit = keras_model.fit(train_generator, epochs=epochs, validation_data=validation_generator, validation_steps=total_validate//cons.batch_size, steps_per_epoch=total_train//cons.batch_size, callbacks=callbacks)
 
 # save trained keras model
