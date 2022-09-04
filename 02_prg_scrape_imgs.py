@@ -5,7 +5,7 @@ from webscrapers.beautifulsoup.main import main
 if __name__ == '__main__':
     
     # set number of images constants
-    n_images = 5000
+    n_images = cons.n_images
 
     # run main function
     main(search = 'cat', n_images = n_images, home_url = cons.home_url, output_dir = cons.train_fdir)
