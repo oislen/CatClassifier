@@ -17,6 +17,7 @@ webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
 # set subdirectories
 checkpoints_fdir = os.path.join(model_fdir, 'checkpoints')
 arch_fdir = os.path.join(model_fdir, 'arch')
+utilities_fdir = os.path.join(dataprep_fdir, 'utilities')
 
 # set file paths
 train_data_pickle_fpath = os.path.join(data_fdir, 'train_data.pickle')
@@ -27,7 +28,7 @@ test_preds_pickle_fpath = os.path.join(report_fdir, 'test_preds.pickle')
 
 # set list containing all required directories
 root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, model_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
-sub_fdirs = [checkpoints_fdir, arch_fdir]
+sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir]
 
 # append directories to path
 for fdir in root_fdirs + sub_fdirs:
@@ -44,13 +45,24 @@ train_sample_size = 1
 test_sample_size = 1
 
 # webscraping constants
+n_images = 6000
 home_url = 'https://free-images.com'
 output_dir =  os.path.join(data_fdir, '{search}')
 
-FAST_RUN = False
+FAST_RUN = True
 IMAGE_WIDTH=128
 IMAGE_HEIGHT=128
 IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
 IMAGE_CHANNELS=3
 input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS)
 batch_size=16
+
+# data generator constants
+rescale = 1./255
+rotation_range = 15
+shear_range = 0.1
+zoom_range = 0.2
+horizontal_flip = True
+width_shift_range = 0.1
+height_shift_range = 0.1
+shuffle = False
