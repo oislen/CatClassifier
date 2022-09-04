@@ -56,12 +56,14 @@ sudo umount /tmp
 # update os
 sudo yum update -y
 # install required base software
-sudo yum install -y htop vim tmux docker
+sudo yum install -y htop vim tmux dos2unix docker
 # remove unneed dependencies
 sudo yum autoremove
 
 #-- Pull and Run Docker Contianer --#
 
+# apply doc2unix to docker_extract_data.sh script
+dos2unix ~/docker_extract_data.sh
 #set docker tag
 docker_user='oislen'
 docker_repo='cat-classifier'
