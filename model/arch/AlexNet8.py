@@ -5,8 +5,7 @@ from keras.layers import Conv2D, MaxPooling2D
 
 def AlexNet8(input_shape = (227, 227, 3), 
             n_classes = 1000,
-            output_activation = 'softmax',
-            name = 'AlexNet8'
+            output_activation = 'softmax'
             ):
     
     """
@@ -42,7 +41,7 @@ def AlexNet8(input_shape = (227, 227, 3),
     dense_layer_3 = Dense(units = n_classes, activation = output_activation)(drop_layer_2)
     
     # wrap architecture within keras Model
-    model = Model(inputs = inputs, outputs = dense_layer_3, name = name)
+    model = Model(inputs = inputs, outputs = dense_layer_3, name = 'AlexNet8')
     
     return model
     

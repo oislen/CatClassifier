@@ -4,8 +4,7 @@ from keras.models import Model
 
 def ResNet50_pretrained(input_shape = (224, 224, 3), 
                         n_classes = 2,
-                        output_activation = 'softmax',
-                        name = 'ResNet50_pretrained'
+                        output_activation = 'softmax'
                         ):
 
     """
@@ -40,7 +39,7 @@ def ResNet50_pretrained(input_shape = (224, 224, 3),
     # Add a final sigmoid layer for classification
     x = Dense(n_classes, activation=output_activation)(x)
 
-    model = Model(inputs = ResNet50_pretrained.input, outputs = x, name = name)
+    model = Model(inputs = ResNet50_pretrained.input, outputs = x, name = 'ResNet50_pretrained')
 
     return model
 

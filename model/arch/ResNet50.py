@@ -93,8 +93,7 @@ def convolutional_block(X, f, filters, s = 2, training=True, initializer = gloro
 
 def ResNet50(input_shape = (64, 64, 3), 
              n_classes = 6,
-             output_activation = 'softmax',
-             name = 'ResNet50'
+             output_activation = 'softmax'
              ):
     """
     Stage-wise implementation of the architecture of the popular ResNet50:
@@ -158,6 +157,6 @@ def ResNet50(input_shape = (64, 64, 3),
     outputs = Dense(units = n_classes, activation = output_activation, kernel_initializer = glorot_uniform(seed = 0))(flat_outputs)
     
     # Create model
-    model = Model(inputs = inputs, outputs = outputs, name = name)
+    model = Model(inputs = inputs, outputs = outputs, name = 'ResNet50')
 
     return model

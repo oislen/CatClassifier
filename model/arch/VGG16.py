@@ -5,8 +5,7 @@ from keras.layers import Conv2D, MaxPooling2D
 
 def VGG16(input_shape = (224, 224, 3), 
          n_classes = 1000,
-         output_activation = 'softmax',
-         name = 'VGG16'
+         output_activation = 'softmax'
          ):
     
     """
@@ -56,7 +55,7 @@ def VGG16(input_shape = (224, 224, 3),
     dense_layer_3 = Dense(units = n_classes, activation = output_activation)(drop_layer_2)
     
     # wrap architecture within keras Model
-    model = Model(inputs = inputs, outputs = dense_layer_3, name = name)
+    model = Model(inputs = inputs, outputs = dense_layer_3, name = 'VGG16')
     
     return model
     

@@ -4,8 +4,7 @@ from keras.models import Model
 
 def VGG16_pretrained(input_shape = (224, 224, 3), 
                      n_classes = 1,
-                     output_activation = 'sigmoid',
-                     name = 'VGG16_pretrained'
+                     output_activation = 'sigmoid'
                      ):
     """
     model = VGG16_pretrained(input_shape = (224, 224, 3), 
@@ -42,6 +41,6 @@ def VGG16_pretrained(input_shape = (224, 224, 3),
     # Add a final sigmoid layer for classification
     x = Dense(n_classes, activation=output_activation)(x)
 
-    model = Model(inputs = VGG16_pretrained.input, outputs = x, name = name)
+    model = Model(inputs = VGG16_pretrained.input, outputs = x, name = 'VGG16_pretrained')
 
     return model

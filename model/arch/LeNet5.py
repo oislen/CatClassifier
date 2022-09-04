@@ -11,8 +11,7 @@ from keras.layers import Conv2D, AveragePooling2D
 
 def LeNet5(input_shape = (28, 28, 1), 
            n_classes = 10,
-           output_activation = 'softmax',
-           name = 'LeNet5'
+           output_activation = 'softmax'
            ):
     
     """
@@ -112,6 +111,6 @@ def LeNet5(input_shape = (28, 28, 1),
     dense_layer_3 = Dense(units = n_classes, activation = output_activation)(drop_layer_2)
     
     # wrap architecture within keras Model
-    model = Model(inputs = inputs, outputs = dense_layer_3, name = name)
+    model = Model(inputs = inputs, outputs = dense_layer_3, name = 'LeNet5')
     
     return model
