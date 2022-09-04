@@ -15,16 +15,20 @@ train_fdir = os.path.join(data_fdir, 'train')
 webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
 
 # set subdirectories
-checkpoints_fdir = os.path.join(model_fdir, 'checkpoints')
+checkpoints_fdir = os.path.join(data_fdir, 'checkpoints')
 arch_fdir = os.path.join(model_fdir, 'arch')
 utilities_fdir = os.path.join(dataprep_fdir, 'utilities')
 
 # set file paths
 train_data_pickle_fpath = os.path.join(data_fdir, 'train_data.pickle')
 test_data_pickle_fpath = os.path.join(data_fdir, 'test_data.pickle')
-model_fit_pickle_fpath = os.path.join(report_fdir, 'model_fit.pickle')
-keras_model_pickle_fpath = os.path.join(report_fdir, 'keras_model.h5')
-test_preds_pickle_fpath = os.path.join(report_fdir, 'test_preds.pickle')
+model_fit_pickle_fpath = os.path.join(data_fdir, 'model_fit.pickle')
+keras_model_pickle_fpath = os.path.join(data_fdir, 'keras_model.h5')
+test_preds_pickle_fpath = os.path.join(data_fdir, 'test_preds.pickle')
+submission_csv_fpath = os.path.join(data_fdir, 'submission.csv')
+random_image_fpath = os.path.join(report_fdir, 'random_image.jpg')
+generator_plot_fpath = os.path.join(report_fdir, 'generator_plot.jpg')
+pred_images_fpath = os.path.join(report_fdir, 'pred_images.jpg')
 
 # set list containing all required directories
 root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, model_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
