@@ -2,8 +2,8 @@ import os
 import sys
 
 # set root file directories
-root_fdir = 'E:\\GitHub\\Cat-Classifier'
-#root_fdir = '/home/ubuntu/Cat-Classifier'
+#root_fdir = 'E:\\GitHub\\Cat-Classifier'
+root_fdir = '/home/ubuntu/Cat-Classifier'
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
@@ -47,7 +47,7 @@ test_sample_size = 1
 home_url = 'https://free-images.com'
 output_dir =  os.path.join(data_fdir, '{search}')
 
-FAST_RUN = True
+FAST_RUN = False
 IMAGE_WIDTH=128
 IMAGE_HEIGHT=128
 IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
