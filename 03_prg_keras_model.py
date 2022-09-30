@@ -16,7 +16,7 @@ import cons
 from utilities.plot_image import plot_image
 from utilities.plot_generator import plot_generator
 from utilities.plot_preds import plot_preds
-from model.arch.LeNet5 import LeNet5
+from model.arch.AlexNet8 import AlexNet8
 from model.plot_model import plot_model_fit
 
 # create a dataframe of filenames and categories
@@ -55,7 +55,7 @@ example_generator = train_datagen.flow_from_dataframe(dataframe = example_df, di
 plot_generator(generator = example_generator, output_fpath = cons.generator_plot_fpath)
 
 # initiate LeNet5 architecture
-keras_model = LeNet5(input_shape = cons.input_shape, n_classes = 2, output_activation = 'softmax')
+keras_model = AlexNet8(input_shape = cons.input_shape, n_classes = 2, output_activation = 'softmax')
 keras_model.summary()
 
 # set gradient decent compiler
