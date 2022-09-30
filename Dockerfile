@@ -27,7 +27,7 @@ RUN git clone https://github.com/oislen/Cat-Classifier.git /home/${user}/Cat-Cla
 # make data directory
 RUN mkdir /home/${user}/Cat-Classifier/data
 RUN mkdir /home/${user}/Cat-Classifier/report
-RUN mkdir /home/${user}/Cat-Classifier/keras/checkpoints
+RUN mkdir /home/${user}/Cat-Classifier/model/checkpoints
 
 # copy kaggle .zip file to data directory
 COPY data/dogs-vs-cats.zip /home/${user}/Cat-Classifier/data
