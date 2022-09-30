@@ -30,5 +30,8 @@ conda install -c conda-forge seaborn --yes
 # run playwright install
 playwright install
 
+# install jupyterlab
+conda install -c conda-forge jupyterlab --yes
+
 # deactivate new environment
 conda deactivate
