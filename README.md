@@ -41,3 +41,9 @@ The main dog and cat image classification application is contained within the ro
 * The __Dockerfile__ builds the application container for deployment on ec2.
 * The __exeDocker.bat__ executes the Docker build process locally on windows.
 * The __requirements.txt__ file contains the python package dependencies for the application.
+
+## Docker Container
+
+The application docker container is available on dockerhub here:
+
+https://hub.docker.com/repository/docker/oislen/cat-classifier
