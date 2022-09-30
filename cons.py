@@ -53,7 +53,7 @@ n_images = 6000
 home_url = 'https://free-images.com'
 output_dir =  os.path.join(data_fdir, '{search}')
 
-FAST_RUN = True
+FAST_RUN = False
 IMAGE_WIDTH=128
 IMAGE_HEIGHT=128
 IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
