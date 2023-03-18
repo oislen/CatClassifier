@@ -9,3 +9,8 @@ __pycache__
 
 #ipynob checkoukpoints
 .ipynb_checkpoints
+
+# quarto tmp files
+*.css
+*.woff
+*.js
