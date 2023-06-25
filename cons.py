@@ -1,9 +1,9 @@
 import os
 import sys
+import platform
 
 # set root file directories
-#root_fdir = 'E:\\GitHub\\Cat-Classifier'
-root_fdir = '/home/ubuntu/Cat-Classifier'
+root_fdir = 'E:\\GitHub\\Cat-Classifier' if platform.system() == 'Windows' else '/home/ubuntu/Cat-Classifier'
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
