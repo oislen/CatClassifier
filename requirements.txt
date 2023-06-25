@@ -13,3 +13,6 @@ matplotlib
 seaborn
 kaggle
 jupyterlab
+torch
+torchvision
+transformers
