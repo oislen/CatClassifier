@@ -6,15 +6,6 @@ This git repository contains code and configurations for implementing a Convolut
 
 ## Repo Contents
 
-1. [aws](https://github.com/oislen/cat_classifier/tree/main/aws)
-2. [conda](https://github.com/oislen/cat_classifier/tree/main/conda)
-3. [data_prep](https://github.com/oislen/cat_classifier/tree/main/data_prep)
-4. [kaggle](https://github.com/oislen/cat_classifier/tree/main/kaggle)
-5. [model](https://github.com/oislen/cat_classifier/tree/main/model)
-6. [ref](https://github.com/oislen/cat_classifier/tree/main/ref)
-7. [report](https://github.com/oislen/cat_classifier/tree/main/report)
-8. [webscrapers](https://github.com/oislen/cat_classifier/tree/main/webscrapers)
-
 * The __aws__ subdirectory contains batch and shell scripts for configuring ec2 spot instances and the deploying docker container remotely. 
 * The __conda__ subdirectory contains batch and shell scripts for creating a local conda environment for the project. 
 * The __data_prep__ subdirectory contains python utility scripts to data cleansing and processing for modelling.
@@ -27,15 +18,6 @@ This git repository contains code and configurations for implementing a Convolut
 ## Application Scripts
 
 The main dog and cat image classification application is contained within the root scripts:
-
-1. [01_prg_kaggle_data.py](https://github.com/oislen/cat_classifier/tree/main/01_prg_kaggle_data.py)
-2. [02_prg_scrape_imgs.py](https://github.com/oislen/cat_classifier/tree/main/02_prg_scrape_imgs.py)
-3. [03_prg_keras_model.py](https://github.com/oislen/cat_classifier/tree/main/03_prg_keras_model.py)
-4. [analysis_results.ipynb](https://github.com/oislen/cat_classifier/tree/main/analysis_results.ipynb)
-5. [cons.py](https://github.com/oislen/cat_classifier/tree/main/cons.py)
-6. [Dockerfile](https://github.com/oislen/cat_classifier/tree/main/Dockerfile)
-7. [exeDocker.bat](https://github.com/oislen/cat_classifier/tree/main/exeDocker.bat)
-8. [requirements.txt](https://github.com/oislen/cat_classifier/tree/main/requirements.txt)
 
 * The __01_prg_kaggle_data.py__ script downloads / unzips the cat vs dogs competition data.
 * The __02_prg_scrape_imgs.py__ script scrapes additional cat and dog images from [freeimages.com](https://www.freeimages.com/).
