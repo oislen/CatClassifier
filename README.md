@@ -21,12 +21,17 @@ The main dog and cat image classification application is contained within the ro
 
 * The __01_prg_kaggle_data.py__ script downloads / unzips the cat vs dogs competition data.
 * The __02_prg_scrape_imgs.py__ script scrapes additional cat and dog images from [freeimages.com](https://www.freeimages.com/).
-* The  __03_prg_keras_model.py__ script trains, fits and makes image predictions of the cat and dog images using a CNN model.
+* The __03_prg_keras_model.py__ script trains, fits and makes image predictions of the cat and dog images using a CNN model.
 * The __analysis_results.ipynb__ file contains a high level summary aof the analysis results.
 * The __cons.py__ script contains programme constants and configurations.
 * The __Dockerfile__ builds the application container for deployment on ec2.
 * The __exeDocker.bat__ executes the Docker build process locally on windows.
 * The __requirements.txt__ file contains the python package dependencies for the application.
+
+## Analysis Results
+
+See the analysis results notebook for a summary of the project; including image processing, CNN architecture and model performance.
+* https://github.com/oislen/Cat-Classifier/blob/main/notebooks/analysis_results.ipynb
 
 ## Docker Container
 
