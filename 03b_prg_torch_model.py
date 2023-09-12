@@ -30,12 +30,14 @@ import cons
 filenames = os.listdir(cons.train_fdir)
 categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
 df = pd.DataFrame({'filename': filenames, 'category': categories})
+frac = 0.05
+df = df.sample(frac = frac)
 df["category"] = df["category"]#.replace({0: 'cat', 1: 'dog'}) 
 df['source'] = df['filename'].str.contains(pat = '[cat|dog].[0-9]+\.jpg', regex = True).map({True:'kaggle', False:'webscraper'})
 df["filepath"] = cons.train_fdir + '/' + df['filename']
 
 # prepare data
-validate_df = df[df['source'] == 'kaggle'].sample(n = 5000, random_state = 42)
+validate_df = df[df['source'] == 'kaggle'].sample(n = int(5000 * frac), random_state = 42)
 train_df = df[~df.index.isin(validate_df.index)]
 train_df = train_df.reset_index(drop=True)
 validate_df = validate_df.reset_index(drop=True)
@@ -70,57 +72,77 @@ learning_rate = 0.001
 
 # initiate LeNet5 architecture
 model = AlexNet8(num_classes=2).to(device)
-#model = CNN().to(device)
-
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+#model = CNN().to(device)
 
-n_total_steps = len(train_loader)
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(train_loader):
-        # origin shape: [4, 3, 32, 32] = 4, 3, 1024
-        # input layer: 3 input channels, 6 output channels, 5 kernel size
-        image = images.to(device)
-        label = labels.to(device)
+def fit_torch(model, device, criterion, optimizer, train_loader, num_epochs = 4):
+    """
+    """
+    train_loss_list = []
+    train_acc_list = []
+    model = model.to(device)
+    n_total_steps = len(train_loader)
+    for epoch in range(num_epochs):
+        t_loss, t_corr = 0.0, 0.0
+        model.train()
+        for i, (images, labels) in enumerate(train_loader):
+            # origin shape: [4, 3, 32, 32] = 4, 3, 1024
+            # input layer: 3 input channels, 6 output channels, 5 kernel size
+            inputs = images.to(device)
+            label = labels.to(device)
 
-        # forward pass
-        outputs = model(image)
-        loss = criterion(outputs, label)
+            # forward pass
+            preds = model(inputs)
+            loss = criterion(preds, label)
 
-        # backward and optimise
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            # backward and optimise
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        if (i+1)% 2000 == 0:
+            # calculate metrics
+            t_loss += loss.item() * inputs.size(0)
+            t_corr += torch.sum(preds.argmax(1) == labels) 
             print(f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
-print('Finished Training')
+        train_loss = t_loss / len(train_loader.dataset)
+        train_acc = t_corr.cpu().numpy() / len(train_loader.dataset)
+        train_loss_list.append(train_loss)
+        train_acc_list.append(train_acc)  
+        print('Train Loss: {:.4f} Accuracy: {:.4f}%'.format(train_loss, train_acc * 100))
 
-with torch.no_grad():
-    n_correct = 0
-    n_samples = 0
-    n_class_correct = [0 for i in range(10)]
-    n_class_samples = [0 for i in range(10)]
-    for images, labels in validation_loader:
-        images = images.to(device)
-        labels = labels.to(device)
-        output  = model(images)
-        # max returns (value, index)
-        _, predicted = torch.max(outputs, 1)
-        n_samples += labels.size(0)
-        n_correct += (predicted == labels).sum().item()
+    print('Finished Training')
+    return model, train_loss_list, train_acc_list
 
-        for i in range(batch_size):
-            label = labels[i]
-            pred = predicted[i]
-            if (label == pred):
-                n_class_correct[label] += 1
-            n_class_samples[label] += 1
-    
-    for i in range(2):
-        acc = 100.0 * n_correct / n_class_samples[i]
-        print(f'Accuracy of {i}: {acc}%')
-    
+model, train_loss_list, train_acc_list = fit_torch(model, device, criterion, optimizer, train_loader, num_epochs = 4)
+
+def training_plot(train_loss_list, train_acc_list):
+    """
+    """
+    num_epochs = len(train_loss_list)
+    plt.figure()
+    plt.title('Train Loss and Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('')
+    plt.plot(range(1, num_epochs+1), np.array(train_loss_list), color='blue', linestyle='-', label='Train_Loss')
+    plt.plot(range(1, num_epochs+1), np.array(train_acc_list), color='red', linestyle='-', label='Train_Accuracy')
+    plt.legend()
+    plt.show() 
+    return 0
+
+def validation_accuaracy():
+    """
+    """
+    v_corr = 0.0    
+    model.eval()
+    with torch.no_grad():
+        for inputs, labels in validation_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            preds = model(inputs)
+            v_corr += torch.sum(preds.argmax(1) == labels)
+            
+        print('Accuracy: {:.4f}%'.format((v_corr / len(validation_loader.dataset)) * 100))
 
 
