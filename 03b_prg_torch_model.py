@@ -7,6 +7,7 @@ from torchvision import transforms
 
 # load custom scripts
 from model.torch.AlexNet8 import AlexNet8
+from model.torch.LeNet5 import LeNet5
 from model.torch.CustomDataset import CustomDataset
 from model.torch.fit_torch import fit_torch
 from model.torch.validation_accuaracy import validation_accuaracy
@@ -33,7 +34,7 @@ total_train = train_df.shape[0]
 total_validate = validate_df.shape[0]
 
 transform = transforms.Compose([
-    transforms.Resize([224, 224]),  # resize the input image to a uniform size
+    transforms.Resize([128, 128]),  # resize the input image to a uniform size
     transforms.ToTensor(),  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
     transforms.Normalize(   # standardized processing
         mean=[0.485, 0.456, 0.406],
@@ -58,6 +59,7 @@ learning_rate = 0.001
 
 # initiate LeNet5 architecture
 model = AlexNet8(num_classes=2).to(device)
+model = LeNet5(num_classes=2).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
