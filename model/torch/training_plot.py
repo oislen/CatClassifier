@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def training_plot(train_loss_list, train_acc_list):
     """
