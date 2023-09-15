@@ -8,6 +8,7 @@ from torchvision import transforms
 # load custom scripts
 from model.torch.AlexNet8 import AlexNet8
 from model.torch.LeNet5 import LeNet5
+from model.torch.VGG16 import VGG16
 from model.torch.CustomDataset import CustomDataset
 from model.torch.fit_torch import fit_torch
 from model.torch.validation_accuaracy import validation_accuaracy
@@ -57,9 +58,10 @@ num_epochs = 4
 batch_size = 4
 learning_rate = 0.001
 
-# initiate LeNet5 architecture
+# initiate cnn architecture
 model = AlexNet8(num_classes=2).to(device)
 model = LeNet5(num_classes=2).to(device)
+model = VGG16(num_classes=2).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
