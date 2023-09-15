@@ -45,7 +45,7 @@ class VGG16(nn.Module):
         )
         self.classifier = nn.Sequential(
             # first dense layer with dropout regularization
-            nn.Linear(in_features=8192, out_features=4096),
+            nn.Linear(in_features=512*4*4, out_features=4096),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.25),
             # second dense layer with dropout regularization

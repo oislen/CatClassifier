@@ -14,7 +14,7 @@ class LeNet5(nn.Module):
             nn.AvgPool2d(kernel_size=(2, 2), stride=(2, 2))
         )
         self.classifier = nn.Sequential(
-            nn.Linear(in_features = 13456, out_features = 120),
+            nn.Linear(in_features = 16*29*29, out_features = 120),
             nn.ReLU(inplace=True),
             nn.Dropout(p = 0.25),
             nn.Linear(in_features = 120, out_features = 84),
