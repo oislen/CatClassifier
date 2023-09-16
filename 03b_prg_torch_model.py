@@ -9,8 +9,8 @@ from torchvision import transforms
 # load custom scripts
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
-from model.torch.fit_torch import fit_torch
-from model.torch.validation_accuaracy import validation_accuaracy
+from model.torch.fit import fit
+from model.torch.validate import validate
 from data_prep.utilities.plot_preds import plot_preds
 import cons
 
@@ -64,12 +64,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = VGG16_pretrained(num_classes=2).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
 
 # fit torch model
-model, train_loss_list, train_acc_list = fit_torch(model, device, criterion, optimizer, train_loader, num_epochs = num_epochs)
+model, train_loss_list, train_acc_list = fit(model, device, criterion, optimizer, train_loader, num_epochs = num_epochs, scheduler=scheduler)
 
 # calculate validation accuracy
-validation_accuaracy(model, device, validation_loader)
+validate(model, device, validation_loader,criterion)
 
 # save model
 model.save(output_fpath=cons.torch_model_pt_fpath)
