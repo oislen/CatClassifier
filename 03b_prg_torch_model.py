@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 # load custom scripts
-from model.torch.ResNet50_pretrained import ResNet50_pretrained
+from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.torch.fit_torch import fit_torch
 from model.torch.validation_accuaracy import validation_accuaracy
@@ -61,7 +61,7 @@ validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffl
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # initiate cnn architecture
-model = ResNet50_pretrained(num_classes=2).to(device)
+model = VGG16_pretrained(num_classes=2).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -75,7 +75,7 @@ validation_accuaracy(model, device, validation_loader)
 model.save(output_fpath=cons.torch_model_pt_fpath)
 
 # load model
-model = ResNet50_pretrained(num_classes=2).to(device)
+model = VGG16_pretrained(num_classes=2).to(device)
 model.load(input_fpath=cons.torch_model_pt_fpath)
 
 # prepare test data
