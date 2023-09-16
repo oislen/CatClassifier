@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
 import numpy as np
+# load custom modules
+from model.torch.predict import predict as predict_module
+from model.torch.save import save as save_module
+from model.torch.load import load as load_module
 
 class AlexNet8(nn.Module):
     def __init__(self, num_classes=1000):
@@ -36,23 +40,13 @@ class AlexNet8(nn.Module):
         return x
 
     def predict(self, dataloader, device):
-        fin_outputs = []
-        with torch.no_grad():
-            for i, (images, labels) in enumerate(dataloader):
-                images = images.to(device)
-                labels = labels.to(device)
-                outputs = self.forward(images)
-                fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
-                proba = np.array(fin_outputs)
+        proba = predict_module(self, dataloader, device)
         return proba
     
     def save(self, output_fpath):
-        torch.save(self.state_dict(), output_fpath)
-        msg = f'Saved to {output_fpath}'
+        msg = save_module(self, output_fpath)
         return msg
     
     def load(self, input_fpath):
-        self.load_state_dict(torch.load(input_fpath))
-        self.eval()
-        msg = f'Loaded from {input_fpath}'
+        msg = load_module(self, input_fpath)
         return msg
