@@ -10,8 +10,8 @@ from torchvision import transforms
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.torch.fit import fit
-from model.torch.validate import validate
 from data_prep.utilities.plot_preds import plot_preds
+from model.plot_model import plot_model_fit
 import cons
 
 # create a dataframe of filenames and categories
@@ -67,10 +67,10 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
 
 # fit torch model
-model, train_loss_list, train_acc_list = fit(model, device, criterion, optimizer, train_loader, num_epochs = num_epochs, scheduler=scheduler)
+model, model_fit = fit(model=model, device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader)
 
-# calculate validation accuracy
-validate(model, device, validation_loader,criterion)
+# plot model fits
+plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
 
 # save model
 model.save(output_fpath=cons.torch_model_pt_fpath)
