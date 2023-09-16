@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import numpy as np
 
 class AlexNet8(nn.Module):
     def __init__(self, num_classes=1000):
@@ -34,3 +34,23 @@ class AlexNet8(nn.Module):
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
+
+    def predict(self, dataloader, device):
+        fin_outputs = []
+        with torch.no_grad():
+            for i, (images, labels) in enumerate(dataloader):
+                images = images.to(device)
+                labels = labels.to(device)
+                outputs = self.forward(images)
+                fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+                proba = np.array(fin_outputs)
+        return proba
+    
+    def save(self, output_fpath):
+        torch.save(self.state_dict(), output_fpath)
+        return 0
+    
+    def load(self, input_fpath):
+        self.load_state_dict(torch.load(input_fpath))
+        self.eval()
+        return 0
