@@ -74,9 +74,11 @@ class VGG16(nn.Module):
     
     def save(self, output_fpath):
         torch.save(self.state_dict(), output_fpath)
-        return 0
+        msg = f'Saved to {output_fpath}'
+        return msg
     
     def load(self, input_fpath):
         self.load_state_dict(torch.load(input_fpath))
         self.eval()
-        return 0
+        msg = f'Loaded from {input_fpath}'
+        return msg
