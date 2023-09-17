@@ -14,6 +14,8 @@ from model.torch.CustomDataset import CustomDataset
 from model.plot_model import plot_model_fit
 from data_prep.utilities.plot_preds import plot_preds
 from data_prep.utilities.plot_image import plot_image
+from data_prep.utilities.plot_generator import plot_generator
+from data_prep.utilities.load_image import load_image
 import cons
 
 # create a dataframe of filenames and categories
@@ -44,11 +46,12 @@ total_train = train_df.shape[0]
 total_validate = validate_df.shape[0]
 
 transform = transforms.Compose([
-    transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT]),  # resize the input image to a uniform size
-    transforms.ToTensor(),  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
-    transforms.Normalize(   # standardized processing
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225])
+    transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
+    ,transforms.RandomRotation(30)
+    ,transforms.RandomHorizontalFlip(p=0.05)
+    ,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
+    ,transforms.ToTensor()  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
+    ,transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # standardized processing
 ])
 
 # hyper-parameters
@@ -64,7 +67,9 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 validation_dataset = CustomDataset(train_df, transform, mode = 'train')
 validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
 
-# TODO: adapt plot_generator to plot an image from the train_loader
+# datagen example
+example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
+plot_generator(generator = example_generator, mode = 'torch', output_fpath = cons.generator_plot_fpath)
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
