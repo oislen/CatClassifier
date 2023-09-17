@@ -1,17 +1,19 @@
 import os
 import pandas as pd 
 import numpy as np
+import random
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
+from tensorflow.keras.preprocessing.image import load_img
 
 # load custom scripts
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
-from model.torch.fit import fit
-from data_prep.utilities.plot_preds import plot_preds
 from model.plot_model import plot_model_fit
+from data_prep.utilities.plot_preds import plot_preds
+from data_prep.utilities.plot_image import plot_image
 import cons
 
 # create a dataframe of filenames and categories
@@ -25,6 +27,11 @@ df["categoryname"] = df["category"].replace(category_mapper)
 df['source'] = df['filename'].str.contains(pat = '[cat|dog].[0-9]+\.jpg', regex = True).map({True:'kaggle', False:'webscraper'})
 df["filepath"] = cons.train_fdir + '/' + df['filename']
 
+# random image plot
+sample = random.choice(filenames)
+image = load_img(os.path.join(cons.train_fdir, sample))
+plot_image(image, output_fpath = cons.random_image_fpath)
+
 # prepare data
 random_state = 42
 validate_df = df[df['source'] == 'kaggle'].sample(n = int(5000 * frac), random_state = random_state)
@@ -37,7 +44,7 @@ total_train = train_df.shape[0]
 total_validate = validate_df.shape[0]
 
 transform = transforms.Compose([
-    transforms.Resize([128, 128]),  # resize the input image to a uniform size
+    transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT]),  # resize the input image to a uniform size
     transforms.ToTensor(),  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
     transforms.Normalize(   # standardized processing
         mean=[0.485, 0.456, 0.406],
@@ -57,6 +64,8 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 validation_dataset = CustomDataset(train_df, transform, mode = 'train')
 validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
 
+# TODO: adapt plot_generator to plot an image from the train_loader
+
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -67,10 +76,10 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
 
 # fit torch model
-model, model_fit = fit(model=model, device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader)
+model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader)
 
 # plot model fits
-plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
+plot_model_fit(model_fit = model.model_fit, output_fdir = cons.report_fdir)
 
 # save model
 model.save(output_fpath=cons.torch_model_pt_fpath)
