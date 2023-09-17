@@ -21,8 +21,8 @@ class ResNet50_pretrained(nn.Module):
         x = self.classifier(x)
         return x
 
-    def fit(self, device, criterion, optimizer, train_dataloader, num_epochs = 4, scheduler = None, valid_dataLoader = None, early_stopping = False):
-        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopping)
+    def fit(self, device, criterion, optimizer, train_dataloader, num_epochs = 4, scheduler = None, valid_dataLoader = None, early_stopper = None):
+        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper)
 
     def validate(self, device, dataloader, criterion):
         valid_loss, valid_acc = validate_module(self, device, dataloader, criterion)
