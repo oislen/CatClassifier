@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing.image import load_img
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.plot_model import plot_model_fit
+from model.torch.EarlyStopper import EarlyStopper
 from data_prep.utilities.plot_preds import plot_preds
 from data_prep.utilities.plot_image import plot_image
 from data_prep.utilities.plot_generator import plot_generator
@@ -22,8 +23,8 @@ import cons
 filenames = os.listdir(cons.train_fdir)
 categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
 df = pd.DataFrame({'filename': filenames, 'category': categories})
-frac = 0.05
-df = df.sample(frac = frac)
+#frac = 0.05
+#df = df.sample(frac = frac)
 category_mapper = {0: 'cat', 1: 'dog'}
 df["categoryname"] = df["category"].replace(category_mapper) 
 df['source'] = df['filename'].str.contains(pat = '[cat|dog].[0-9]+\.jpg', regex = True).map({True:'kaggle', False:'webscraper'})
@@ -36,7 +37,7 @@ plot_image(image, output_fpath = cons.random_image_fpath)
 
 # prepare data
 random_state = 42
-validate_df = df[df['source'] == 'kaggle'].sample(n = int(5000 * frac), random_state = random_state)
+validate_df = df[df['source'] == 'kaggle']#.sample(n = int(5000 * frac), random_state = random_state)
 train_df = df[~df.index.isin(validate_df.index)]
 train_df = train_df.reset_index(drop=True)
 validate_df = validate_df.reset_index(drop=True)
@@ -55,7 +56,7 @@ transform = transforms.Compose([
 ])
 
 # hyper-parameters
-num_epochs = 4
+num_epochs = 25
 batch_size = 64
 learning_rate = 0.001
 
@@ -79,9 +80,10 @@ model = VGG16_pretrained(num_classes=2).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
+early_stopper = EarlyStopper(patience=3, min_delta=0.3)
 
 # fit torch model
-model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader)
+model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper)
 
 # plot model fits
 plot_model_fit(model_fit = model.model_fit, output_fdir = cons.report_fdir)
