@@ -2,7 +2,7 @@ import torch
 from model.torch.validate import validate
 from model.torch.ModelFit import ModelFit
 
-def fit(model, device, criterion, optimizer, train_dataloader, num_epochs = 4, scheduler = None, valid_dataLoader = None, early_stopping = False):
+def fit(model, device, criterion, optimizer, train_dataloader, num_epochs = 4, scheduler = None, valid_dataLoader = None, early_stopper = None):
     """
     """
     train_loss_list, train_acc_list, valid_loss_list, valid_acc_list = [], [], [], []
@@ -40,6 +40,10 @@ def fit(model, device, criterion, optimizer, train_dataloader, num_epochs = 4, s
             valid_loss_list.append(valid_loss)
             valid_acc_list.append(valid_acc)
             print(f'Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}')
+            # if implementing early stopping
+            if early_stopper != None and early_stopper.early_stop(valid_loss):
+                print(f"Applying early stopping criteria at validation loss: {valid_loss}")
+                break
     # create model fit object
     model_fit = ModelFit(loss=train_loss_list, accuracy=train_acc_list, val_loss=valid_loss_list, val_accuracy=valid_acc_list)
     return model, model_fit
