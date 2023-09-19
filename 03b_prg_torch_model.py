@@ -23,8 +23,8 @@ import cons
 filenames = os.listdir(cons.train_fdir)
 categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
 df = pd.DataFrame({'filename': filenames, 'category': categories})
-#frac = 0.05
-#df = df.sample(frac = frac)
+frac = 0.05
+df = df.sample(frac = frac)
 category_mapper = {0: 'cat', 1: 'dog'}
 df["categoryname"] = df["category"].replace(category_mapper) 
 df['source'] = df['filename'].str.contains(pat = '[cat|dog].[0-9]+\.jpg', regex = True).map({True:'kaggle', False:'webscraper'})
@@ -33,11 +33,11 @@ df["filepath"] = cons.train_fdir + '/' + df['filename']
 # random image plot
 sample = random.choice(filenames)
 image = load_img(os.path.join(cons.train_fdir, sample))
-plot_image(image, output_fpath = cons.random_image_fpath)
+plot_image(image, output_fpath = cons.torch_random_image_fpath)
 
 # prepare data
 random_state = 42
-validate_df = df[df['source'] == 'kaggle']#.sample(n = int(5000 * frac), random_state = random_state)
+validate_df = df[df['source'] == 'kaggle'].sample(n = int(5000 * frac), random_state = random_state)
 train_df = df[~df.index.isin(validate_df.index)]
 train_df = train_df.reset_index(drop=True)
 validate_df = validate_df.reset_index(drop=True)
@@ -48,15 +48,15 @@ total_validate = validate_df.shape[0]
 
 transform = transforms.Compose([
     transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
-    ,transforms.RandomRotation(30)
-    ,transforms.RandomHorizontalFlip(p=0.05)
-    ,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
+    #,transforms.RandomRotation(30)
+    #,transforms.RandomHorizontalFlip(p=0.05)
+    #,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
     ,transforms.ToTensor()  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
     ,transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # standardized processing
 ])
 
 # hyper-parameters
-num_epochs = 25
+num_epochs = 4
 batch_size = 64
 learning_rate = 0.001
 
@@ -70,7 +70,7 @@ validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffl
 
 # datagen example
 example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
-plot_generator(generator = example_generator, mode = 'torch', output_fpath = cons.generator_plot_fpath)
+plot_generator(generator = example_generator, mode = 'torch', output_fpath = cons.torch_generator_plot_fpath)
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -86,7 +86,7 @@ early_stopper = EarlyStopper(patience=3, min_delta=0.3)
 model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs = num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper)
 
 # plot model fits
-plot_model_fit(model_fit = model.model_fit, output_fdir = cons.report_fdir)
+plot_model_fit(model_fit = model.model_fit, output_fdir = cons.torch_report_fdir)
 
 # save model
 model.save(output_fpath=cons.torch_model_pt_fpath)
@@ -113,7 +113,7 @@ test_df['category'] = np.argmax(predict, axis=-1)
 test_df["category"] = test_df["category"].replace(category_mapper) 
 
 # plot random sample predictions
-plot_preds(data = test_df, cons = cons, output_fpath = cons.pred_images_fpath)
+plot_preds(data = test_df, cons = cons, output_fpath = cons.torch_pred_images_fpath)
 
 # make submission
 submission_df = test_df.copy()
