@@ -29,7 +29,7 @@ df['source'] = df['filename'].str.contains(pat = '[cat|dog].[0-9]+\.jpg', regex 
 # random image plot
 sample = random.choice(filenames)
 image = load_img(os.path.join(cons.train_fdir, sample))
-plot_image(image, output_fpath = cons.random_image_fpath)
+plot_image(image, output_fpath = cons.keras_random_image_fpath)
 
 # prepare data
 validate_df = df[df['source'] == 'kaggle'].sample(n = 5000, random_state = 42)
@@ -52,7 +52,7 @@ validation_generator = validation_datagen.flow_from_dataframe(dataframe = valida
 # datagen example
 example_df = train_df.sample(n=1).reset_index(drop=True)
 example_generator = train_datagen.flow_from_dataframe(dataframe = example_df, directory = cons.train_fdir, x_col='filename', y_col='category', target_size=cons.IMAGE_SIZE, class_mode='categorical')
-plot_generator(generator = example_generator, output_fpath = cons.generator_plot_fpath)
+plot_generator(generator = example_generator, output_fpath = cons.keras_generator_plot_fpath)
 
 # initiate LeNet5 architecture
 keras_model = AlexNet8(input_shape = cons.input_shape, n_classes = 2, output_activation = 'softmax')
@@ -85,7 +85,7 @@ with open(cons.model_fit_pickle_fpath, 'wb') as handle:
     pickle.dump(model_fit, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 # plot model fits
-plot_model_fit(model_fit = model_fit, output_fdir = cons.report_fdir)
+plot_model_fit(model_fit = model_fit, output_fdir = cons.keras_report_fdir)
 
 # save model fit
 keras_model.save(cons.keras_model_pickle_fpath, save_format = "h5")
@@ -107,7 +107,7 @@ label_map = dict((v,k) for k,v in train_generator.class_indices.items())
 test_df['category'] = test_df['category'].replace(label_map)
 
 # plot random sample predictions
-plot_preds(data = test_df, cons = cons, output_fpath = cons.pred_images_fpath)
+plot_preds(data = test_df, cons = cons, output_fpath = cons.keras_pred_images_fpath)
 
 # make submission
 submission_df = test_df.copy()
