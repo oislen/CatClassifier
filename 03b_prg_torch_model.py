@@ -16,7 +16,6 @@ from model.torch.EarlyStopper import EarlyStopper
 from data_prep.utilities.plot_preds import plot_preds
 from data_prep.utilities.plot_image import plot_image
 from data_prep.utilities.plot_generator import plot_generator
-from data_prep.utilities.load_image import load_image
 import cons
 
 # create a dataframe of filenames and categories
