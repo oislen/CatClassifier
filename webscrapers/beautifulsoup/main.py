@@ -1,6 +1,7 @@
 # TODO: apply multiprocessing to for loops
 import os
 import requests
+import logging
 import numpy as np
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
@@ -10,13 +11,13 @@ def gen_urls(n_images, home_url, search):
     """
     This function generates all relevant page urls for scraping
     """
-    print('Scraping urls ...')
+    logging.info('Scraping urls ...')
     # create list of urls for scraping
     urls = []
     skip = 100
     npages = int(np.ceil(n_images / skip))
     for i in range(npages):
-        print(i)
+        logging.info(i)
         skip_param = str(i * skip)
         html_query = f'search/?q={search}&skip={skip_param}'
         url = urljoin(home_url, html_query)
@@ -27,12 +28,12 @@ def scrape_srcs(n_images, home_url, urls):
     """
     This function scrapes image scrs from the given urls
     """
-    print('Scraping srcs ...')
+    logging.info('Scraping srcs ...')
     # parse image sources from urls
     image_cnt = 0
     srcs= []
     for url in urls:
-        print(url)
+        logging.info(url)
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
         root_table_level = soup.find("div", {"id":"spiccont"})
@@ -52,7 +53,7 @@ def download_src(src, output_dir, search):
     image_fstem = src.split('/')[-1]
     image_fname = f'{search}.{image_fstem}'
     image_fpath = os.path.join(output_dir, image_fname)
-    print(image_fpath)
+    logging.info(image_fpath)
     with open(image_fpath, 'wb') as handler:
         handler.write(img_data)
     return 0
