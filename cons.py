@@ -7,7 +7,6 @@ root_fdir = 'E:\\GitHub\\Cat-Classifier' if platform.system() == 'Windows' else 
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
-kaggle_fdir = os.path.join(root_fdir, 'kaggle')
 model_fdir = os.path.join(root_fdir, 'model')
 report_fdir = os.path.join(root_fdir, 'report')
 keras_report_fdir = os.path.join(report_fdir, 'keras')
@@ -37,7 +36,7 @@ torch_generator_plot_fpath = os.path.join(torch_report_fdir, 'generator_plot.jpg
 torch_pred_images_fpath = os.path.join(torch_report_fdir, 'pred_images.jpg')
 
 # set list containing all required directories
-root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, model_fdir, report_fdir, keras_report_fdir, torch_report_fdir, test_fdir, train_fdir, webscrapers_fdir]
+root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, model_fdir, report_fdir, keras_report_fdir, torch_report_fdir, test_fdir, train_fdir, webscrapers_fdir]
 sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir]
 
 # append directories to path
