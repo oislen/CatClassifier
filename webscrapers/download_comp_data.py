@@ -2,6 +2,7 @@
 import os
 import subprocess
 import zipfile
+import logging
 
 def download_comp_data(comp_name,
                        data_dir,
@@ -52,7 +53,7 @@ def download_comp_data(comp_name,
     
     """
     
-    print('checking inputs ...')
+    logging.info('checking inputs ...')
     
     # check for string data types
     str_types = [comp_name, data_dir]
@@ -64,7 +65,7 @@ def download_comp_data(comp_name,
     if any([type(bool_inp) != bool for bool_inp in bool_types]):
         raise TypeError('Input Type Error: the input parameters [download_data, unzip_data, del_zip] must be boolean data types.')
     
-    print('create zip file path ...')
+    logging.info('create zip file path ...')
           
     # define filenames
     zip_data_fname = '{}.zip'.format(comp_name)
@@ -74,7 +75,7 @@ def download_comp_data(comp_name,
     zip_train_fpath = os.path.join(data_dir, 'train.zip')
     zip_test_fpath = os.path.join(data_dir, 'test1.zip')
     
-    print('checking for data directory ...')
+    logging.info('checking for data directory ...')
         
     # check data directory exists
     if os.path.exists(data_dir) == False:
@@ -85,12 +86,12 @@ def download_comp_data(comp_name,
     # otherwise
     else:
         
-        print('data directory exists: {}'.format(data_dir))
+        logging.info('data directory exists: {}'.format(data_dir))
     
     # if redownloading the data
     if download_data == True:
         
-        print('downing kaggle data ..')
+        logging.info('downing kaggle data ..')
         
         # define the kaggle api command to download the data
         kaggle_cmd = 'kaggle competitions download -c {} -p {}'.format(comp_name, data_dir)
@@ -110,30 +111,30 @@ def download_comp_data(comp_name,
         # otherwise
         else:
             
-            print('unzipping data ...')
+            logging.info('unzipping data ...')
             
             # read zip file
             with zipfile.ZipFile(zip_data_fpath, "r") as zip_ref:
                 
                 # extract files
                 zip_ref.extractall(data_dir)
-    
+            
             # read zip file
             with zipfile.ZipFile(zip_train_fpath, "r") as zip_ref:
                 
                 # extract files
                 zip_ref.extractall(data_dir)
-
+            
             # read zip file
             with zipfile.ZipFile(zip_test_fpath, "r") as zip_ref:
                 
                 # extract files
                 zip_ref.extractall(data_dir)
-
+    
     # if deleting zip file
     if del_zip == True:
         
-        print('deleting zip file ..')
+        logging.info('deleting zip file ..')
         
         # delete zip file
         os.remove(path = zip_data_fpath)
