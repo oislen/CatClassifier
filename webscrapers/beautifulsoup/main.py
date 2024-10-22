@@ -7,19 +7,20 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
 from beartype import beartype
+import cons
 
 @beartype
-def gen_urls(n_images:int, home_url:str, search:str) -> list:
+def gen_urls(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url) -> list:
     """This function generates all relevant page urls for scraping
     
     Parameters
     ----------
-    n_images : int
-        The number of images to scrape
-    home_url : str
-        The url of the home page to web scrape from
     search : str
         The text to search and scrape for
+    n_images : int
+        The number of images to scrape, default is cons.n_images
+    home_url : str
+        The url of the home page to web scrape from, default is cons.home_url
     
     Returns
     -------
@@ -40,17 +41,17 @@ def gen_urls(n_images:int, home_url:str, search:str) -> list:
     return urls
 
 @beartype
-def scrape_srcs(n_images:int, home_url:str, urls:list):
+def scrape_srcs(urls:list, n_images:int=cons.n_images, home_url:str=cons.home_url):
     """This function scrapes image scrs from the given urls
     
     Parameters
     ----------
-    n_images : int
-        The number of images to scrape
-    home_url : str
-        The url of the home page to web scrape from
     urls : list
         The image urls to scrape srcs for
+    n_images : int
+        The number of images to scrape, default is cons.n_images
+    home_url : str
+        The url of the home page to web scrape from, default is cons.home_url
     
     Returns
     -------
@@ -122,7 +123,7 @@ def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
     return results
 
 @beartype
-def main(search:str, n_images:int, home_url:str, output_dir:str):
+def main(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url, output_dir:str=cons.train_fdir):
     """The main beautiful soup webscrapping programme
 
     Parameters
@@ -130,11 +131,11 @@ def main(search:str, n_images:int, home_url:str, output_dir:str):
     search : str
         The text to search for
     n_images : int
-        The number of images to web scrape
+        The number of images to web scrape, default is cons.n_images
     home_url : str
-        The url for the home page to web scrape from
+        The url for the home page to web scrape from, default is cons.home_url
     output_dir : str
-        The output file directory to download the scraped images to
+        The output file directory to download the scraped images to, default is cons.train_fdir
 
     Returns
     -------
@@ -143,8 +144,8 @@ def main(search:str, n_images:int, home_url:str, output_dir:str):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok = True)
     # run function and scrape urls
-    urls = gen_urls(n_images, home_url, search)
+    urls = gen_urls(search=search, n_images=n_images, home_url=home_url)
     # run function and scrape srcs
-    srcs = scrape_srcs(n_images, home_url, urls)
+    srcs = scrape_srcs(urls=urls, n_images=n_images, home_url=home_url)
     # run function to download src
     multiprocess(download_src, [(src, output_dir, search) for src in srcs])
