@@ -1,2 +1,16 @@
+# ignore sub repos
 data
 .creds
+checkpoints
+
+# python cache
+__pycache__
+*.pyc
+
+#ipynob checkoukpoints
+.ipynb_checkpoints
+
+# quarto tmp files
+*.css
+*.woff
+*.js
