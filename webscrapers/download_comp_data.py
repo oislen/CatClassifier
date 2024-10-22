@@ -3,14 +3,10 @@ import os
 import subprocess
 import zipfile
 import logging
+from beartype import beartype
 
-def download_comp_data(comp_name,
-                       data_dir,
-                       download_data = True, 
-                       unzip_data = True, 
-                       del_zip = True
-                       ):
-    
+@beartype
+def download_comp_data(comp_name:str, data_dir:str, download_data:bool=True, unzip_data:bool=True, del_zip:bool=True):
     """Download Competition Data Documentation
 
     Parameters
