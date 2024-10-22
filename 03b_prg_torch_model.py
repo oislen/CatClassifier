@@ -1,9 +1,16 @@
 import os
-import logging
 import platform
+import logging
 import pandas as pd 
 import numpy as np
 import random
+
+# set huggingface hub directory
+if platform.system() == 'Windows':
+    huggingface_hub_dir = 'E:\\huggingface'
+    os.environ['TORCH_HOME'] = huggingface_hub_dir
+    os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -20,11 +27,22 @@ from data_prep.utilities.plot_image import plot_image
 from data_prep.utilities.plot_generator import plot_generator
 import cons
 
-# set huggingface hub directory
-if platform.system() == 'Windows':
-    huggingface_hub_dir = 'E:\\huggingface'
-    os.environ["TF_ENABLE_ONEDNN_OPTS"]="0"
-    os.environ['TORCH_HOME'] = huggingface_hub_dir
+# hyper-parameters
+num_epochs = 10
+batch_size = 64
+learning_rate = 0.001
+
+# device configuration
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+torch_transforms = transforms.Compose([
+    transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
+    #,transforms.RandomRotation(30)
+    #,transforms.RandomHorizontalFlip(p=0.05)
+    #,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
+    ,transforms.ToTensor()  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
+    ,transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # standardized processing
+])
 
 if __name__ == "__main__":
     
@@ -59,34 +77,17 @@ if __name__ == "__main__":
     total_train = train_df.shape[0]
     total_validate = validate_df.shape[0]
     
-    transform = transforms.Compose([
-        transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
-        #,transforms.RandomRotation(30)
-        #,transforms.RandomHorizontalFlip(p=0.05)
-        #,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
-        ,transforms.ToTensor()  # convert PIL Image or numpy.ndarray to tensor and normalize to somewhere between [0,1]
-        ,transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # standardized processing
-    ])
-    
-    # hyper-parameters
-    num_epochs = 10
-    batch_size = 64
-    learning_rate = 0.001
-    
     # set train datagen
-    train_dataset = CustomDataset(train_df, transform, mode='train')
+    train_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     
     # set validation datagen
-    validation_dataset = CustomDataset(train_df, transform, mode='train')
+    validation_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
     validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
     
     # datagen example
     example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
     plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath)
-    
-    # device configuration
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # initiate cnn architecture
     model = VGG16_pretrained(num_classes=2).to(device)
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     nb_samples = test_df.shape[0]
     
     # set train datagen
-    test_dataset = CustomDataset(test_df, transform, mode='test')
+    test_dataset = CustomDataset(test_df, transforms=torch_transforms, mode='test')
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     # make test set predictions
