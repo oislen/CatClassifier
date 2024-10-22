@@ -6,10 +6,25 @@ import numpy as np
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
+from beartype import beartype
 
-def gen_urls(n_images, home_url, search):
-    """
-    This function generates all relevant page urls for scraping
+@beartype
+def gen_urls(n_images:int, home_url:str, search:str) -> list:
+    """This function generates all relevant page urls for scraping
+    
+    Parameters
+    ----------
+    n_images : int
+        The number of images to scrape
+    home_url : str
+        The url of the home page to web scrape from
+    search : str
+        The text to search and scrape for
+    
+    Returns
+    -------
+    list
+        The urls to web scrape
     """
     logging.info('Scraping urls ...')
     # create list of urls for scraping
@@ -24,9 +39,23 @@ def gen_urls(n_images, home_url, search):
         urls.append(url)
     return urls
 
-def scrape_srcs(n_images, home_url, urls):
-    """
-    This function scrapes image scrs from the given urls
+@beartype
+def scrape_srcs(n_images:int, home_url:str, urls:list):
+    """This function scrapes image scrs from the given urls
+    
+    Parameters
+    ----------
+    n_images : int
+        The number of images to scrape
+    home_url : str
+        The url of the home page to web scrape from
+    urls : list
+        The image urls to scrape srcs for
+    
+    Returns
+    -------
+    list
+        The scrape image srcs
     """
     logging.info('Scraping srcs ...')
     # parse image sources from urls
@@ -45,9 +74,21 @@ def scrape_srcs(n_images, home_url, urls):
             if image_cnt == n_images:
                 return srcs
 
-def download_src(src, output_dir, search):
-    """
-    This function downloads a scraped image sources
+@beartype
+def download_src(src:str, output_dir:str, search:str):
+    """This function downloads a scraped image sources
+    
+    Parameters
+    ----------
+    src : str
+        The image src to download to disk
+    output_dir : str
+        The output file directory to download the image srcs to
+    search : str
+        The text searched and scraped for
+    
+    Returns
+    -------
     """
     img_data = requests.get(src).content
     image_fstem = src.split('/')[-1]
@@ -56,19 +97,47 @@ def download_src(src, output_dir, search):
     logging.info(image_fpath)
     with open(image_fpath, 'wb') as handler:
         handler.write(img_data)
-    return 0
 
-def multiprocess(func, args, ncpu = os.cpu_count()):
-    """
-    This utility function applyies another function in parallel given a specified number of cpus
+@beartype
+def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
+    """This utility function applyies another function in parallel given a specified number of cpus
+    
+    Parameters
+    ----------
+    func : function
+        The function to run in parallel
+    args : dict
+        The arguments to pass to the function
+    ncpu : int
+        The number of cpus to use for parallel processing, default is os.cpu_count()
+    
+    Returns
+    -------
+    list
+        The multiprocessing results
     """
     pool = Pool(ncpu)
     results = pool.starmap(func, args)
     pool.close()
     return results
 
-def main(search, n_images, home_url, output_dir):
-    """
+@beartype
+def main(search:str, n_images:int, home_url:str, output_dir:str):
+    """The main beautiful soup webscrapping programme
+
+    Parameters
+    ----------
+    search : str
+        The text to search for
+    n_images : int
+        The number of images to web scrape
+    home_url : str
+        The url for the home page to web scrape from
+    output_dir : str
+        The output file directory to download the scraped images to
+
+    Returns
+    -------
     """
     # if output directory does not exist
     if not os.path.exists(output_dir):
@@ -79,4 +148,3 @@ def main(search, n_images, home_url, output_dir):
     srcs = scrape_srcs(n_images, home_url, urls)
     # run function to download src
     multiprocess(download_src, [(src, output_dir, search) for src in srcs])
-    return 0
