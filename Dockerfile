@@ -24,10 +24,10 @@ RUN mkdir /home/${user}/Cat-Classifier/data
 RUN mkdir /home/${user}/Cat-Classifier/model/checkpoints
 
 # install required python packages
-RUN apt-get install -y python3 python3-venv python3-pip
-RUN python3 -m venv /opt/venv
+RUN apt-get install -y python3.12
+RUN python3.12 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN /opt/venv/bin/python3 -m pip install -v -r /home/${user}/Cat-Classifier/requirements.txt
+RUN /opt/venv/bin/python3.12 -m pip install -v -r /home/${user}/Cat-Classifier/requirements.txt
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
