@@ -16,3 +16,4 @@ jupyterlab
 torch
 torchvision
 #transformers
+beartype
