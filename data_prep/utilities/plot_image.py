@@ -1,7 +1,21 @@
 import matplotlib.pyplot as plt
+from beartype import beartype
+from typing import Union
 
-def plot_image(image_array, output_fpath = None):
-    """"""
+@beartype
+def plot_image(image_array, output_fpath:Union[str,None]=None):
+    """Plots an image array.
+
+    Parameters
+    ----------
+    image_array : PIL
+        The image to plot
+    output_fpath : str
+        The output file location to save the plot, default is None
+
+    Returns
+    -------
+    """
     # set plot figure size
     plt.figure(figsize = (8, 6))
     # plot image
@@ -12,4 +26,3 @@ def plot_image(image_array, output_fpath = None):
     # show plot
     plt.show()
     plt.close()
-    return 0
