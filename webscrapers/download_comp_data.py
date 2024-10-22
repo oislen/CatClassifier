@@ -11,46 +11,24 @@ def download_comp_data(comp_name,
                        del_zip = True
                        ):
     
-    """
-    
-    Download Competition Data Documentation
-    
-    Function Overview
-    
-    This function downloads the relevant competition data using the kaggle api.
-    The data is downloaded as a .zip file and extracted to a specified location.
-    The .zip file can be deleted once file extraction is completed.
-    
-    Defaults 
-    
-    download_comp_data(comp_name,
-                       data_dir,
-                       download_data = True, 
-                       unzip_data = True, 
-                       del_zip = True
-                       )
-    
+    """Download Competition Data Documentation
+
     Parameters
+    ----------
     
-    comp_name - String, the name of the competition to download data for.
-    data_dir - String, the data directory to download and extract the data to.
-    download_data - Boolean, whether or not to download the data, default is True.
-    unzip_data - Boolean, whether or not to unzip the data, default is True.
-    del_zip - Boolean, whether or not ti delete the zip file once data extraction is complete, default is True
+    comp_name : str
+        The name of the competition to download data for.
+    data_dir : str 
+        The data directory to download and extract the data to.
+    download_data : bool
+        Whether or not to download the data, default is True.
+    unzip_data : bool 
+        Whether or not to unzip the data, default is True.
+    del_zip : bool
+        Whether or not ti delete the zip file once data extraction is complete, default is True
     
     Returns
-    
-    0 for successful execution
-    
-    Example
-    
-    download_comp_data(comp_name = 'digit-recognizer',
-                       data_dir = 'C:\\Users\\User\\Documents\\GitHub\\Kaggle\\Digit_Recognizer',
-                       download_data = True, 
-                       unzip_data = True, 
-                       del_zip = True
-                       )
-    
+    -------
     """
     
     logging.info('checking inputs ...')
@@ -140,5 +118,3 @@ def download_comp_data(comp_name,
         os.remove(path = zip_data_fpath)
         os.remove(path = zip_train_fpath)
         os.remove(path = zip_test_fpath)
-        
-    return 0
