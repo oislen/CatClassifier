@@ -12,7 +12,7 @@ call docker build --no-cache -t %DOCKER_IMAGE% .
 
 :: run docker container
 SET UBUNTU_DIR=/home/ubuntu
-call docker run --shm-size=512m --publish 8889:8888 --volume E:\GitHub\Cat-Classifier\.cred:/home/ubuntu/Cat-Classifier/.cred -it %DOCKER_IMAGE%
+call docker run --shm-size=512m --publish 8889:8888 --volume E:\GitHub\Cat-Classifier\.cred:/home/ubuntu/Cat-Classifier/.cred  --volume E:\GitHub\Cat-Classifier\report:/home/ubuntu/Cat-Classifier/report -it %DOCKER_IMAGE%
 
 :: useful docker commands
 :: docker images
