@@ -1,7 +1,23 @@
 import torch 
 
-def validate(model, device, dataloader, criterion):
-    """
+def validate(model, device:torch.device, dataloader:torch.utils.data.DataLoader, criterion:torch.nn.CrossEntropyLoss) -> tuple:
+    """Calculates validation loss and accuracy
+    
+    Parameters
+    ----------
+    model : CustomModelClass
+        The customer torch model class object being fit
+    device : torch.device
+        The torch device to use when fitting the model
+    dataloader : torch.utils.data.DataLoader
+        The torch data loader to use when fitting the model
+    criterion : torch.nn.CrossEntropyLoss
+        The criterion to use when fitting the model
+    
+    Returns
+    -------
+    tuple
+        The validation loss and accuracy
     """ 
     model = model.to(device)
     model.eval()
@@ -20,6 +36,6 @@ def validate(model, device, dataloader, criterion):
         # update training loss and accuarcy
         valid_loss = v_loss / len(dataloader.dataset)
         valid_acc = v_corr.cpu().numpy() / len(dataloader.dataset)
-    return valid_loss, valid_acc
+    return (valid_loss, valid_acc)
 
 

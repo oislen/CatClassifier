@@ -1,9 +1,38 @@
 import torch 
 from model.torch.validate import validate
 from model.torch.ModelFit import ModelFit
+from model.torch.EarlyStopper import EarlyStopper
+from typing import Union
+from beartype import beartype
 
-def fit(model, device, criterion, optimizer, train_dataloader, num_epochs = 4, scheduler = None, valid_dataLoader = None, early_stopper = None):
+@beartype
+def fit(model, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None):
     """
+    Fits model to specified data loader given the criterion and optimizer
+    
+    Parameters
+    ----------
+    model : CustomModelClass
+        The customer torch model class object being fit
+    device : torch.device
+        The torch device to use when fitting the model
+    criterion : torch.nn.CrossEntropyLoss
+        The criterion to use when fitting the model
+    optimizer : torch.optim.SGD
+        The torch optimizer to use when fitting the model
+    train_dataloader : torch.utils.data.DataLoader
+        The torch data loader to use when fitting the model
+    num_epochs : int
+        The number of training epochs, default is 4
+    scheduler : torch.optim.lr_scheduler.ReduceLROnPlateau
+        The torch scheduler to use when fitting the model, default is None
+    valid_dataLoader : torch.utils.data.DataLoader
+        The torch data loader to use for validation when fitting the model, default is None
+    early_stopper : EarlyStopper
+        The EarlyStopper object for halting fitting when performing validation
+    
+    Returns
+    -------
     """
     train_loss_list, train_acc_list, valid_loss_list, valid_acc_list = [], [], [], []
     model = model.to(device)
