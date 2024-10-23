@@ -1,1 +1,1 @@
-call python webscrapers\prg_torch_model.py
+call python model\prg_torch_model.py
