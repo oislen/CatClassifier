@@ -27,7 +27,6 @@ def gen_urls(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url)
     list
         The urls to web scrape
     """
-    logging.info('Scraping urls ...')
     # create list of urls for scraping
     urls = []
     skip = 100
@@ -58,7 +57,6 @@ def scrape_srcs(urls:list, n_images:int=cons.n_images, home_url:str=cons.home_ur
     list
         The scrape image srcs
     """
-    logging.info('Scraping srcs ...')
     # parse image sources from urls
     image_cnt = 0
     srcs= []
@@ -143,8 +141,10 @@ def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_ur
     # if output directory does not exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok = True)
+    logging.info('Scraping urls ...')
     # run function and scrape urls
     urls = gen_urls(search=search, n_images=n_images, home_url=home_url)
+    logging.info('Scraping srcs ...')
     # run function and scrape srcs
     srcs = scrape_srcs(urls=urls, n_images=n_images, home_url=home_url)
     # run function to download src

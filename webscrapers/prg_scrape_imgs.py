@@ -10,6 +10,7 @@ if __name__ == '__main__':
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
 
+    logging.info('Downloading kaggle data ...')
     # download competition data
     download_comp_data(
         comp_name=cons.comp_name,
@@ -19,6 +20,7 @@ if __name__ == '__main__':
         del_zip=cons.del_zip
         )
 
+    logging.info('Running image webscraper ...')
     # run main function
     webscraper(search='cat', n_images=cons.n_images, home_url=cons.home_url, output_dir=cons.train_fdir)
     webscraper(search='dog', n_images=cons.n_images, home_url=cons.home_url, output_dir=cons.train_fdir)
