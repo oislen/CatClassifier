@@ -22,9 +22,9 @@ from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.plot_model import plot_model_fit
 from model.torch.EarlyStopper import EarlyStopper
-from data_prep.utilities.plot_preds import plot_preds
-from data_prep.utilities.plot_image import plot_image
-from data_prep.utilities.plot_generator import plot_generator
+from model.utilities.plot_preds import plot_preds
+from model.utilities.plot_image import plot_image
+from model.utilities.plot_generator import plot_generator
 import cons
 
 # hyper-parameters
