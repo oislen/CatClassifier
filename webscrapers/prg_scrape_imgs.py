@@ -32,7 +32,7 @@ def scrape_imags(
             del_zip=cons.del_zip
             )
     if run_webscraper:
-        logging.info('Running image webscraper ...')
+        logging.info('Running cat image webscraper ...')
         # run cat webscraper
         webscraper(
             search='cat', 
@@ -40,6 +40,7 @@ def scrape_imags(
             home_url=cons.home_url, 
             output_dir=cons.train_fdir
             )
+        logging.info('Running dog image webscraper ...')
         # run dog webscraper
         webscraper(
             search='dog', 
