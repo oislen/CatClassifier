@@ -18,6 +18,7 @@ from torchvision import transforms
 from tensorflow.keras.preprocessing.image import load_img
 
 # load custom scripts
+import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
@@ -25,7 +26,6 @@ from model.utilities.plot_model import plot_model_fit
 from model.utilities.plot_preds import plot_preds
 from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
-import cons
 
 # hyper-parameters
 num_epochs = 10
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     df = df.sample(frac = frac)
     category_mapper = {0: 'cat', 1: 'dog'}
     df["categoryname"] = df["category"].replace(category_mapper) 
-    df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+\.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
+    df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
     df["filepath"] = cons.train_fdir + '/' + df['filename']
     
     logging.info("Plot sample image...")
