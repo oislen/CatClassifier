@@ -49,20 +49,9 @@ sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir]
 for fdir in root_fdirs + sub_fdirs:
     sys.path.append(fdir)
 
-# set kaggle competition name
-comp_name = 'dogs-vs-cats'
-download_data = False
-unzip_data = True
-del_zip = False
-
 # set sample size
 train_sample_size = 1
 test_sample_size = 1
-
-# webscraping constants
-n_images = 6000
-home_url = 'https://free-images.com'
-output_dir =  os.path.join(data_fdir, '{search}')
 
 FAST_RUN = False
 IMAGE_WIDTH=128
