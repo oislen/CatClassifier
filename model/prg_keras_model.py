@@ -17,7 +17,7 @@ from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.plot_preds import plot_preds
 from model.keras.AlexNet8 import AlexNet8
-from model.plot_model import plot_model_fit
+from model.utilities.plot_model import plot_model_fit
 import cons
 
 if __name__ == "__main__":
