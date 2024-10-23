@@ -123,7 +123,7 @@ def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
     return results
 
 @beartype
-def main(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url, output_dir:str=cons.train_fdir):
+def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url, output_dir:str=cons.train_fdir):
     """The main beautiful soup webscrapping programme
 
     Parameters
