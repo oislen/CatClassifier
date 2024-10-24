@@ -7,7 +7,7 @@ SET DOCKER_CONTAINER_NAME=cc
 SET GIT_BRANCH=v0.0.0
 
 :: remove existing docker containers and images
-docker rm -f %DOCKER_IMAGE%
+docker image rm -f %DOCKER_IMAGE%
 
 :: build docker image
 call docker build --no-cache -t %DOCKER_IMAGE% . --build-arg GIT_BRANCH=%GIT_BRANCH%
