@@ -50,6 +50,6 @@ class LeNet5(nn.Module):
         msg = save_module(self, output_fpath)
         return msg
     
-    def load(self, input_fpath):
-        msg = load_module(self, input_fpath)
+    def load(self, input_fpath, weights_only=False):
+        msg = load_module(self, input_fpath, weights_only=weights_only)
         return msg

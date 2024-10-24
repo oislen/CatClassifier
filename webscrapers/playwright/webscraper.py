@@ -11,7 +11,7 @@ from playwright.sync_api import sync_playwright
 import cons
   
 # define main webscraping programme
-def main(search, n_images, image_size, output_dir, headless = True):
+def webscraper(search, n_images, image_size, output_dir, headless = True):
 
     # run playwright in a syncronised fashion
     with sync_playwright() as p:
@@ -111,8 +111,9 @@ if __name__ == '__main__':
     print('Starting programme ...')
     # execute main webscrapping programme
     search = 'cats'
-    main(search = search,
-         n_images = 1000, 
-         image_size = 'small', 
-         output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
-         )
+    webscraper(
+        search = search,
+        n_images = 1000, 
+        image_size = 'small', 
+        output_dir = f'E:\\GitHub\\cat_classifier\\data\\{search}'
+        )

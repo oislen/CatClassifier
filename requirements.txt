@@ -1,8 +1,8 @@
 Pillow
-playwright
+#playwright
 requests
 beautifulsoup4
-scrapy
+#scrapy
 numpy
 pandas
 opencv-python
@@ -15,4 +15,5 @@ kaggle
 jupyterlab
 torch
 torchvision
-transformers
+#transformers
+beartype
