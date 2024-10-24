@@ -1,5 +1,6 @@
 import logging
 import cons
+from commandline_interface import commandline_interface
 from webscrapers.download_comp_data import download_comp_data
 from webscrapers.beautifulsoup.webscraper import webscraper
 from beartype import beartype
@@ -16,7 +17,7 @@ def scrape_imags(
     run_download_comp_data : bool
         Whether to run the download Kaggle competition data, default is False
     run_webscraper : bool
-        Whether to run the image webscraper
+        Whether to run the image webscraper, default is False
 
     Returns
     -------
@@ -56,8 +57,11 @@ if __name__ == '__main__':
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
 
+    # handle input parameters
+    input_params_dict = commandline_interface()
+
     # run the scrape images programme
     scrape_imags(
-        run_download_comp_data=True, 
-        run_webscraper=True
+        run_download_comp_data=input_params_dict['run_download_comp_data'], 
+        run_webscraper=input_params_dict['run_webscraper']
         )
