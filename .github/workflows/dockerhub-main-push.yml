@@ -22,5 +22,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: oislen/irishclimatedashboard:latest
+          tags: oislen/cat-classifier:latest
           build-args: GIT_BRANCH=main
