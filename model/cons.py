@@ -2,12 +2,17 @@ import os
 import sys
 import platform
 
+# set huggingface hub directory
+if platform.system() == 'Windows':
+    huggingface_hub_dir = 'E:\\huggingface'
+    os.environ['TORCH_HOME'] = huggingface_hub_dir
+    os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 # set root file directories
 root_fdir = 'E:\\GitHub\\Cat-Classifier' if platform.system() == 'Windows' else '/home/ubuntu/Cat-Classifier'
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
-kaggle_fdir = os.path.join(root_fdir, 'kaggle')
 model_fdir = os.path.join(root_fdir, 'model')
 report_fdir = os.path.join(root_fdir, 'report')
 keras_report_fdir = os.path.join(report_fdir, 'keras')
@@ -37,27 +42,16 @@ torch_generator_plot_fpath = os.path.join(torch_report_fdir, 'generator_plot.jpg
 torch_pred_images_fpath = os.path.join(torch_report_fdir, 'pred_images.jpg')
 
 # set list containing all required directories
-root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, kaggle_fdir, model_fdir, report_fdir, keras_report_fdir, torch_report_fdir, test_fdir, train_fdir, webscrapers_fdir]
+root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, env_fdir, model_fdir, report_fdir, keras_report_fdir, torch_report_fdir, test_fdir, train_fdir, webscrapers_fdir]
 sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir]
 
 # append directories to path
 for fdir in root_fdirs + sub_fdirs:
     sys.path.append(fdir)
 
-# set kaggle competition name
-comp_name = 'dogs-vs-cats'
-download_data = False
-unzip_data = True
-del_zip = False
-
 # set sample size
 train_sample_size = 1
 test_sample_size = 1
-
-# webscraping constants
-n_images = 6000
-home_url = 'https://free-images.com'
-output_dir =  os.path.join(data_fdir, '{search}')
 
 FAST_RUN = False
 IMAGE_WIDTH=128

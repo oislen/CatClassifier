@@ -10,7 +10,7 @@ class CustomDataset(Dataset):
         self.filepath = df['filepath'].tolist()
         if mode == 'train':
             self.category = df['category'].tolist()
-        self.transform = transforms
+        self.transforms = transforms
         
     def __len__(self):
         return len(self.filepath)
@@ -18,9 +18,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         image_filepath = self.filepath[idx]
         image = Image.open(image_filepath)
-        
-        if self.transform:
-            image = self.transform(image)
+        image = self.transforms(image)
 
         if self.mode == 'train':
             label = torch.tensor(self.category[idx], dtype=torch.int64)
