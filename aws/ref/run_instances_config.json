@@ -1,0 +1,9 @@
+{
+    "DryRun": false,
+    "LaunchTemplate": {
+        "LaunchTemplateName": "catclassifier",
+        "Version": "$Latest"
+    },
+    "MaxCount":1,
+    "MinCount":1
+}
