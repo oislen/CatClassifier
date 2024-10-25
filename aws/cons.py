@@ -8,7 +8,7 @@ sys.path.append(root_dir)
 # set directories
 data_dir = os.path.join(root_dir, 'data')
 creds_data = os.path.join(root_dir, '.creds')
-ec2_ref_data_dir = os.path.join(data_dir, "ec2", "ref")
+ec2_ref_data_dir = os.path.join(root_dir, "aws", "ref")
 session_token_fpath = os.path.join(creds_data, "sessionToken.json")
 launch_template_config_fpath = os.path.join(ec2_ref_data_dir, "launch_template_config.json")
 create_fleet_config_fpath = os.path.join(ec2_ref_data_dir, "create_fleet_config.json")
