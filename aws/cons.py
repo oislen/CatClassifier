@@ -3,7 +3,7 @@ import os
 import sys
 import json
 
-root_dir = 'E:\\GitHub\\Cat-Classifier' if platform.system() == 'Windows' else '/home/ubuntu/Cat-Classifier'
+root_dir = 'E:\\GitHub\\CatClassifier' if platform.system() == 'Windows' else '/home/ubuntu/CatClassifier'
 sys.path.append(root_dir)
 # set directories
 data_dir = os.path.join(root_dir, 'data')

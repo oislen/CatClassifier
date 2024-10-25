@@ -31,7 +31,7 @@ The main dog and cat image classification application is contained within the ro
 ## Analysis Results
 
 See the analysis results notebook for a summary of the project; including image processing, CNN architecture and model performance.
-* https://nbviewer.org/github/oislen/Cat-Classifier/blob/main/notebooks/torch_analysis_results.ipynb
+* https://nbviewer.org/github/oislen/CatClassifier/blob/main/notebooks/torch_analysis_results.ipynb
 
 ## Docker Container
 

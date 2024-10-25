@@ -13,7 +13,7 @@ docker image rm -f %DOCKER_IMAGE%
 call docker build --no-cache -t %DOCKER_IMAGE% . --build-arg GIT_BRANCH=%GIT_BRANCH%
 
 :: run docker container
-call docker run --name %DOCKER_CONTAINER_NAME% --shm-size=512m --publish 8888:8888 --volume E:\GitHub\Cat-Classifier\.cred:/home/ubuntu/Cat-Classifier/.cred  --volume E:\GitHub\Cat-Classifier\report:/home/ubuntu/Cat-Classifier/report -it %DOCKER_IMAGE%
+call docker run --name %DOCKER_CONTAINER_NAME% --shm-size=512m --publish 8888:8888 --volume E:\GitHub\CatClassifier\.cred:/home/ubuntu/CatClassifier/.cred  --volume E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report -it %DOCKER_IMAGE%
 
 :: useful docker commands
 :: docker images
