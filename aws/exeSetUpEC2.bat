@@ -16,6 +16,6 @@ FOR /F "tokens=* USEBACKQ" %%F IN (`type %EC2_DNS_FPATH%`) DO (
 call scp -i %EC2_PEM_FPATH% -r %EC2_CREDS_FDIR% %EC2_USER%@%EC2_DNS%:~/.
 call scp -i %EC2_PEM_FPATH% %EC2_SETUP_FPATH% %EC2_USER%@%EC2_DNS%:~/linux_docker_setup.sh
 call scp -i %EC2_PEM_FPATH% %EC2_EXTRACT_FPATH% %EC2_USER%@%EC2_DNS%:~/docker_extract_data.sh
-:: ssh to EC2
-call ssh -i %EC2_PEM_FPATH% %EC2_USER%@%EC2_DNS%
+:: ssh to EC2 and run linux setp
+call ssh -v -i %EC2_PEM_FPATH% %EC2_USER%@%EC2_DNS% "sed -i 's/\r$//' ~/docker_extract_data.sh; bash ~/docker_extract_data.sh"
 ENDLOCAL
