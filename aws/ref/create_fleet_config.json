@@ -2,7 +2,7 @@
     "DryRun": false,
     "SpotOptions": {
         "AllocationStrategy": "diversified",
-        "InstanceInterruptionBehavior": "terminate",
+        "InstanceInterruptionBehavior": "terminate"
     },
     "LaunchTemplateConfigs": [
         {
