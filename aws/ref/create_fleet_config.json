@@ -1,10 +1,8 @@
 {
     "DryRun": false,
-    "TargetCapacitySpecification": {
-        "TotalTargetCapacity": 1,
-        "OnDemandTargetCapacity": 1,
-        "SpotTargetCapacity": 0,
-        "DefaultTargetCapacityType": "on-demand"
+    "SpotOptions": {
+        "AllocationStrategy": "diversified",
+        "InstanceInterruptionBehavior": "terminate",
     },
     "LaunchTemplateConfigs": [
         {
@@ -14,12 +12,49 @@
             },
             "Overrides": [
                 {
-                    "InstanceType": "t2.micro"
+                    "InstanceType": "c3.2xlarge"
+                },
+                {
+                    "InstanceType": "c3.4xlarge"
+                },
+                {
+                    "InstanceType": "c4.2xlarge"
+                },
+                {
+                    "InstanceType": "c4.4xlarge"
+                },
+                {
+                    "InstanceType": "c5.2xlarge"
+                },
+                {
+                    "InstanceType": "c5.4xlarge"
+                },
+                {
+                    "InstanceType": "c5a.2xlarge"
+                },
+                {
+                    "InstanceType": "c5a.4xlarge"
+                },
+                {
+                    "InstanceType": "c5ad.2xlarge"
+                },
+                {
+                    "InstanceType": "c5ad.4xlarge"
+                },
+                {
+                    "InstanceType": "c5d.2xlarge"
+                },
+                {
+                    "InstanceType": "c5d.4xlarge"
                 }
             ]
         }
     ],
-    "SpotOptions": {
-        "AllocationStrategy": "diversified"
-    }
+    "TargetCapacitySpecification": {
+        "TotalTargetCapacity": 1,
+        "OnDemandTargetCapacity": 0,
+        "SpotTargetCapacity": 1,
+        "DefaultTargetCapacityType": "spot"
+    },
+    "Type": "request"
 }
