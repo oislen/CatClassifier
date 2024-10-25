@@ -10,6 +10,10 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False):
 
     Parameters
     ----------
+    launch : bool
+        Whether to launch an ec2 instance using the launch template
+    terminate : bool
+        Whether to stop and terminate all running ec2 instance
 
     Returns
     -------
