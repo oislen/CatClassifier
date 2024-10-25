@@ -4,6 +4,13 @@
         "LaunchTemplateName": "catclassifier",
         "Version": "$Latest"
     },
-    "MaxCount":1,
-    "MinCount":1
+    "InstanceMarketOptions": {
+        "MarketType": "spot",
+        "SpotOptions": {
+            "SpotInstanceType": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    },
+    "MaxCount": 1,
+    "MinCount": 1
 }
