@@ -20,8 +20,11 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False):
     # if launch ec2 instance
     if launch:
         logging.info("Launching EC2 instance.")
-        # delete any existing launch template
-        ec2_client.delete_launch_template(LaunchTemplateName=cons.launch_template_config["LaunchTemplateName"])
+        try:
+            # delete any existing launch template
+            ec2_client.delete_launch_template(LaunchTemplateName=cons.launch_template_config["LaunchTemplateName"])
+        except Exception as e:
+            logging.warning(e)
         # create a new launch template
         ec2_client.create_launch_template(cons.launch_template_config)
         # start ec2 instance
