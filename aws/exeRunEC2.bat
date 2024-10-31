@@ -1,1 +1,1 @@
-call python prg_run_ec2_instance.py --launch --terminate
+call python prg_run_ec2_instance.py --launch --terminate --describe --isFleet
