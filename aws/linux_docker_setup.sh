@@ -66,10 +66,10 @@ sudo yum autoremove
 sudo mkdir /home/ubuntu
 sudo git clone https://github.com/oislen/CatClassifier.git --branch v0.0.0 /home/ubuntu/CatClassifier
 cd /home/ubuntu/CatClassifier
-sudo mkdir /home/ubuntu/CatClassifier/.cred
-sudo cp -r ~/.creds/* /home/ubuntu/CatClassifier/.cred*
-sudo chmod 700 /home/ubuntu/CatClassifier/.cred
-sudo chmod 600 /home/ubuntu/CatClassifier/.cred/*
+sudo mkdir /home/ubuntu/CatClassifier/.creds
+sudo cp -r ~/.creds/* /home/ubuntu/CatClassifier/.creds/*
+sudo chmod 700 /home/ubuntu/CatClassifier/.creds
+sudo chmod 600 /home/ubuntu/CatClassifier/.creds/*
 
 #-- Pull and Run Docker Contianer --#
 
@@ -93,6 +93,6 @@ cat ~/.creds/docker | docker login --username oislen --password-stdin
 docker pull $docker_image
 # run pulled docker container
 #docker run --shm-size=512m -p 8889:8888 -it $docker_image
-#docker run --name $docker_container_name --shm-size=512m --publish 8888:8888 --volume /home/ubuntu/CatClassifier/.cred:/home/ubuntu/CatClassifier/.cred  --volume /home/ubuntu/CatClassifier/report:/home/ubuntu/CatClassifier/report --rm -it --entrypoint bash $docker_image
+#docker run --name $docker_container_name --shm-size=512m --publish 8888:8888 --volume /home/ubuntu/CatClassifier/.creds:/home/ubuntu/CatClassifier/.creds  --volume /home/ubuntu/CatClassifier/report:/home/ubuntu/CatClassifier/report --rm -it --entrypoint bash $docker_image
 #docker run --shm-size=512m -p 8889:8888 -d $docker_image
 #docker run -it -d <container_id_or_name> /bin/bash
