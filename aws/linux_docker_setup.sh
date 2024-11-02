@@ -67,8 +67,8 @@ sudo mkdir /home/ubuntu
 sudo git clone https://github.com/oislen/CatClassifier.git --branch v0.0.0 /home/ubuntu/CatClassifier
 cd /home/ubuntu/CatClassifier
 sudo mkdir /home/ubuntu/CatClassifier/.creds
-sudo cp -r ~/.creds/* /home/ubuntu/CatClassifier/.creds/*
-sudo chmod 700 /home/ubuntu/CatClassifier/.creds
+sudo cp -r ~/.creds/* /home/ubuntu/CatClassifier/.creds/
+sudo chmod 755 /home/ubuntu/CatClassifier/.creds
 sudo chmod 600 /home/ubuntu/CatClassifier/.creds/*
 
 #-- Pull and Run Docker Contianer --#
