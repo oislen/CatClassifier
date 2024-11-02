@@ -4,6 +4,7 @@ import logging
 import pandas as pd 
 import numpy as np
 import random
+from PIL import Image
 
 # set huggingface hub directory
 if platform.system() == 'Windows':
@@ -36,7 +37,7 @@ learning_rate = 0.001
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 torch_transforms = transforms.Compose([
-    transforms.Resize([cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
+    transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
     #,transforms.RandomRotation(30)
     #,transforms.RandomHorizontalFlip(p=0.05)
     #,transforms.RandomPerspective(distortion_scale=0.05, p=0.05)
@@ -61,6 +62,8 @@ if __name__ == "__main__":
     df["categoryname"] = df["category"].replace(category_mapper) 
     df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
     df["filepath"] = cons.train_fdir + '/' + df['filename']
+    df["ndims"] = df['filepath'].apply(lambda x: len(np.array(Image.open(x)).shape))
+    df = df.loc[df["ndims"] == 3, :].copy()
     
     logging.info("Plot sample image...")
     # random image plot
