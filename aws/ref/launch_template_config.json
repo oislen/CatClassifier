@@ -7,7 +7,7 @@
             {
                 "DeviceName": "/dev/xvda",
                 "Ebs": {
-                    "VolumeSize": 20,
+                    "VolumeSize": 50,
                     "VolumeType": "gp3"
                 }
             }
