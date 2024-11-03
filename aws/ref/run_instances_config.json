@@ -1,0 +1,16 @@
+{
+    "DryRun": false,
+    "LaunchTemplate": {
+        "LaunchTemplateName": "catclassifier",
+        "Version": "$Latest"
+    },
+    "InstanceMarketOptions": {
+        "MarketType": "spot",
+        "SpotOptions": {
+            "SpotInstanceType": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    },
+    "MaxCount": 1,
+    "MinCount": 1
+}

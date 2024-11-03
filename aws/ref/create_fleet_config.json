@@ -1,0 +1,60 @@
+{
+    "DryRun": false,
+    "SpotOptions": {
+        "AllocationStrategy": "diversified",
+        "InstanceInterruptionBehavior": "terminate"
+    },
+    "LaunchTemplateConfigs": [
+        {
+            "LaunchTemplateSpecification": {
+                "LaunchTemplateName": "catclassifier",
+                "Version": "$Latest"
+            },
+            "Overrides": [
+                {
+                    "InstanceType": "c3.2xlarge"
+                },
+                {
+                    "InstanceType": "c3.4xlarge"
+                },
+                {
+                    "InstanceType": "c4.2xlarge"
+                },
+                {
+                    "InstanceType": "c4.4xlarge"
+                },
+                {
+                    "InstanceType": "c5.2xlarge"
+                },
+                {
+                    "InstanceType": "c5.4xlarge"
+                },
+                {
+                    "InstanceType": "c5a.2xlarge"
+                },
+                {
+                    "InstanceType": "c5a.4xlarge"
+                },
+                {
+                    "InstanceType": "c5ad.2xlarge"
+                },
+                {
+                    "InstanceType": "c5ad.4xlarge"
+                },
+                {
+                    "InstanceType": "c5d.2xlarge"
+                },
+                {
+                    "InstanceType": "c5d.4xlarge"
+                }
+            ]
+        }
+    ],
+    "TargetCapacitySpecification": {
+        "TotalTargetCapacity": 1,
+        "OnDemandTargetCapacity": 0,
+        "SpotTargetCapacity": 1,
+        "DefaultTargetCapacityType": "spot"
+    },
+    "Type": "request"
+}

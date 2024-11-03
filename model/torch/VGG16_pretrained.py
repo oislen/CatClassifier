@@ -88,7 +88,7 @@ class VGG16_pretrained(nn.Module):
 
     @beartype
     def predict(self, dataloader:torch.utils.data.DataLoader, device:torch.device) -> np.ndarray:
-        """Predicts porbabilities for a given data loader
+        """Predicts probabilities for a given data loader
         
         Parameters
         ----------
