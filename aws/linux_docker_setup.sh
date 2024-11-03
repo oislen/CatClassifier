@@ -66,6 +66,7 @@ sudo yum autoremove
 sudo mkdir /home/ubuntu
 sudo git clone https://github.com/oislen/CatClassifier.git --branch main /home/ubuntu/CatClassifier
 cd /home/ubuntu/CatClassifier
+sudo git config --global --add safe.directory /home/ubuntu/CatClassifier
 sudo mkdir /home/ubuntu/CatClassifier/.creds
 sudo cp -r ~/.creds/* /home/ubuntu/CatClassifier/.creds/
 sudo chmod 755 /home/ubuntu/CatClassifier/.creds
