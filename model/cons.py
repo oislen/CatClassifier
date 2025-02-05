@@ -1,15 +1,17 @@
 import os
 import sys
+import re
 import platform
 
 # set huggingface hub directory
-if platform.system() == 'Windows':
-    huggingface_hub_dir = 'E:\\huggingface'
+huggingface_hub_dir = 'E:\\huggingface'
+if (platform.system() == 'Windows') and (os.path.exists(huggingface_hub_dir)):
     os.environ['TORCH_HOME'] = huggingface_hub_dir
     os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 # set root file directories
-root_fdir = 'E:\\GitHub\\CatClassifier' if platform.system() == 'Windows' else '/home/ubuntu/CatClassifier'
+root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")
+root_fdir = root_dir_re_match[0] if len(root_dir_re_match) > 0 else os.path.join(".", "CatClassifier")
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
