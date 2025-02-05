@@ -7,8 +7,8 @@ import random
 from PIL import Image
 
 # set huggingface hub directory
-if platform.system() == 'Windows':
-    huggingface_hub_dir = 'E:\\huggingface'
+huggingface_hub_dir = 'E:\\huggingface'
+if (platform.system() == 'Windows') and (os.path.exists(huggingface_hub_dir)):
     os.environ['TORCH_HOME'] = huggingface_hub_dir
     os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -29,7 +29,7 @@ from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 
 # hyper-parameters
-num_epochs = 10
+num_epochs = 3  if cons.FAST_RUN else 10
 batch_size = 64
 learning_rate = 0.001
 
@@ -85,10 +85,10 @@ if __name__ == "__main__":
     total_validate = validate_df.shape[0]
     # set train datagen
     train_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
     # set validation datagen
     validation_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-    validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
+    validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
     
     logging.info("Plot example data loader images...")
     # datagen example
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     logging.info("Create test dataloader...")
     # set train datagen
     test_dataset = CustomDataset(test_df, transforms=torch_transforms, mode='test')
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
     
     logging.info("Generate test set predictions...")
     # make test set predictions
