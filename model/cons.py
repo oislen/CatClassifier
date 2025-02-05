@@ -72,3 +72,6 @@ horizontal_flip = True
 width_shift_range = 0.1
 height_shift_range = 0.1
 shuffle = False
+
+# multiprocessing
+num_workers = os.cpu_count()
