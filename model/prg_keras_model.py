@@ -7,18 +7,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing.image import load_img
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
-from keras.models import load_model
 
 # load custom scripts
+import cons
 from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.plot_preds import plot_preds
 from model.keras.AlexNet8 import AlexNet8
 from model.utilities.plot_model import plot_model_fit
-import cons
+
+# load tensorflow / keras modules
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import load_img
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from keras.models import load_model
 
 if __name__ == "__main__":
     
@@ -31,7 +33,7 @@ if __name__ == "__main__":
     categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
     df = pd.DataFrame({'filename': filenames, 'category': categories})
     df["category"] = df["category"].replace({0: 'cat', 1: 'dog'}) 
-    df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+\.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
+    df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
     
     # random image plot
     sample = random.choice(filenames)
@@ -76,7 +78,7 @@ if __name__ == "__main__":
     
     # set model check points
     model_name = keras_model.name
-    check_out_fname = model_name + "-{epoch:02d}.hdf5"
+    check_out_fname = model_name + "-{epoch:02d}.keras"
     check_out_fpath = os.path.join(cons.checkpoints_fdir, check_out_fname)
     check_points = ModelCheckpoint(check_out_fpath, save_best_only=False, verbose=1)
     
@@ -95,7 +97,7 @@ if __name__ == "__main__":
     plot_model_fit(model_fit=model_fit, output_fdir=cons.keras_report_fdir)
     
     # save model fit
-    keras_model.save(cons.keras_model_pickle_fpath, save_format="h5")
+    keras_model.save(cons.keras_model_pickle_fpath)
     keras_model = load_model(cons.keras_model_pickle_fpath)
     
     # prepare test data
@@ -108,7 +110,7 @@ if __name__ == "__main__":
     test_generator = test_gen.flow_from_dataframe(dataframe=test_df, directory=cons.test_fdir, x_col='filename', y_col=None, class_mode=None, target_size=cons.IMAGE_SIZE, batch_size=cons.batch_size, shuffle=cons.shuffle)
     
     # make test set predictions
-    predict = keras_model.predict(test_generator, steps=np.ceil(nb_samples/cons.batch_size))
+    predict = keras_model.predict(test_generator, steps=int(np.ceil(nb_samples/cons.batch_size)))
     test_df['category'] = np.argmax(predict, axis=-1)
     label_map = dict((v,k) for k,v in train_generator.class_indices.items())
     test_df['category'] = test_df['category'].replace(label_map)
