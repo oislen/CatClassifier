@@ -10,7 +10,7 @@ def plot_preds(data, cons, output_fpath = None):
         filename = row['filename']
         category = row['category']
         img = load_img(os.path.join(cons.test_fdir, filename), target_size=cons.IMAGE_SIZE)
-        plt.subplot(6, 3, index)
+        plt.subplot(6, 3, index+1)
         plt.imshow(img)
         #plt.title(category)
         plt.xlabel(filename + '(' + "{}".format(category) + ')' )
