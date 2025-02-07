@@ -89,13 +89,16 @@ def download_src(src:str, output_dir:str, search:str):
     Returns
     -------
     """
-    img_data = requests.get(src).content
-    image_fstem = src.split('/')[-1]
-    image_fname = f'{search}.{image_fstem}'
-    image_fpath = os.path.join(output_dir, image_fname)
-    logging.info(image_fpath)
-    with open(image_fpath, 'wb') as handler:
-        handler.write(img_data)
+    try:
+        img_data = requests.get(src).content
+        image_fstem = src.split('/')[-1]
+        image_fname = f'{search}.{image_fstem}'
+        image_fpath = os.path.join(output_dir, image_fname)
+        logging.info(image_fpath)
+        with open(image_fpath, 'wb') as handler:
+            handler.write(img_data)
+    except Exception as e:
+        logging.error(e)
 
 @beartype
 def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
