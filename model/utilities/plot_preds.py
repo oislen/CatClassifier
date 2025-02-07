@@ -2,8 +2,11 @@ import os
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import load_img
 
-def plot_preds(data, cons, output_fpath = None):
-    """"""
+def plot_preds(data, cons, output_fpath = None, show_plot:bool=True):
+    """
+    show_plot : bool
+        Whether to show the generated plot, default is True
+    """
     sample_test = data.head(18)
     plt.figure(figsize=(12, 24))
     for id, (index, row) in enumerate(sample_test.iterrows()):
@@ -18,6 +21,7 @@ def plot_preds(data, cons, output_fpath = None):
     #  show save, plot and close
     if output_fpath != None:
         plt.savefig(output_fpath)
-    plt.show()
+    if show_plot:
+        plt.show()
     plt.close()
     return 0
