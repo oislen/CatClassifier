@@ -10,7 +10,7 @@ ENV PYTHON_VERSION=${PYTHON_VERSION}
 
 # install required software and programmes for development environment
 RUN apt-get update 
-RUN apt-get install -y apt-utils vim curl wget unzip
+RUN apt-get install -y apt-utils vim curl wget unzip htop
 
 # added cv2 dependencies
 RUN apt-get install -y ffmpeg libsm6 libxext6
