@@ -21,6 +21,7 @@ from tensorflow.keras.preprocessing.image import load_img
 # load custom scripts
 import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
+from model.torch.AlexNet8 import AlexNet8
 from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
@@ -30,9 +31,7 @@ from model.utilities.plot_generator import plot_generator
 from model.utilities.TimeIt import TimeIt
 
 # hyper-parameters
-num_epochs = 3  if cons.FAST_RUN else 10
-batch_size = 64
-learning_rate = 0.001
+num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -60,8 +59,7 @@ if __name__ == "__main__":
     df = pd.DataFrame({'filename': filenames, 'category': categories})
     frac = 0.05
     df = df.sample(frac = frac)
-    category_mapper = {0: 'cat', 1: 'dog'}
-    df["categoryname"] = df["category"].replace(category_mapper) 
+    df["categoryname"] = df["category"].replace(cons.category_mapper) 
     df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
     df["filepath"] = cons.train_fdir + '/' + df['filename']
     df["ndims"] = df['filepath'].apply(lambda x: len(np.array(Image.open(x)).shape))
@@ -72,7 +70,7 @@ if __name__ == "__main__":
     # random image plot
     sample = random.choice(filenames)
     image = load_img(os.path.join(cons.train_fdir, sample))
-    plot_image(image, output_fpath=cons.torch_random_image_fpath)
+    plot_image(image, output_fpath=cons.torch_random_image_fpath, show_plot=False)
     timeLogger.logTime(parentKey="Plots", subKey="SampleImage")
     
     logging.info("Split into training, validation and test dataset...")
@@ -90,23 +88,24 @@ if __name__ == "__main__":
     total_validate = validate_df.shape[0]
     # set train datagen
     train_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
     # set validation datagen
     validation_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-    validation_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+    validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
     timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
     
     logging.info("Plot example data loader images...")
     # datagen example
     example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
-    plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath)
+    plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
     timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
     
     logging.info("Initiate torch model...")
     # initiate cnn architecture
+    #model = AlexNet8(num_classes=2).to(device)
     model = VGG16_pretrained(num_classes=2).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
     early_stopper = EarlyStopper(patience=3, min_delta=0.3)
     timeLogger.logTime(parentKey="Modelling", subKey="InitiateTorchModel")
@@ -118,7 +117,7 @@ if __name__ == "__main__":
     
     logging.info("Plot model fit results...")
     # plot model fits
-    plot_model_fit(model_fit=model.model_fit, output_fdir=cons.torch_report_fdir)
+    plot_model_fit(model_fit=model.model_fit, output_fdir=cons.torch_report_fdir, show_plot=False)
     timeLogger.logTime(parentKey="Plots", subKey="ModelFit")
     
     logging.info("Save fitted torch model to disk...")
@@ -128,6 +127,7 @@ if __name__ == "__main__":
     
     logging.info("Load fitted torch model from disk...")
     # load model
+    #model = AlexNet8(num_classes=2).to(device)
     model = VGG16_pretrained(num_classes=2).to(device)
     model.load(input_fpath=cons.torch_model_pt_fpath)
     timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
@@ -145,25 +145,25 @@ if __name__ == "__main__":
     logging.info("Create test dataloader...")
     # set train datagen
     test_dataset = CustomDataset(test_df, transforms=torch_transforms, mode='test')
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
     timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
     
     logging.info("Generate test set predictions...")
     # make test set predictions
     predict = model.predict(test_loader, device)
     test_df['category'] = np.argmax(predict, axis=-1)
-    test_df["category"] = test_df["category"].replace(category_mapper)
+    test_df["category"] = test_df["category"].replace(cons.category_mapper)
     timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
     
     logging.info("Plot example test set predictions...")
     # plot random sample predictions
-    plot_preds(data=test_df, cons=cons, output_fpath=cons.torch_pred_images_fpath)
+    plot_preds(data=test_df, cons=cons, output_fpath=cons.torch_pred_images_fpath, show_plot=False)
     timeLogger.logTime(parentKey="Plots", subKey="TestSetPredictions")
     
     logging.info("Generate a sample submission file for kaggle...")
     # make submission
     submission_df = test_df.copy()
     submission_df['id'] = submission_df['filename'].str.split('.').str[0]
-    submission_df['label'] = submission_df['category'].replace(category_mapper)
+    submission_df['label'] = submission_df['category'].replace(cons.category_mapper)
     submission_df.to_csv(cons.submission_csv_fpath, index=False)
     timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")
