@@ -1,15 +1,17 @@
 import os
 import sys
+import re
 import platform
 
 # set huggingface hub directory
-if platform.system() == 'Windows':
-    huggingface_hub_dir = 'E:\\huggingface'
+huggingface_hub_dir = 'E:\\huggingface'
+if (platform.system() == 'Windows') and (os.path.exists(huggingface_hub_dir)):
     os.environ['TORCH_HOME'] = huggingface_hub_dir
     os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 # set root file directories
-root_fdir = 'E:\\GitHub\\CatClassifier' if platform.system() == 'Windows' else '/home/ubuntu/CatClassifier'
+root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")
+root_fdir = root_dir_re_match[0] if len(root_dir_re_match) > 0 else os.path.join(".", "CatClassifier")
 data_fdir = os.path.join(root_fdir, 'data')
 dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
@@ -30,7 +32,7 @@ utilities_fdir = os.path.join(dataprep_fdir, 'utilities')
 train_data_pickle_fpath = os.path.join(data_fdir, 'train_data.pickle')
 test_data_pickle_fpath = os.path.join(data_fdir, 'test_data.pickle')
 model_fit_pickle_fpath = os.path.join(data_fdir, 'model_fit.pickle')
-keras_model_pickle_fpath = os.path.join(data_fdir, 'keras_model.h5')
+keras_model_pickle_fpath = os.path.join(data_fdir, 'keras_model.keras')
 torch_model_pt_fpath = os.path.join(data_fdir, 'torch_model.pt')
 test_preds_pickle_fpath = os.path.join(data_fdir, 'test_preds.pickle')
 submission_csv_fpath = os.path.join(data_fdir, 'submission.csv')
@@ -59,7 +61,11 @@ IMAGE_HEIGHT=128
 IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
 IMAGE_CHANNELS=3
 input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS)
-batch_size=16
+batch_size=64
+learning_rate=0.001
+min_epochs=3
+max_epochs=10
+category_mapper={0: 'cat', 1: 'dog'}
 
 # data generator constants
 rescale = 1./255
@@ -70,3 +76,6 @@ horizontal_flip = True
 width_shift_range = 0.1
 height_shift_range = 0.1
 shuffle = False
+
+# multiprocessing
+num_workers = os.cpu_count()

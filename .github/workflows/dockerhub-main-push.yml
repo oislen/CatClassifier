@@ -23,4 +23,3 @@ jobs:
         with:
           push: true
           tags: oislen/cat-classifier:latest
-          build-args: GIT_BRANCH=main

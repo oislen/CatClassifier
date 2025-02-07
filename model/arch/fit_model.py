@@ -52,7 +52,7 @@ def fit_model(model,
     
     # if reloading previous model
     if starting_epoch != None:
-        check_in_filename = model_name +'{0:02d}.hdf5'.format(starting_epoch)
+        check_in_filename = model_name +'{0:02d}.keras'.format(starting_epoch)
         check_in_fpath = os.path.join(output_dir, check_in_filename)
         model = load_model(check_in_fpath)
     # otherwise compile

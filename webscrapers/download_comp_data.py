@@ -47,7 +47,7 @@ def download_comp_data(comp_name:str, data_dir:str, download_data:bool=True, unz
     # if redownloading the data
     if download_data == True:
         logging.info('downing kaggle data ..')
-        kaggle_cmd = 'kaggle competitions download -c {} -p {}'.format(comp_name, data_dir)
+        kaggle_cmd = 'kaggle competitions download --competition {} --path {} --force'.format(comp_name, data_dir)
         subprocess.run(kaggle_cmd.split())
     
     # if unzipping the data

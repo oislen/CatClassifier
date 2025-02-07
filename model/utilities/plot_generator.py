@@ -3,7 +3,7 @@ from typing import Union
 from beartype import beartype
 
 @beartype
-def plot_generator(generator, mode:str='keras', output_fpath:Union[str,None]=None):
+def plot_generator(generator, mode:str='keras', output_fpath:Union[str,None]=None, show_plot:bool=True):
     """Plots multiple images from a generator.
 
     Parameters
@@ -14,6 +14,8 @@ def plot_generator(generator, mode:str='keras', output_fpath:Union[str,None]=Non
         The model mode type the generate was created with, default is 'keras'
     output_fpath : str
         The output file location to save the plot, default is None
+    show_plot : bool
+        Whether to show the generated plot, default is True
 
     Returns
     -------
@@ -35,5 +37,6 @@ def plot_generator(generator, mode:str='keras', output_fpath:Union[str,None]=Non
     #  show save, plot and close
     if output_fpath != None:
         plt.savefig(output_fpath)
-    plt.show()
+    if show_plot:
+        plt.show()
     plt.close()

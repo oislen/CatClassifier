@@ -3,7 +3,7 @@ from beartype import beartype
 from typing import Union
 
 @beartype
-def plot_image(image_array, output_fpath:Union[str,None]=None):
+def plot_image(image_array, output_fpath:Union[str,None]=None, show_plot:bool=True):
     """Plots an image array.
 
     Parameters
@@ -12,6 +12,8 @@ def plot_image(image_array, output_fpath:Union[str,None]=None):
         The image to plot
     output_fpath : str
         The output file location to save the plot, default is None
+    show_plot : bool
+        Whether to show the generated plot, default is True
 
     Returns
     -------
@@ -23,6 +25,7 @@ def plot_image(image_array, output_fpath:Union[str,None]=None):
     #  show save, plot and close
     if output_fpath != None:
         plt.savefig(output_fpath)
-    # show plot
-    plt.show()
+    if show_plot:
+        # show plot
+        plt.show()
     plt.close()
