@@ -12,7 +12,7 @@ subKey="Test Sub Key"
 exp_log_keys = ["parentKey", "subKey", "stepTime", "cumulativeTime"]
 obs_timeit = TimeIt()
 obs_timeit.logTime(parentKey=parentKey, subKey=subKey)
-obs_log_keys = obs_timeit.log.keys()
+obs_log_keys = list(obs_timeit.log[0].keys())
 
 class Test_TimeIt(unittest.TestCase):
     """"""
