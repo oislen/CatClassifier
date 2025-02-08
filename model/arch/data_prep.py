@@ -16,7 +16,8 @@ from arch.pad_image import pad_image
 from arch.resize_image import resize_image
 
 def data_prep():
-    """Data preparation pipeline for generating the model training, testing and validation data.
+    """
+    Data preparation pipeline for generating the model training, testing and validation data.
 
     Parameters
     ----------

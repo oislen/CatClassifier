@@ -1,12 +1,12 @@
 import numpy as np
 import cv2
 from beartype import beartype
-from types import UnionType
+from typing import Union
 
 @beartype
 def resize_image(
     image_array:np.array,
-    reshape_wh:UnionType[list,tuple],
+    reshape_wh:Union[list,tuple],
     interpolation=cv2.INTER_LINEAR,
     keep_3dim:bool=True
     ) -> np.array:

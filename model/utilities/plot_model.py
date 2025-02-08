@@ -1,19 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  2 11:37:53 2021
-@author: oislen
-"""
-
 # load relevant libraries
 import os
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from matplotlib import pyplot as plt
  
 @beartype
 def plot_model_fit(
     model_fit,
-    output_fdir:UnionType[str,None]=None,
+    output_fdir:Union[str,None]=None,
     show_plot:bool=True
     ):
     """

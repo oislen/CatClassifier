@@ -1,12 +1,12 @@
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, AveragePooling2D
 
 @beartype
 def LeNet5(
-    input_shape:UnionType[list,tuple]=(28,28,1), 
+    input_shape:Union[list,tuple]=(28,28,1), 
     n_classes:int=10,
     output_activation:str='softmax'
     ) -> Model:

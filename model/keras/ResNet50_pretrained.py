@@ -1,12 +1,12 @@
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.layers import Dropout, Dense, Flatten
 from keras.applications import ResNet50
 from keras.models import Model
 
 @beartype
 def ResNet50_pretrained(
-    input_shape:UnionType[list,tuple]=(224,224,3), 
+    input_shape:Union[list,tuple]=(224,224,3), 
     n_classes:int=2,
     output_activation:str='softmax'
     ) -> Model:

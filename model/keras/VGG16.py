@@ -1,11 +1,11 @@
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
 @beartype
-def VGG16(input_shape:UnionType[list,tuple]=(224,224,3), 
+def VGG16(input_shape:Union[list,tuple]=(224,224,3), 
          n_classes:int=1000,
          output_activation:str='softmax'
          ) -> Model:

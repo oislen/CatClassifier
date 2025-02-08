@@ -1,12 +1,12 @@
 import numpy as np
 from beartype import beartype
-from types import UnionType
+from typing import Union
 
 @beartype
 def crop_image(
     image_array:np.array,
-    pt1_wh:UnionType[tuple,list],
-    pt2_wh:UnionType[tuple,list]
+    pt1_wh:Union[tuple,list],
+    pt2_wh:Union[tuple,list]
     ) -> np.array:
     """Crops an image array to specified combination of two diagonal points
 

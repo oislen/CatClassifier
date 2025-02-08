@@ -1,11 +1,11 @@
 import numpy as np
 from beartype import beartype
-from types import UnionType
+from typing import Union
 
 @beartype
 def pad_image(
     image_array:np.array,
-    pad_shape_wh:UnionType[list,tuple]
+    pad_shape_wh:Union[list,tuple]
     ) -> np.array:
     """
     Pads an image array to a desired width and height

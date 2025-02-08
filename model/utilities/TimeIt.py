@@ -1,6 +1,6 @@
 import logging
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from time import time
 
 class TimeIt():
@@ -15,7 +15,11 @@ class TimeIt():
         self.cumulativeTime = 0.0
     
     @beartype
-    def logTime(self, parentKey:str, subKey:UnionType[str,None]=None):
+    def logTime(
+        self,
+        parentKey:str,
+        subKey:Union[str,None]=None
+        ):
         """Sets a timestamp for code execution step
 
         Parameters

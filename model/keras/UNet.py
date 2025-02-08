@@ -1,5 +1,5 @@
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.layers import Input, Conv2D, MaxPooling2D, Conv2DTranspose
 from keras.layers.merge import concatenate
 import tensorflow as tf

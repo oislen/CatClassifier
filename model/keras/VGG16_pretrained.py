@@ -1,12 +1,12 @@
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.layers import Dropout, Dense, GlobalMaxPooling2D
 from keras.applications import VGG16
 from keras.models import Model
 
 @beartype
 def VGG16_pretrained(
-    input_shape:UnionType[list,tuple]=(224,224,3), 
+    input_shape:Union[list,tuple]=(224,224,3), 
     n_classes:int=1,
     output_activation:str='sigmoid'
     ) -> Model:
