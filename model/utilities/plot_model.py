@@ -6,38 +6,31 @@ Created on Tue Feb  2 11:37:53 2021
 
 # load relevant libraries
 import os
+from beartype import beartype
+from types import UnionType
 from matplotlib import pyplot as plt
  
-def plot_model_fit(model_fit, output_fdir = None, show_plot:bool=True):
+@beartype
+def plot_model_fit(model_fit, output_fdir:UnionType[str,None]=None, show_plot:bool=True):
     
-    """
-    
-    Plot Model Fit Documentation
-    
-    Function Overview
-    
-    This function plots the model's fit during training in relation to a validation set.
-    
-    Defaults
-    
-    plot_model_fit(model_fit)
+    """This function plots the model's fit during training in relation to a validation set.
     
     Parameters
+    ----------
     
-    model_fit - model.predict(), the Keras model predict object
+    model_fit : model.predict(), 
+        the Keras model predict object
+    output_fdir : str
+        The file path to save the model fit plots to disk, default is None
     show_plot : bool
         Whether to show the generated plot, default is True
     
     Returns
-    
-    0 for successful execution
-    
-    Exmaple
-    
-    plot_model_fit(model_fit = model_fit)
-    
-    Source
-    
+    -------
+
+    Reference
+    ----------
+
     https://github.com/jiadaizhao/Advanced-Machine-Learning-Specialization
     
     """
@@ -89,5 +82,3 @@ def plot_model_fit(model_fit, output_fdir = None, show_plot:bool=True):
     if show_plot:
         plt.show()
     plt.close()
-    
-    return 0
