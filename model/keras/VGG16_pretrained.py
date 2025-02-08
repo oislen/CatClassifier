@@ -1,12 +1,34 @@
+from beartype import beartype
+from types import UnionType
 from keras.layers import Dropout, Dense, GlobalMaxPooling2D
 from keras.applications import VGG16
 from keras.models import Model
 
-def VGG16_pretrained(input_shape = (224, 224, 3), 
-                     n_classes = 1,
-                     output_activation = 'sigmoid'
-                     ):
+@beartype
+def VGG16_pretrained(
+    input_shape:UnionType[list,tuple]=(224,224,3), 
+    n_classes:int=1,
+    output_activation:str='sigmoid'
+    ) -> Model:
     """
+    Pretrained VGG16 keras model
+    
+    Parameters
+    ----------
+    input_shape : list,tuple
+        the input image shape / dimensions, default is (224,224,3)
+    n_classes : int
+        The number of target classes, default is 1
+    output_activation : str
+        The type of activation function to use, default is sigmoid
+    
+    Returns
+    -------
+    Model
+        Keras.Model, the pretrained VGG16 model
+    
+    Example
+    -------
     model = VGG16_pretrained(input_shape = (224, 224, 3), 
                              n_classes = 1,
                              output_activation = 'sigmoid',
