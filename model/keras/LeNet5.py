@@ -1,90 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 31 15:22:57 2021
-@author: oislen
-"""
-
-# load in relevant libraries
+from beartype import beartype
+from types import UnionType
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, AveragePooling2D
 
-def LeNet5(input_shape = (28, 28, 1), 
-           n_classes = 10,
-           output_activation = 'softmax'
-           ):
-    
+@beartype
+def LeNet5(
+    input_shape:UnionType[list,tuple]=(28,28,1), 
+    n_classes:int=10,
+    output_activation:str='softmax'
+    ) -> Model:
     """
-        
-    LeNet5 Documentation
-    
-    Function Overview
-    
-    This function generates a LeNet5 Model architecture:
-        
-         1. Conv2D 
-             - filters: 32  
-             - kernal: 5 x 5 
-             - activation: relu 
-             - padding: same
-             
-            MaxPooling2D 
-             - pool: 2 x 2 
-             
-         2. Conv2D 
-             - filters: 32  
-             - kernal: 5 x 5 
-             - activation: relu 
-             - padding: same
-             
-            MaxPooling2D 
-             - pool: 2 x 2 
-             
-            Flatten
-         
-         3. Dense 
-             - units: 128  
-             - activation: relu 
-             
-            Dropout 
-             - rate: 0.25 
-             
-         4. Dense 
-             - units: 64  
-             - activation: relu 
-             
-            Dropout 
-             - 0.25 rate
-             
-         5. Dense 
-            - units: n classes  
-            - activation: output_activation 
-        
-    Defaults
-    
-    LeNet5(input_shape = (28, 28, 1), 
-           n_classes = 10,
-           output_activation = 'softmax',
-           name = 'LeNet5'
-           )
+    LeNet5 keras model
     
     Parameters
-    
-    input_shape - the input image shape / dimensions
-    n_classes - the number of target classes
+    ----------
+    input_shape : list,tuple
+        the input image shape / dimensions, default is (28,28,1)
+    n_classes : int
+        The number of target classes, default is 10
+    output_activation : str
+        The type of activation function to use, default is softmax
     
     Returns
-    
-    model - keras.Model, the LeNet model
-    
-    Example
-    
-    LeNet5(input_shape = (28, 28, 1), 
-           n_classes = 10, 
-           output_activation = 'softmax', 
-           name = 'LeNet5'
-           )
-    
+    -------
+    Model
+        Keras.Model, the LeNet model
     """
     
     # set input shapes

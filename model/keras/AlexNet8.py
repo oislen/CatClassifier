@@ -1,14 +1,32 @@
 # load in relevant libraries
+from beartype import beartype
+from types import UnionType
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
-def AlexNet8(input_shape = (227, 227, 3), 
-            n_classes = 1000,
-            output_activation = 'softmax'
-            ):
-    
+@beartype
+def AlexNet8(
+        input_shape:UnionType[list,tuple]=(227,227,3), 
+        n_classes:int=1000,
+        output_activation:str='softmax'
+        ) -> Model:
     """
+    AlexNet8 Keras model
+    
+    Parameters
+    ----------
+    input_shape : list,tuple
+        The dimensions of the input image arrays, default is (227.227,3)
+    n_classes : int
+        The number of output classes to classify for, default is 1000
+    output_activation : str
+        The type of activation function to use, default is softmax
+    
+    Returns
+    -------
+    Model
+        The keras AlexNet8 model
     """
 
     # set input shapes
