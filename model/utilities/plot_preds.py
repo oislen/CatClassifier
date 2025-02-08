@@ -6,8 +6,13 @@ from tensorflow.keras.preprocessing.image import load_img
 import cons
 
 @beartype
-def plot_preds(data:pd.DataFrame, output_fpath:str = None, show_plot:bool=True):
-    """Shows model predictions as a grid of images with labels
+def plot_preds(
+    data:pd.DataFrame,
+    output_fpath:str = None,
+    show_plot:bool=True
+    ):
+    """
+    Shows model predictions as a grid of images with labels
 
     Parameters
     ----------

@@ -3,8 +3,14 @@ from typing import Union
 from beartype import beartype
 
 @beartype
-def plot_generator(generator, mode:str='keras', output_fpath:Union[str,None]=None, show_plot:bool=True):
-    """Plots multiple images from a generator.
+def plot_generator(
+    generator,
+    mode:str='keras',
+    output_fpath:Union[str,None]=None,
+    show_plot:bool=True
+    ):
+    """
+    Plots multiple images from a generator.
 
     Parameters
     ----------

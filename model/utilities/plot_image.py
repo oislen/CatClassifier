@@ -1,10 +1,16 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from beartype import beartype
 from typing import Union
 
 @beartype
-def plot_image(image_array, output_fpath:Union[str,None]=None, show_plot:bool=True):
-    """Plots an image array.
+def plot_image(
+    image_array:np.array,
+    output_fpath:Union[str,None]=None,
+    show_plot:bool=True
+    ):
+    """
+    Plots an image array.
 
     Parameters
     ----------

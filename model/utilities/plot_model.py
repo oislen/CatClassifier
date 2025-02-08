@@ -11,9 +11,13 @@ from types import UnionType
 from matplotlib import pyplot as plt
  
 @beartype
-def plot_model_fit(model_fit, output_fdir:UnionType[str,None]=None, show_plot:bool=True):
-    
-    """This function plots the model's fit during training in relation to a validation set.
+def plot_model_fit(
+    model_fit,
+    output_fdir:UnionType[str,None]=None,
+    show_plot:bool=True
+    ):
+    """
+    Plots the model's fit during training in relation to a validation set.
     
     Parameters
     ----------
