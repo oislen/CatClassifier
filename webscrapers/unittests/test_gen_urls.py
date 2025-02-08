@@ -1,14 +1,11 @@
 import unittest
 import os
 import sys
-import numpy as np
-import pandas as pd
-import random
 
 sys.path.append(os.path.join(os.getcwd(), "webscrapers"))
 
 import cons
-from beautifulsoup.webscraper import gen_urls
+from utilities.webscraper import gen_urls
 
 exp_urls = ['https://free-images.com/search/?q=cat&skip=0', 'https://free-images.com/search/?q=cat&skip=100', 'https://free-images.com/search/?q=cat&skip=200']
 obs_urls = gen_urls(search="cat", n_images=300, home_url=cons.home_url)

@@ -1,1 +1,1 @@
-call python -m unittest discover unittests\beautifulsoup
+call python -m unittest discover unittests
