@@ -1,13 +1,13 @@
 # load in relevant libraries
 from beartype import beartype
-from types import UnionType
+from typing import Union
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
 @beartype
 def AlexNet8(
-        input_shape:UnionType[list,tuple]=(227,227,3), 
+        input_shape:Union[list,tuple]=(227,227,3), 
         n_classes:int=1000,
         output_activation:str='softmax'
         ) -> Model:
