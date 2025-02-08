@@ -5,7 +5,7 @@ from typing import Union
 
 @beartype
 def plot_image(
-    image_array:np.array,
+    image_array,
     output_fpath:Union[str,None]=None,
     show_plot:bool=True
     ):
