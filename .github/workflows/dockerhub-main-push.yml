@@ -1,8 +1,10 @@
 name: DockerHub Main Push
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["Unittest Main Push"]
+    types:
+      - completed
 
 jobs:
   build:
