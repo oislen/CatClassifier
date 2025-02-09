@@ -1,5 +1,5 @@
 ---
-title: "Torch Analysis Results"
+title: "Keras Analysis Results"
 format: 
     html:
         toc: true
@@ -22,48 +22,44 @@ root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")[0
 sys.path.append(os.path.join(root_dir_re_match, "model"))
 import cons
 
-import torch
-from model.torch.VGG16_pretrained import VGG16_pretrained
+from tensorflow import keras
 ```
 
 This project aims to create a model to classify cat and dog images. The data was sourced from the [dogs-vs-cats](https://www.kaggle.com/competitions/dogs-vs-cats/overview) Kaggle competition, and also from [freeimages.com](https://www.freeimages.com/) using a web scraper. Docker containers were used to deploy the application on an EC2 spot instances in order to scale up hardware and computation power. 
 
 ## Example Image
 
-![Random Image](../torch/random_image.jpg)
+![Random Image](keras/random_image.jpg)
 
 ## Data Processing
 
-The images were resized to a uniform dimension prior to the modelling training phase. See example image processing below. 
+The images were further processed using rotations, scaling, zooming, flipping and shearing prior to the modelling training phase. See example image processing below. 
 
-![Generator Plot](../torch/generator_plot.jpg)
+![Generator Plot](keras/generator_plot.jpg)
 
-## VGG16 Model Architecture
+## AlexNet8 Model Architecture
 
-A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See VGG16 diagram below, as well as torch model summary.
+An AlexNet CNN model with 8 layers was trained using the processed images via Keras. See AlexNet diagram below, as well as Keras model summary.
 
-![AlexNet Architecture](../torch/VGG16_architecture.png)
+![AlexNet Architecture](keras/AlexNet8_architecture.png)
 
 ```{python}
-# device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# load trained torch model
-model = VGG16_pretrained(num_classes=2).to(device)
-model.load(input_fpath=cons.torch_model_pt_fpath)
+# load trained keras model
+model = keras.models.load_model('data/keras_model.h5')
 # print model summary
-print(model)
+model.summary()
 ```
 
 ## Model Performance
 
-The model was trained across 4 epochs. The model accuracy and loss are plotted below across the training and validation sets.
+The model was trained across 25 epochs. The model accuracy and loss are plotted below across the training and validation sets.
 
-![Model Accuracy](../torch/model_accuracy.png)
+![Model Accuracy](keras/model_accuracy.png)
 
-![Model Loss](../torch/model_loss.png)
+![Model Loss](keras/model_loss.png)
 
 ## Model Image Predictions
 
 The model predictions were made for the Kaggle test set, see below example model predictions.
 
-![Predicted Images](../report/torch/pred_images.jpg)
+![Predicted Images](keras/pred_images.jpg)
