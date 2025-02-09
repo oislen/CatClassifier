@@ -15,11 +15,8 @@ jupyter: python3
 
 ```{python}
 import sys
-import re
-import os
 
-root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")[0]
-sys.path.append(os.path.join(root_dir_re_match, "model"))
+sys.path.append("../model")
 import cons
 
 import torch
