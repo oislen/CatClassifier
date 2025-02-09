@@ -1,11 +1,30 @@
 import os
+from beartype import beartype
 import matplotlib.pyplot as plt
+import pandas as pd
 from tensorflow.keras.preprocessing.image import load_img
+import cons
 
-def plot_preds(data, cons, output_fpath = None, show_plot:bool=True):
+@beartype
+def plot_preds(
+    data:pd.DataFrame,
+    output_fpath:str = None,
+    show_plot:bool=True
+    ):
     """
+    Shows model predictions as a grid of images with labels
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        A dataframe of image arrays and associated labels
+    output_fpath : str
+        The file path to save the plot of predictions, default is None
     show_plot : bool
         Whether to show the generated plot, default is True
+
+    Returns
+    -------
     """
     sample_test = data.head(18)
     plt.figure(figsize=(12, 24))
@@ -24,4 +43,3 @@ def plot_preds(data, cons, output_fpath = None, show_plot:bool=True):
     if show_plot:
         plt.show()
     plt.close()
-    return 0

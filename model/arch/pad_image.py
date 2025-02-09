@@ -1,7 +1,27 @@
 import numpy as np
+from beartype import beartype
+from typing import Union
 
-def pad_image(image_array, pad_shape_wh):
-    """"""
+@beartype
+def pad_image(
+    image_array:np.array,
+    pad_shape_wh:Union[list,tuple]
+    ) -> np.array:
+    """
+    Pads an image array to a desired width and height
+
+    Parameters
+    ----------
+    image_array: np.array
+        The image array to pad to a specified dimension
+    pad_shape_wh : list, tuple
+        The desired dimensions to pad the input image array to
+
+    Returns
+    -------
+    numpy.array
+        The padded image array
+    """
     image_array_shape = image_array.shape
     (img_h, img_w) = image_array_shape[0:2]
     (pad_img_w, pad_img_h) = pad_shape_wh

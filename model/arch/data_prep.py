@@ -2,6 +2,7 @@
 import os
 import sys
 import pickle
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -9,17 +10,23 @@ from sklearn.model_selection import train_test_split
 # load custom modules
 sys.path.append(os.getcwd())
 import cons
-from utilities.load_image import load_image
-from utilities.greyscale_image import greyscale_image
-from utilities.pad_image import pad_image
-from utilities.plot_image import plot_image
-from utilities.resize_image import resize_image
+from arch.load_image import load_image
+from arch.greyscale_image import greyscale_image
+from arch.pad_image import pad_image
+from arch.resize_image import resize_image
 
-def data_prep(cons):
+def data_prep():
+    """
+    Data preparation pipeline for generating the model training, testing and validation data.
 
-    """"""
+    Parameters
+    ----------
 
-    print("Generating image file paths and classes ...")
+    Returns
+    -------
+    """
+
+    logging.info("Generating image file paths and classes ...")
 
 
     if False:
@@ -55,7 +62,7 @@ def data_prep(cons):
         # combine train and test files
         image_fpaths = {**train_image_fpaths, **test_image_fpaths}
     
-    print("Creating image dataframe ...")
+    logging.info("Creating image dataframe ...")
 
     # create list to hold image data
     image_data = []
@@ -78,7 +85,7 @@ def data_prep(cons):
     # convert image data object into a pandas dataframe
     image_dataframe = pd.DataFrame(image_data)
 
-    print("Padding images ...")
+    logging.info("Padding images ...")
 
     # find the largest image dimensions
     max_height = image_dataframe['image_shape'].apply(lambda x: x[0]).max() # height
@@ -90,7 +97,7 @@ def data_prep(cons):
     # apply padding to standardize all images shapes
     image_dataframe['pad_image_array'] = image_dataframe['image_array'].apply(lambda x: pad_image(x, pad_shape_wh = pad_shape))
 
-    print('Down sizing image ...')
+    logging.info('Down sizing image ...')
 
     # set down size shape
     downsize_shape = tuple([round(dim * 1/3) for dim in pad_shape])
@@ -98,7 +105,7 @@ def data_prep(cons):
     # apply resizing to downsize image shapes
     image_dataframe['pad_image_array'] = image_dataframe['pad_image_array'].apply(lambda x: resize_image(x, reshape_wh = downsize_shape))
 
-    print('Splitting train set ...')
+    logging.info('Splitting train set ...')
 
     # subset the output image data
     sub_cols = ['image_fpath', 'pad_image_array', 'target', 'dataset']
@@ -135,8 +142,6 @@ def data_prep(cons):
         pickle.dump(train_data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open(cons.test_data_pickle_fpath, 'wb') as handle:
         pickle.dump(test_data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    return 0
 
 # if running as main programme
 if __name__ == "__main__":

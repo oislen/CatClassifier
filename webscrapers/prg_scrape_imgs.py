@@ -1,9 +1,9 @@
 import logging
-import cons
-from commandline_interface import commandline_interface
-from webscrapers.download_comp_data import download_comp_data
-from webscrapers.beautifulsoup.webscraper import webscraper
 from beartype import beartype
+import cons
+from utilities.commandline_interface import commandline_interface
+from utilities.download_comp_data import download_comp_data
+from utilities.webscraper import webscraper
 
 @beartype
 def scrape_imags(

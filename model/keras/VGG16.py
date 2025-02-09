@@ -1,14 +1,30 @@
-# load in relevant libraries
+from beartype import beartype
+from typing import Union
 from keras.models import Model
 from keras.layers import Flatten, Dense, Input, Dropout
 from keras.layers import Conv2D, MaxPooling2D
 
-def VGG16(input_shape = (224, 224, 3), 
-         n_classes = 1000,
-         output_activation = 'softmax'
-         ):
-    
+@beartype
+def VGG16(input_shape:Union[list,tuple]=(224,224,3), 
+         n_classes:int=1000,
+         output_activation:str='softmax'
+         ) -> Model:
     """
+    VGG16 keras model
+    
+    Parameters
+    ----------
+    input_shape : list,tuple
+        the input image shape / dimensions, default is (224,224,3)
+    n_classes : int
+        The number of target classes, default is 1000
+    output_activation : str
+        The type of activation function to use, default is softmax
+    
+    Returns
+    -------
+    Model
+        Keras.Model, the VGG16 model
     """
 
     # set input shapes

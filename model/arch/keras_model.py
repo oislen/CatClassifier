@@ -12,9 +12,9 @@ from keras.callbacks import ReduceLROnPlateau
 sys.path.append(os.getcwd())
 import cons
 from utilities.plot_image import plot_image
-from arch.LeNet5 import LeNet5
+from keras.LeNet5 import LeNet5
 from fit_model import fit_model
-from plot_model import plot_model_fit
+from utilities.plot_model import plot_model_fit
 
 print('Loading data ...')
 

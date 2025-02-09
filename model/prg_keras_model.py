@@ -147,7 +147,7 @@ if __name__ == "__main__":
         
         logging.info("Plot example test set predictions...")
         # plot random sample predictions
-        plot_preds(data=test_df, cons=cons, output_fpath=cons.keras_pred_images_fpath, show_plot=False)
+        plot_preds(data=test_df, output_fpath=cons.keras_pred_images_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="TestSetPredictions")
         
         logging.info("Generate a sample submission file for kaggle...")

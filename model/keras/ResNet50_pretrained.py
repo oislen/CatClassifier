@@ -1,13 +1,34 @@
+from beartype import beartype
+from typing import Union
 from keras.layers import Dropout, Dense, Flatten
 from keras.applications import ResNet50
 from keras.models import Model
 
-def ResNet50_pretrained(input_shape = (224, 224, 3), 
-                        n_classes = 2,
-                        output_activation = 'softmax'
-                        ):
-
+@beartype
+def ResNet50_pretrained(
+    input_shape:Union[list,tuple]=(224,224,3), 
+    n_classes:int=2,
+    output_activation:str='softmax'
+    ) -> Model:
     """
+    Pretrained ResNet50 keras model
+    
+    Parameters
+    ----------
+    input_shape : list,tuple
+        the input image shape / dimensions, default is (224,224,3)
+    n_classes : int
+        The number of target classes, default is 2
+    output_activation : str
+        The type of activation function to use, default is softmax
+    
+    Returns
+    -------
+    Model
+        Keras.Model, the pretrained ResNet50 model
+    
+    Example
+    -------
     model = ResNet50_pretrained(input_shape = (224, 224, 3), 
                                 n_classes = 2,
                                 output_activation = 'softmax',
@@ -42,6 +63,3 @@ def ResNet50_pretrained(input_shape = (224, 224, 3),
     model = Model(inputs = ResNet50_pretrained.input, outputs = x, name = 'ResNet50_pretrained')
 
     return model
-
-
-
