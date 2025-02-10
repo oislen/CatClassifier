@@ -12,9 +12,16 @@ Docker containers were used to deploy the application on an EC2 spot instances i
 
 ## Analysis Results
 
-Both models were trained using a variety of image transformations, early stopping, stochastic gradient descent, learning rate reduction and cross entropy loss criterion.
+The images were further normalised using rotations, scaling, zooming, flipping and shearing prior to the modelling training phase.
 
-See the analysis results notebook for a summary of the project; including image processing, CNN architecture and model performance.
+![Generator Plot](report/torch/generator_plot.jpg)
+
+Models were trained across 10 to 25 epochs using stochastic gradient descent and cross entropy loss. Learning rate reduction on plateau and early stopping were implemented as part of training procedure.
+
+![Predicted Images](report/torch/pred_images.jpg)
+
+See the analysis results notebook for a further details on the analysis; including CNN architecture and model performance.
+
 * https://nbviewer.org/github/oislen/CatClassifier/blob/main/report/torch_analysis_results.ipynb
 
 ## Running the Application (Windows)
