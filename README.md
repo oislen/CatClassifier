@@ -28,8 +28,42 @@ See the analysis results notebook for a further details on the analysis; includi
 
 ### Anaconda
 
+Create a local conda environment for the Cat Classifier app using [anaconda](https://www.anaconda.com/):
+
+```
+conda create --name CatClassifier python=3.12 --yes
+conda activate CatClassifier
+pip install -r requirements.txt
+```
+
+Execute the webscrapers and model training pipeline using the following commands and the local conda environment:
+
+```
+:: run webscrapers
+python webscrapers/prg_scrape_imgs.py --run_download_comp_data --run_webscraper
+:: run model training pipeline
+python model/prg_torch_model.py --run_model_training --run_testset_prediction
+```
+
+The model training and evaluation report can be opened with:
+
+```
+jupyter lab --ip=0.0.0.0 --allow-root "report/torch_analysis_results.ipynb"
+```
 ### Docker
 
-The application docker container is available on dockerhub here:
+The latest version of the Cat Classifier app can be found as a [docker](https://www.docker.com/) image on dockerhub here:
 
-https://hub.docker.com/repository/docker/oislen/cat-classifier
+* https://hub.docker.com/repository/docker/oislen/cat-classifier
+
+The image can be pulled from dockerhub using the following command:
+
+```
+docker pull oislen/cat-classifier:latest
+```
+
+The Cat Classifier app can then be started within a jupyter lab session using the following command and the docker image:
+
+```
+docker run --name cc --shm-size=512m --publish 8888:8888 -it oislen/cat-classifier:latest
+```
