@@ -1,0 +1,66 @@
+---
+title: "Torch Analysis Results"
+format: 
+    html:
+        toc: true
+        toc-location: left
+        toc-depth: 2
+        toc-title: Contents
+        code-fold: false
+        echo: false
+jupyter: python3
+---
+
+# Cats vs Dogs Image Classification
+
+```{python}
+import sys
+
+sys.path.append("../model")
+import cons
+
+import torch
+from model.torch.VGG16_pretrained import VGG16_pretrained
+```
+
+This project aims to create a model to classify cat and dog images. The data was sourced from the [dogs-vs-cats](https://www.kaggle.com/competitions/dogs-vs-cats/overview) Kaggle competition, and also from [freeimages.com](https://www.freeimages.com/) using a web scraper. Docker containers were used to deploy the application on an EC2 spot instances in order to scale up hardware and computation power. 
+
+## Example Image
+
+![Random Image](torch/random_image.jpg)
+
+## Data Processing
+
+The images were resized to a uniform dimension and the colour channels normalised prior to the modelling training phase. See example image processing below. 
+
+![Generator Plot](torch/generator_plot.jpg)
+
+## VGG16 Model Architecture
+
+A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See VGG16 diagram below, as well as torch model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
+
+![AlexNet Architecture](torch/VGG16_architecture.png)
+
+```{python}
+# device configuration
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# load trained torch model
+model = VGG16_pretrained(num_classes=2).to(device)
+model.load(input_fpath=cons.torch_model_pt_fpath)
+# print model summary
+print(model)
+```
+
+## Model Performance
+
+The model was trained across 10 epochs. Learning rate reduction on plateau and early stopping were implemented as part of training procedure. The model accuracy and loss are plotted below across the training and validation sets.
+
+![Model Accuracy](torch/model_accuracy.png)
+
+![Model Loss](torch/model_loss.png)
+
+## Model Image Predictions
+
+The model predictions were made for the Kaggle test set, see below example model predictions.
+
+![Predicted Images](torch/pred_images.jpg)

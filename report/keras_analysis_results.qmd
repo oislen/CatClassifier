@@ -1,5 +1,5 @@
 ---
-title: "Analysis Results"
+title: "Keras Analysis Results"
 format: 
     html:
         toc: true
@@ -14,6 +14,11 @@ jupyter: python3
 # Cats vs Dogs Image Classification
 
 ```{python}
+import sys
+
+sys.path.append("../model")
+import cons
+
 from tensorflow import keras
 ```
 
@@ -21,35 +26,37 @@ This project aims to create a model to classify cat and dog images. The data was
 
 ## Example Image
 
-![Random Image](report/keras/random_image.jpg)
+![Random Image](keras/random_image.jpg)
 
 ## Data Processing
 
 The images were further processed using rotations, scaling, zooming, flipping and shearing prior to the modelling training phase. See example image processing below. 
 
-![Generator Plot](report/keras/generator_plot.jpg)
+![Generator Plot](keras/generator_plot.jpg)
 
-## AlexNet8 Model Archecture
+## AlexNet8 Model Architecture
 
-An AlexNet CNN model with 8 layers was trained using the processed images via Keras. See AlexNet diagram below, as well as keras model summary.
+An AlexNet CNN model with 8 layers was trained using the processed images via Keras. See AlexNet diagram below, as well as Keras model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
+
+![AlexNet Architecture](keras/AlexNet8_architecture.png)
 
 ```{python}
 # load trained keras model
-model = keras.models.load_model('data/keras_model.h5')
+model = keras.models.load_model(cons.keras_model_pickle_fpath)
 # print model summary
 model.summary()
 ```
 
 ## Model Performance
 
-The model was trained across 25 epochs. The model accuracy and loss are plotted below across the training and validation sets.
+The model was trained across 25 epochs. Learning rate reduction on plateau and early stopping were implemented as part of training procedure.The model accuracy and loss are plotted below across the training and validation sets.
 
-![Model Accuaracy](report/keras/model_accuracy.png)
+![Model Accuracy](keras/model_accuracy.png)
 
-![Model Loss](report/keras/model_loss.png)
+![Model Loss](keras/model_loss.png)
 
 ## Model Image Predictions
 
 The model predictions were made for the Kaggle test set, see below example model predictions.
 
-![Predicted Images](report/keras/pred_images.jpg)
+![Predicted Images](keras/pred_images.jpg)
