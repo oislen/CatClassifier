@@ -31,13 +31,13 @@ This project aims to create a model to classify cat and dog images. The data was
 
 ## Data Processing
 
-The images were resized to a uniform dimension prior to the modelling training phase. See example image processing below. 
+The images were resized to a uniform dimension and the colour channels normalised prior to the modelling training phase. See example image processing below. 
 
 ![Generator Plot](torch/generator_plot.jpg)
 
 ## VGG16 Model Architecture
 
-A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See VGG16 diagram below, as well as torch model summary.
+A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See VGG16 diagram below, as well as torch model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
 
 ![AlexNet Architecture](torch/VGG16_architecture.png)
 
@@ -53,7 +53,7 @@ print(model)
 
 ## Model Performance
 
-The model was trained across 4 epochs. The model accuracy and loss are plotted below across the training and validation sets.
+The model was trained across 10 epochs. Learning rate reduction on plateau and early stopping were implemented as part of training procedure. The model accuracy and loss are plotted below across the training and validation sets.
 
 ![Model Accuracy](torch/model_accuracy.png)
 
