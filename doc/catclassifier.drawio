@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36" version="25.0.3">
+  <diagram name="Page-1" id="bBaojYlcXimtXHP4Su1T">
+    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-1" value="freeimages.com" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="30" y="110" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-2" value="Kaggle" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="30" y="270" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0;entryDx=0;entryDy=15;entryPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-1" target="kfa_lcFOGdhym_HThWfJ-23">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="320" as="sourcePoint" />
+            <mxPoint x="230" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=1;entryDx=0;entryDy=-15;entryPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-2" target="kfa_lcFOGdhym_HThWfJ-23">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="320" as="sourcePoint" />
+            <mxPoint x="230" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-5" value="Data Collection" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;fillColor=default;" vertex="1" parent="1">
+          <mxGeometry x="110" y="20" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-7" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0;exitDx=0;exitDy=52.5;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-2" target="kfa_lcFOGdhym_HThWfJ-24">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="310" as="sourcePoint" />
+            <mxPoint x="520" y="313" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-9" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="450" as="sourcePoint" />
+            <mxPoint x="310" y="40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-11" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="450" as="sourcePoint" />
+            <mxPoint x="630" y="50" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-12" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-23" target="kfa_lcFOGdhym_HThWfJ-13">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="200" as="sourcePoint" />
+            <mxPoint x="410" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-13" value="&lt;div&gt;AlexNet8 Model&lt;/div&gt;&lt;div&gt;VGG16 Model&lt;/div&gt;&lt;div&gt;&lt;hr&gt;&lt;/div&gt;&lt;div&gt;37K Images&lt;/div&gt;&lt;div&gt;Image Transformations&lt;/div&gt;&lt;div&gt;Pretrained Model Weights&lt;/div&gt;&lt;div&gt;Early Stopping&lt;/div&gt;&lt;div&gt;Stochastic Gradient Descent&lt;/div&gt;&lt;div&gt;Learning Rate Deduction&lt;/div&gt;&lt;div&gt;Cross Entropy Loss Criterion&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;rounded=1;align=center;fillColor=#d5e8d4;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="380" y="135" width="170" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-14" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=15;entryPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-13" target="kfa_lcFOGdhym_HThWfJ-25">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="310" as="sourcePoint" />
+            <mxPoint x="712" y="294" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-15" value="Output" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;fillColor=default;" vertex="1" parent="1">
+          <mxGeometry x="710" y="20" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-16" value="Modelling" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;fillColor=default;" vertex="1" parent="1">
+          <mxGeometry x="435" y="20" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-17" value="" style="endArrow=classic;html=1;rounded=0;exitX=1.024;exitY=0.394;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-13" target="kfa_lcFOGdhym_HThWfJ-18">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="310" as="sourcePoint" />
+            <mxPoint x="690" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-18" value="Jupyter Lab Report&lt;div&gt;&lt;hr&gt;Data Processing&lt;/div&gt;&lt;div&gt;Model Architecture&lt;/div&gt;&lt;div&gt;Model Performance&lt;/div&gt;&lt;div&gt;Image Prediction&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;rounded=1;fillColor=#e1d5e7;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="680" y="140" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-23" value="Train and Validation Data" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="180" y="180" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-24" value="Test Data" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="180" y="350" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-25" value="Submission&lt;div&gt;Data&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="690" y="360" width="100" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kfa_lcFOGdhym_HThWfJ-26" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="kfa_lcFOGdhym_HThWfJ-24" target="kfa_lcFOGdhym_HThWfJ-25">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="310" as="sourcePoint" />
+            <mxPoint x="450" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
