@@ -1,4 +1,4 @@
-# python model/arch/classify_image_torch.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg
+# python model/arch/classify_image_torch.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg --model_fpath E:/GitHub/CatClassifier/data/models/VGG16.pt
 
 import logging
 import argparse
@@ -45,13 +45,15 @@ torch_transforms = transforms.Compose([
 ])
 
 @beartype
-def classify_image_torch(image_fpath:str):
+def classify_image_torch(image_fpath:str, model_fpath:str=cons.torch_model_pt_fpath):
     """Classifies an input image using the torch model
     
     Parameters
     ----------
     image_fpath : str
-        The image file to classify using the torch model
+        The full filepath to the image to classify using the torch model
+    model_fpath : str
+        The full filepath to the torch model to use for classification, default is cons.torch_model_pt_fpath
     
     Returns
     -------
@@ -63,7 +65,7 @@ def classify_image_torch(image_fpath:str):
     # load model
     #model = AlexNet8(num_classes=2).to(device)
     model = VGG16_pretrained(num_classes=2).to(device)
-    model.load(input_fpath=cons.torch_model_pt_fpath)
+    model.load(input_fpath=model_fpath)
     
     logging.info("Generating dataset...")
     # prepare test data
@@ -93,9 +95,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Classify Image (Torch Model)")
     # add input arguments
     parser.add_argument("--image_fpath", action="store", dest="image_fpath", type=str, help="String, the full file path to the image to classify")
+    parser.add_argument("--model_fpath", action="store", dest="model_fpath", type=str, default=cons.torch_model_pt_fpath, help="String, the full file path to the model to use for classification")
     # create an output dictionary to hold the results
     input_params_dict = {}
     # extract input arguments
     args = parser.parse_args()
     # classify image using torch model
-    response = classify_image_torch(image_fpath=args.image_fpath)
+    response = classify_image_torch(image_fpath=args.image_fpath, model_fpath=args.model_fpath)
