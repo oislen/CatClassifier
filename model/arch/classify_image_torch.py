@@ -1,4 +1,4 @@
-# python arch/classify_image_torch.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg
+# python model/arch/classify_image_torch.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg
 
 import logging
 import argparse
@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import sys
 import re
+from beartype import beartype
 
 # set root file directories
 root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")
@@ -43,12 +44,51 @@ torch_transforms = transforms.Compose([
     ,transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # standardized processing
 ])
 
-if __name__ == "__main__":
+@beartype
+def classify_image_torch(image_fpath:str):
+    """Classifies an input image using the torch model
+    
+    Parameters
+    ----------
+    image_fpath : str
+        The image file to classify using the torch model
+    
+    Returns
+    -------
+    list
+        The image file classification results as a recordset
+    """
+    
+    logging.info("Loading torch model...")
+    # load model
+    #model = AlexNet8(num_classes=2).to(device)
+    model = VGG16_pretrained(num_classes=2).to(device)
+    model.load(input_fpath=cons.torch_model_pt_fpath)
+    
+    logging.info("Generating dataset...")
+    # prepare test data
+    dataframe = pd.DataFrame({'filepath': [image_fpath]})
+    
+    logging.info("Creating dataloader...")
+    # set train data loader
+    dataset = CustomDataset(dataframe, transforms=torch_transforms, mode='test')
+    loader = DataLoader(dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
+    
+    logging.info("Classifying image...")
+    # make test set predictions
+    predict = model.predict(loader, device)
+    dataframe['category'] = np.argmax(predict, axis=-1)
+    dataframe["category"] = dataframe["category"].replace(cons.category_mapper)
+    response = dataframe.to_dict(orient="records")
+    logging.info(response)
+    return response
 
+if __name__ == "__main__":
+    
     # set up logging
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
-
+    
     # define argument parser object
     parser = argparse.ArgumentParser(description="Classify Image (Torch Model)")
     # add input arguments
@@ -57,28 +97,5 @@ if __name__ == "__main__":
     input_params_dict = {}
     # extract input arguments
     args = parser.parse_args()
-    # map input arguments into output dictionary
-    input_params_dict["image_fpath"] = args.image_fpath
-
-    logging.info("Loading torch model...")
-    # load model
-    #model = AlexNet8(num_classes=2).to(device)
-    model = VGG16_pretrained(num_classes=2).to(device)
-    model.load(input_fpath=cons.torch_model_pt_fpath)
-
-    logging.info("Generating dataset...")
-    # prepare test data
-    filenames = os.listdir(cons.test_fdir)
-    df = pd.DataFrame({'filepath': [input_params_dict["image_fpath"]]})
-
-    logging.info("Creating dataloader...")
-    # set train data loader
-    dataset = CustomDataset(df, transforms=torch_transforms, mode='test')
-    loader = DataLoader(dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
-
-    logging.info("Classifying image...")
-    # make test set predictions
-    predict = model.predict(loader, device)
-    df['category'] = np.argmax(predict, axis=-1)
-    df["category"] = df["category"].replace(cons.category_mapper)
-    logging.info(df.to_dict(orient="records"))
+    # classify image using torch model
+    response = classify_image_torch(image_fpath=args.image_fpath)
