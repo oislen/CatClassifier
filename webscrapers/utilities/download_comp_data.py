@@ -104,7 +104,7 @@ def download_models(
     -------
     download_models(
         model_instance_url="oislen/cat-classifier-cnn-models/pyTorch/default/1",
-        model_dir="E:\\GitHub\\CatClassifier\\data\\models"
+        model_dir="E:\\GitHub\\CatClassifier\\data"
         )
     """
 
