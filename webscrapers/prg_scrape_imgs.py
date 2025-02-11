@@ -73,6 +73,7 @@ if __name__ == "__main__":
 
     # run the scrape images programme
     scrape_imags(
+        run_download_models=input_params_dict["run_download_models"],
         run_download_comp_data=input_params_dict["run_download_comp_data"], 
         run_webscraper=input_params_dict["run_webscraper"]
         )
