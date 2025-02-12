@@ -7,7 +7,7 @@
             {
                 "DeviceName": "/dev/xvda",
                 "Ebs": {
-                    "VolumeSize": 50,
+                    "VolumeSize": 70,
                     "VolumeType": "gp3"
                 }
             }
@@ -20,7 +20,7 @@
                 "Groups":["sg-03864b806cd78ded3"]
             }
         ],
-        "ImageId": "ami-0000c3ca6a299ab94",
+        "ImageId": "ami-000b13fcd5cd7b0f8",
         "InstanceType": "g4ad.xlarge",
         "KeyName": "kaggle",
         "Placement": {
