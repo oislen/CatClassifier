@@ -12,40 +12,37 @@
             },
             "Overrides": [
                 {
-                    "InstanceType": "c3.2xlarge"
+                    "InstanceType": "g4ad.xlarge"
                 },
                 {
-                    "InstanceType": "c3.4xlarge"
+                    "InstanceType": "g4ad.2xlarge"
                 },
                 {
-                    "InstanceType": "c4.2xlarge"
+                    "InstanceType": "g4ad.4xlarge"
                 },
                 {
-                    "InstanceType": "c4.4xlarge"
+                    "InstanceType": "g4dn.xlarge"
                 },
                 {
-                    "InstanceType": "c5.2xlarge"
+                    "InstanceType": "g4dn.2xlarge"
                 },
                 {
-                    "InstanceType": "c5.4xlarge"
+                    "InstanceType": "g4dn.4xlarge"
                 },
                 {
-                    "InstanceType": "c5a.2xlarge"
+                    "InstanceType": "g5.xlarge"
                 },
                 {
-                    "InstanceType": "c5a.4xlarge"
+                    "InstanceType": "g5.2xlarge"
                 },
                 {
-                    "InstanceType": "c5ad.2xlarge"
+                    "InstanceType": "g6.xlarge"
                 },
                 {
-                    "InstanceType": "c5ad.4xlarge"
+                    "InstanceType": "g6.2xlarge"
                 },
                 {
-                    "InstanceType": "c5d.2xlarge"
-                },
-                {
-                    "InstanceType": "c5d.4xlarge"
+                    "InstanceType": "g6.4xlarge"
                 }
             ]
         }

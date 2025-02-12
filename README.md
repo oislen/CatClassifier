@@ -24,6 +24,10 @@ See the analysis results notebook for a further details on the analysis; includi
 
 * https://nbviewer.org/github/oislen/CatClassifier/blob/main/report/torch_analysis_results.ipynb
 
+Master serialised copies of the trainined models are available on Kaggle:
+
+* https://www.kaggle.com/models/oislen/cat-classifier-cnn-models
+
 ## Running the Application (Windows)
 
 ### Anaconda
