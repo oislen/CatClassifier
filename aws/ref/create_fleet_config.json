@@ -21,6 +21,9 @@
                     "InstanceType": "g4ad.4xlarge"
                 },
                 {
+                    "InstanceType": "g4ad.8xlarge"
+                },
+                {
                     "InstanceType": "g4dn.xlarge"
                 },
                 {
@@ -30,19 +33,16 @@
                     "InstanceType": "g4dn.4xlarge"
                 },
                 {
+                    "InstanceType": "g4dn.8xlarge"
+                },
+                {
                     "InstanceType": "g5.xlarge"
                 },
                 {
                     "InstanceType": "g5.2xlarge"
                 },
                 {
-                    "InstanceType": "g6.xlarge"
-                },
-                {
-                    "InstanceType": "g6.2xlarge"
-                },
-                {
-                    "InstanceType": "g6.4xlarge"
+                    "InstanceType": "g5.4xlarge"
                 }
             ]
         }
