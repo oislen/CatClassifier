@@ -13,6 +13,8 @@ call docker build --no-cache -t %DOCKER_IMAGE% .
 
 :: run docker container
 call docker run --name %DOCKER_CONTAINER_NAME% --shm-size=512m --publish 8888:8888 --volume E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds  --volume E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report -it %DOCKER_IMAGE%
+::call docker run --entrypoint sh --name %DOCKER_CONTAINER_NAME% ---shm-size=512m --publish 8888:8888 --volume E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds  --volume E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report -it %DOCKER_IMAGE%
+::call docker run -it --entrypoint bash --name cc --shm-size=512m --volume /home/ec2-user/.creds:/home/ubuntu/CatClassifier/.creds --rm  oislen/cat-classifier:latest
 
 :: useful docker commands
 :: docker images
