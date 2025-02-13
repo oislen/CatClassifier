@@ -3,7 +3,7 @@
 # 2. make sure to increase volume in /dev/nvme0n1 (/dev/xvda) e.g. 100gb
 
 # linux file formatting
-# sudo apt install -y dos2unix
+# sudo apt-get install -y dos2unix
 # dos2unix ./linux_docker_setup.sh 
 
 #-- EC2 Spot Instance Checks --#
@@ -57,14 +57,11 @@ sudo umount /tmp
 #-- Download Required Programmes --#
 
 # update os
-sudo apt update -y
+sudo apt-get update -y
 # install required base software
-sudo apt install -y htop vim tmux dos2unix docker git
+sudo apt-get install -y htop vim tmux dos2unix docker git
 # remove unneed dependencies
-sudo apt autoremove
-# install nvidia cuda toolkit
-#sudo apt install nvidia-cuda-toolkit
-# nvcc --version
+sudo apt-get autoremove
 
 #-- Pull Git Repo --#
 
