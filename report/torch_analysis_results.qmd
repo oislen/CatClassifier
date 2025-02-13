@@ -43,7 +43,7 @@ A pre-trained VGG CNN model with 16 layers was trained using the processed image
 
 ```{python}
 # device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 # load trained torch model
 model = VGG16_pretrained(num_classes=2).to(device)
 model.load(input_fpath=cons.torch_model_pt_fpath)

@@ -33,7 +33,7 @@ from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
 
 # device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
 torch_transforms = transforms.Compose([
     transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size

@@ -3,7 +3,7 @@
 # 2. make sure to increase volume in /dev/nvme0n1 (/dev/xvda) e.g. 100gb
 
 # linux file formatting
-# sudo yum install -y dos2unix 
+# sudo apt-get install -y dos2unix
 # dos2unix ./linux_docker_setup.sh 
 
 #-- EC2 Spot Instance Checks --#
@@ -14,6 +14,9 @@ df -h
 lscpu
 # calculate percentage of used memory
 free -m | awk 'FNR == 2 {print $3/($3+$4)*100}'
+# check gpu status
+nvidia-smi
+# watch -n 0.5 nvidia-smi
 
 #-- Configure Permissions and Overcommit Settings --#
 
@@ -54,11 +57,11 @@ sudo umount /tmp
 #-- Download Required Programmes --#
 
 # update os
-sudo yum update -y
+sudo apt-get update -y
 # install required base software
-sudo yum install -y htop vim tmux dos2unix docker git
+sudo apt-get install -y htop vim tmux dos2unix docker git
 # remove unneed dependencies
-sudo yum autoremove
+sudo apt-get autoremove
 
 #-- Pull Git Repo --#
 

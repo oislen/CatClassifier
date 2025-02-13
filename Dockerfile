@@ -33,6 +33,7 @@ RUN apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN /opt/venv/bin/python3 -m pip install -v -r /home/ubuntu/CatClassifier/requirements.txt
+RUN /opt/venv/bin/python3 -m pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
