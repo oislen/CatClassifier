@@ -97,6 +97,6 @@ cat ~/.creds/docker | docker login --username oislen --password-stdin
 docker pull $docker_image
 # run pulled docker container
 #docker run --shm-size=512m -p 8889:8888 -it $docker_image
-docker run --name $docker_container_name --shm-size=512m --publish 8888:8888 --volume /home/ubuntu/CatClassifier/.creds:/home/ubuntu/CatClassifier/.creds  --volume /home/ubuntu/CatClassifier/report:/home/ubuntu/CatClassifier/report --rm -it --entrypoint bash $docker_image
+docker run --name $docker_container_name --shm-size=512m --publish 8888:8888 --volume /home/ubuntu/CatClassifier/.creds:/home/ubuntu/CatClassifier/.creds  --volume /home/ubuntu/CatClassifier/report:/home/ubuntu/CatClassifier/report --gpus all --env PARAM_CHECK_GPU=True -it --entrypoint bash $docker_image
 #docker run --shm-size=512m -p 8889:8888 -d $docker_image
 #docker run -it -d <container_id_or_name> /bin/bash
