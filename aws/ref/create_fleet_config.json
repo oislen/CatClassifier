@@ -12,18 +12,6 @@
             },
             "Overrides": [
                 {
-                    "InstanceType": "g4ad.xlarge"
-                },
-                {
-                    "InstanceType": "g4ad.2xlarge"
-                },
-                {
-                    "InstanceType": "g4ad.4xlarge"
-                },
-                {
-                    "InstanceType": "g4ad.8xlarge"
-                },
-                {
                     "InstanceType": "g4dn.xlarge"
                 },
                 {
@@ -36,6 +24,9 @@
                     "InstanceType": "g4dn.8xlarge"
                 },
                 {
+                    "InstanceType": "g4dn.12xlarge"
+                },
+                {
                     "InstanceType": "g5.xlarge"
                 },
                 {
@@ -43,6 +34,12 @@
                 },
                 {
                     "InstanceType": "g5.4xlarge"
+                },
+                {
+                    "InstanceType": "g5.8xlarge"
+                },
+                {
+                    "InstanceType": "g5.12xlarge"
                 }
             ]
         }
