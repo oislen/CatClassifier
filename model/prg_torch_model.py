@@ -58,7 +58,7 @@ if __name__ == "__main__":
         filenames = os.listdir(cons.train_fdir)
         categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
         df = pd.DataFrame({'filename': filenames, 'category': categories})
-        frac = 0.001
+        frac = 0.05
         df = df.sample(frac = frac)
         df["categoryname"] = df["category"].replace(cons.category_mapper) 
         df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
