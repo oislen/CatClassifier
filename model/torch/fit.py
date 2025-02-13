@@ -55,7 +55,7 @@ def fit(model, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimiz
             optimizer.step()
             # calculate metrics
             t_loss += loss.item() * images.size(0)
-            t_corr += torch.sum(preds.argmax(1) == labels) 
+            t_corr += torch.sum(preds.argmax(1) == labels.to(device)) 
             print(f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
         # update training loss and accuarcy
         train_loss = t_loss / len(train_dataloader.dataset)
