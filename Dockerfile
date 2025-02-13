@@ -25,6 +25,15 @@ COPY . /home/ubuntu/CatClassifier
 RUN mkdir /home/${user}/CatClassifier/data
 RUN mkdir /home/${user}/CatClassifier/model/checkpoints
 
+## install anaconda
+#RUN wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
+#RUN shasum -a 256 ~/Anaconda3-2024.10-1-Linux-x86_64.sh
+#RUN bash ~/Anaconda3-2024.10-1-Linux-x86_64.sh -b -p /home/ubuntu/anaconda3
+#RUN export PATH="/home/ubuntu/anaconda3/bin:PATH"
+#RUN conda init
+#RUN source ~/.bashrc
+# RUN conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch-nightly -c nvidia -y
+
 # add deadsnakes ppa
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
