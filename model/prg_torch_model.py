@@ -111,8 +111,9 @@ if __name__ == "__main__":
         device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
         logging.info(f"device: {device}")
         # initiate cnn architecture
-        model = LeNet5(num_classes=2).to(device)
-        #model = VGG16_pretrained(num_classes=2).to(device)
+        #model = LeNet5(num_classes=2).to(device)
+        #model = AlexNet8(num_classes=2).to(device)
+        model = VGG16_pretrained(num_classes=2).to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
