@@ -59,7 +59,7 @@ def fit(model, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimiz
             print(f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
         # update training loss and accuarcy
         train_loss = t_loss / len(train_dataloader.dataset)
-        train_acc = t_corr.cpu().numpy() / len(train_dataloader.dataset)
+        train_acc = t_corr.item() / len(train_dataloader.dataset)
         train_loss_list.append(train_loss)
         train_acc_list.append(train_acc)  
         print(f'Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}')
