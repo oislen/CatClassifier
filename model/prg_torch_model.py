@@ -22,6 +22,7 @@ from tensorflow.keras.preprocessing.image import load_img
 import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.AlexNet8 import AlexNet8
+from model.torch.LeNet5 import LeNet5
 from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
@@ -30,12 +31,6 @@ from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.TimeIt import TimeIt
 from model.utilities.commandline_interface import commandline_interface
-
-# hyper-parameters
-num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
-
-# device configuration
-device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
 torch_transforms = transforms.Compose([
     transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
@@ -112,8 +107,11 @@ if __name__ == "__main__":
         timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Initiate torch model...")
+        # device configuration
+        device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
+        logging.info(f"device: {device}")
         # initiate cnn architecture
-        model = AlexNet8(num_classes=2).to(device)
+        model = LeNet5(num_classes=2).to(device)
         #model = VGG16_pretrained(num_classes=2).to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
@@ -122,6 +120,8 @@ if __name__ == "__main__":
         timeLogger.logTime(parentKey="Modelling", subKey="InitiateTorchModel")
         
         logging.info("Fit torch model...")
+        # hyper-parameters
+        num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
         # fit torch model
         model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper)
         timeLogger.logTime(parentKey="Modelling", subKey="Fit")
