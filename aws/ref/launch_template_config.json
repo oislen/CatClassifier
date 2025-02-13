@@ -5,9 +5,9 @@
     "LaunchTemplateData": {
         "BlockDeviceMappings": [
             {
-                "DeviceName": "/dev/xvda",
+                "DeviceName": "/dev/sda1",
                 "Ebs": {
-                    "VolumeSize": 70,
+                    "VolumeSize": 100,
                     "VolumeType": "gp3"
                 }
             }
