@@ -25,15 +25,6 @@ COPY . /home/ubuntu/CatClassifier
 RUN mkdir /home/${user}/CatClassifier/data
 RUN mkdir /home/${user}/CatClassifier/model/checkpoints
 
-## install anaconda
-#RUN wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
-#RUN shasum -a 256 ~/Anaconda3-2024.10-1-Linux-x86_64.sh
-#RUN bash ~/Anaconda3-2024.10-1-Linux-x86_64.sh -b -p /home/ubuntu/anaconda3
-#RUN export PATH="/home/ubuntu/anaconda3/bin:PATH"
-#RUN conda init
-#RUN source ~/.bashrc
-#RUN conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch-nightly -c nvidia -y
-
 # add deadsnakes ppa
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
@@ -42,7 +33,7 @@ RUN apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN /opt/venv/bin/python3 -m pip install -v -r /home/ubuntu/CatClassifier/requirements.txt
-#RUN /opt/venv/bin/python3# python3 -m pip install torch==2.5.1+cu121 torchaudio==2.5.1+cu121 torchvision==0.20.1+cu121
+RUN /opt/venv/bin/python3 -m pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
 
 WORKDIR /home/${user}
 ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
