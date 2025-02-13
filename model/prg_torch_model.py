@@ -63,13 +63,14 @@ if __name__ == "__main__":
         filenames = os.listdir(cons.train_fdir)
         categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
         df = pd.DataFrame({'filename': filenames, 'category': categories})
-        frac = 0.05
+        frac = 0.001
         df = df.sample(frac = frac)
         df["categoryname"] = df["category"].replace(cons.category_mapper) 
         df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
         df["filepath"] = cons.train_fdir + '/' + df['filename']
         df["ndims"] = df['filepath'].apply(lambda x: len(np.array(Image.open(x)).shape))
         df = df.loc[df["ndims"] == 3, :].copy()
+        logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
         logging.info("Plot sample image...")
@@ -86,6 +87,8 @@ if __name__ == "__main__":
         train_df = df[~df.index.isin(validate_df.index)]
         train_df = train_df.reset_index(drop=True)
         validate_df = validate_df.reset_index(drop=True)
+        logging.info(f"train_df.shape: {train_df.shape}")
+        logging.info(f"validate_df.shape: {validate_df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
         
         logging.info("Creating training and validation data loaders...")
@@ -102,14 +105,16 @@ if __name__ == "__main__":
         
         logging.info("Plot example data loader images...")
         # datagen example
-        example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
+        example_dataset = CustomDataset(train_df.head(16), transforms=torch_transforms, mode='train')
+        example_loader = DataLoader(example_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+        example_generator = [(image.detach().numpy(), None) for images, labels in example_loader for image in images]
         plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Initiate torch model...")
         # initiate cnn architecture
-        #model = AlexNet8(num_classes=2).to(device)
-        model = VGG16_pretrained(num_classes=2).to(device)
+        model = AlexNet8(num_classes=2).to(device)
+        #model = VGG16_pretrained(num_classes=2).to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
@@ -147,7 +152,7 @@ if __name__ == "__main__":
         test_df["filepath"] = cons.test_fdir + '/' + test_df['filename']
         test_df["idx"] = test_df['filename'].str.extract(pat='([0-9]+)').astype(int)
         test_df = test_df.set_index('idx').sort_index()
-        nb_samples = test_df.shape[0]
+        logging.info(f"train_df.shape: {test_df.shape}")
         timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
         
         logging.info("Create test dataloader...")
