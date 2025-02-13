@@ -35,7 +35,7 @@ from model.utilities.commandline_interface import commandline_interface
 num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
 
 # device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
 torch_transforms = transforms.Compose([
     transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
