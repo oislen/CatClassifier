@@ -16,14 +16,13 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from tensorflow.keras.preprocessing.image import load_img
 
 # load custom scripts
 import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.AlexNet8 import AlexNet8
 from model.torch.LeNet5 import LeNet5
-from model.torch.CustomDataset import CustomDataset
+from model.torch.CustomDataset import CustomDataset, collate_fn
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
 from model.utilities.plot_preds import plot_preds
@@ -31,6 +30,10 @@ from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.TimeIt import TimeIt
 from model.utilities.commandline_interface import commandline_interface
+from model.arch.load_image_v2 import load_image_v2
+
+# device configuration
+device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
 torch_transforms = transforms.Compose([
     transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
@@ -54,24 +57,28 @@ if __name__ == "__main__":
     if input_params_dict["run_model_training"]:
 
         logging.info("Generating dataframe of images...")
+        # TODO: rewrite this with polars
         # create a dataframe of filenames and categories
         filenames = os.listdir(cons.train_fdir)
         categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
-        df = pd.DataFrame({'filename': filenames, 'category': categories})
+        df = pd.DataFrame({'filenames': filenames, 'category': categories})
         frac = 0.05
         df = df.sample(frac = frac)
         df["categoryname"] = df["category"].replace(cons.category_mapper) 
-        df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
-        df["filepath"] = cons.train_fdir + '/' + df['filename']
-        df["ndims"] = df['filepath'].apply(lambda x: len(np.array(Image.open(x)).shape))
+        df['source'] = df['filenames'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
+        df["filepaths"] = cons.train_fdir + '/' + df['filenames']
+        df["images"] = df["filepaths"].apply(lambda x: Image.open(x))
+        df["ndims"] = df['images'].apply(lambda x: len(np.array(x).shape))
         df = df.loc[df["ndims"] == 3, :].copy()
+        # apply transforms and convert to arrays
+        df["image_tensors"] = df["images"].apply(lambda x: torch_transforms(x))#.detach().cpu().numpy())
+        df["category_tensors"] = df["category"].apply(lambda x: torch.tensor(x, dtype=torch.int64))
         logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
         logging.info("Plot sample image...")
         # random image plot
-        sample = random.choice(filenames)
-        image = load_img(os.path.join(cons.train_fdir, sample))
+        image = Image.open(os.path.join(cons.train_fdir, filenames[1]))
         plot_image(image, output_fpath=cons.torch_random_image_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="SampleImage")
         
@@ -91,29 +98,28 @@ if __name__ == "__main__":
         total_train = train_df.shape[0]
         total_validate = validate_df.shape[0]
         # set train data loader
-        train_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
+        train_dataset = CustomDataset(train_df)
         train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
         # set validation data loader
-        validation_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
+        validation_dataset = CustomDataset(train_df)
         validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
         logging.info("Plot example data loader images...")
-        # datagen example
-        example_dataset = CustomDataset(train_df.head(16), transforms=torch_transforms, mode='train')
-        example_loader = DataLoader(example_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
-        example_generator = [(image.detach().numpy(), None) for images, labels in example_loader for image in images]
-        plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
+        # datagen examplec
+        example_data = [train_dataset.__getitem__(idx)[0] for idx in range(16)]
+        plot_generator(generator=example_data, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Initiate torch model...")
-        # device configuration
-        device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
         logging.info(f"device: {device}")
         # initiate cnn architecture
-        #model = LeNet5(num_classes=2).to(device)
+        model = LeNet5(num_classes=2)
         #model = AlexNet8(num_classes=2).to(device)
-        model = VGG16_pretrained(num_classes=2).to(device)
+        #model = VGG16_pretrained(num_classes=2).to(device)
+        if device == "cuda":
+            model = nn.DataParallel(model)
+        model = model.to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
@@ -142,23 +148,28 @@ if __name__ == "__main__":
         logging.info("Load fitted torch model from disk...")
         # load model
         #model = AlexNet8(num_classes=2).to(device)
-        model = VGG16_pretrained(num_classes=2).to(device)
+        model = LeNet5(num_classes=2).to(device)
         model.load(input_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
         logging.info("Generate test dataset...")
         # prepare test data
         test_filenames = os.listdir(cons.test_fdir)
-        test_df = pd.DataFrame({'filename': test_filenames})
-        test_df["filepath"] = cons.test_fdir + '/' + test_df['filename']
+        test_df = pd.DataFrame({'filename': test_filenames}).head()
         test_df["idx"] = test_df['filename'].str.extract(pat='([0-9]+)').astype(int)
+        test_df["filepaths"] = test_df['filename'].apply(lambda x: os.path.join(cons.test_fdir, x))
+        test_df["images"] = load_image_v2(test_df["filepaths"])
+        test_df["category"] = np.nan
         test_df = test_df.set_index('idx').sort_index()
+        # apply transforms and convert to arrays
+        test_df["image_tensors"] = test_df["images"].apply(lambda x: torch_transforms(x))#.detach().cpu().numpy())
+        test_df["category_tensors"] = test_df["category"].apply(lambda x: torch.tensor(torch.tensor(x), dtype=torch.int64))
         logging.info(f"train_df.shape: {test_df.shape}")
         timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
         
         logging.info("Create test dataloader...")
         # set train data loader
-        test_dataset = CustomDataset(test_df, transforms=torch_transforms, mode='test')
+        test_dataset = CustomDataset(test_df)
         test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
         timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
         
