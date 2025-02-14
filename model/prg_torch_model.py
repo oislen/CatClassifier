@@ -62,12 +62,12 @@ if __name__ == "__main__":
         filenames = os.listdir(cons.train_fdir)
         categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
         df = pd.DataFrame({'filenames': filenames, 'category': categories})
-        frac = 0.05
-        df = df.sample(frac = frac)
+        random_state = 42
+        df = df.sample(n=cons.batch_size*4, random_state=random_state).reset_index(drop=True)
         df["categoryname"] = df["category"].replace(cons.category_mapper) 
         df['source'] = df['filenames'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
-        df["filepaths"] = cons.train_fdir + '/' + df['filenames']
-        df["images"] = df["filepaths"].apply(lambda x: Image.open(x))
+        df["filepaths"] = df['filenames'].apply(lambda x: os.path.join(cons.train_fdir, x))
+        df["images"] = load_image_v2(df["filepaths"])
         df["ndims"] = df['images'].apply(lambda x: len(np.array(x).shape))
         df = df.loc[df["ndims"] == 3, :].copy()
         # apply transforms and convert to arrays
@@ -84,8 +84,7 @@ if __name__ == "__main__":
         
         logging.info("Split into training, validation and test dataset...")
         # prepare data
-        random_state = 42
-        validate_df = df[df['source'] == 'kaggle'].sample(n=int(5000 * frac), random_state=random_state)
+        validate_df = df.sample(n=cons.batch_size, random_state=random_state)
         train_df = df[~df.index.isin(validate_df.index)]
         train_df = train_df.reset_index(drop=True)
         validate_df = validate_df.reset_index(drop=True)
@@ -155,9 +154,9 @@ if __name__ == "__main__":
         logging.info("Generate test dataset...")
         # prepare test data
         test_filenames = os.listdir(cons.test_fdir)
-        test_df = pd.DataFrame({'filename': test_filenames}).head()
-        test_df["idx"] = test_df['filename'].str.extract(pat='([0-9]+)').astype(int)
-        test_df["filepaths"] = test_df['filename'].apply(lambda x: os.path.join(cons.test_fdir, x))
+        test_df = pd.DataFrame({'filenames': test_filenames}).head()
+        test_df["idx"] = test_df['filenames'].str.extract(pat='([0-9]+)').astype(int)
+        test_df["filepaths"] = test_df['filenames'].apply(lambda x: os.path.join(cons.test_fdir, x))
         test_df["images"] = load_image_v2(test_df["filepaths"])
         test_df["category"] = np.nan
         test_df = test_df.set_index('idx').sort_index()
