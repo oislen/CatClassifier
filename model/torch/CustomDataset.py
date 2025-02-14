@@ -5,24 +5,23 @@ import numpy as np
 
 class CustomDataset(Dataset):
 
-    def __init__(self, df, transforms, mode):
-        self.mode = mode
-        self.filepath = df['filepath'].tolist()
-        if mode == 'train':
-            self.category = df['category'].tolist()
-        self.transforms = transforms
+    def __init__(self, df):
+        self.image_tensors = df['image_tensors'].values
+        self.category_tensors = df['category_tensors'].values
         
     def __len__(self):
-        return len(self.filepath)
+        return len(self.image_tensors)
 
     def __getitem__(self, idx):
-        image_filepath = self.filepath[idx]
-        image = Image.open(image_filepath)
-        image = self.transforms(image)
+        image_tensor = self.image_tensors[idx]
+        category_tensor = self.category_tensors[idx]
+        return image_tensor, category_tensor
+    
+    #def __getitems__(self, idx_list):
+    #    image_tensors = self.image_tensors[idx_list].tolist()
+    #    category_tensors = self.category_tensors[idx_list].tolist()
+    #    return image_tensors, category_tensors
 
-        if self.mode == 'train':
-            label = torch.tensor(self.category[idx], dtype=torch.int64)
-        else:
-            label = torch.tensor(np.nan)
-        
-        return image, label
+def collate_fn(data):
+    arrays, categories = data
+    return arrays, categories
