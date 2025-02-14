@@ -36,7 +36,7 @@ def plot_generator(
                 plt.imshow(image)
                 break
         elif mode == 'torch':
-            X_batch, Y_batch = generator[i]
+            X_batch = generator[i]
             image = X_batch[0]
             plt.imshow(image)
     plt.tight_layout()
