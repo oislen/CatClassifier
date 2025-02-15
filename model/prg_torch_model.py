@@ -22,7 +22,7 @@ import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.AlexNet8 import AlexNet8
 from model.torch.LeNet5 import LeNet5
-from model.torch.CustomDataset import CustomDataset, collate_fn
+from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
 from model.utilities.plot_preds import plot_preds
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         df["ndims"] = df['images'].apply(lambda x: len(np.array(x).shape))
         df = df.loc[df["ndims"] == 3, :].copy()
         # apply transforms and convert to arrays
-        df["image_tensors"] = df["images"].apply(lambda x: torch_transforms(x))#.detach().cpu().numpy())
+        df["image_tensors"] = df["images"].apply(lambda x: torch_transforms(x))
         df["category_tensors"] = df["category"].apply(lambda x: torch.tensor(x, dtype=torch.int64))
         logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
@@ -98,15 +98,15 @@ if __name__ == "__main__":
         total_validate = validate_df.shape[0]
         # set train data loader
         train_dataset = CustomDataset(train_df)
-        train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+        train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
         # set validation data loader
         validation_dataset = CustomDataset(train_df)
-        validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+        validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
         logging.info("Plot example data loader images...")
         # datagen examplec
-        example_data = [train_dataset.__getitem__(idx)[0] for idx in range(16)]
+        example_data = train_df['image_tensors'].values[:16].tolist()
         plot_generator(generator=example_data, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
@@ -161,15 +161,15 @@ if __name__ == "__main__":
         test_df["category"] = np.nan
         test_df = test_df.set_index('idx').sort_index()
         # apply transforms and convert to arrays
-        test_df["image_tensors"] = test_df["images"].apply(lambda x: torch_transforms(x))#.detach().cpu().numpy())
-        test_df["category_tensors"] = test_df["category"].apply(lambda x: torch.tensor(torch.tensor(x), dtype=torch.int64))
+        test_df["image_tensors"] = test_df["images"].apply(lambda x: torch_transforms(x))
+        test_df["category_tensors"] = test_df["category"].apply(lambda x: torch.tensor(x))
         logging.info(f"train_df.shape: {test_df.shape}")
         timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
         
         logging.info("Create test dataloader...")
         # set train data loader
         test_dataset = CustomDataset(test_df)
-        test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
+        test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
         timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
         
         logging.info("Generate test set predictions...")
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         logging.info("Generate a sample submission file for kaggle...")
         # make submission
         submission_df = test_df.copy()
-        submission_df['id'] = submission_df['filename'].str.split('.').str[0]
+        submission_df['id'] = submission_df['filenames'].str.split('.').str[0]
         submission_df['label'] = submission_df['category'].replace(cons.category_mapper)
         submission_df.to_csv(cons.submission_csv_fpath, index=False)
         timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")
