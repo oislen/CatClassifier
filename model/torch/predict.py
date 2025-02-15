@@ -21,7 +21,6 @@ def predict(model, dataloader:torch.utils.data.DataLoader, device:torch.device) 
     fin_outputs = []
     with torch.no_grad():
         for i, (images, labels) in enumerate(dataloader):
-        #for i, (images, labels) in enumerate(zip(dataloader.dataset.image_tensors, dataloader.dataset.category_tensors)):
             images = images.to(device)
             labels = labels.to(device)
             outputs = model.forward(images)

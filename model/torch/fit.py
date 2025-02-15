@@ -41,9 +41,7 @@ def fit(model, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimiz
     for epoch in range(num_epochs):
         t_loss, t_corr = 0.0, 0.0
         model.train()
-        #train_features, train_labels = next(iter(train_dataloader))
         for i, (images, labels) in enumerate(train_dataloader):
-        #for i, (images, labels) in enumerate(zip(train_dataloader.dataset.image_tensors, train_dataloader.dataset.category_tensors)):
             # load images and labels to device
             images = images.to(device)
             labels = labels.to(device)

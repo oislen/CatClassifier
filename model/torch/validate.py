@@ -24,7 +24,6 @@ def validate(model, device:torch.device, dataloader:torch.utils.data.DataLoader,
     with torch.no_grad():
         v_loss, v_corr = 0.0, 0.0
         for i, (images, labels) in enumerate(dataloader):
-        #for i, (images, labels) in enumerate(zip(dataloader.dataset.image_tensors, dataloader.dataset.category_tensors)):
             # load images and labels to device
             images = images.to(device)
             labels = labels.to(device)
