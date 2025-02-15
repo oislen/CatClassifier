@@ -29,7 +29,7 @@ def plot_preds(
     sample_test = data.head(18)
     plt.figure(figsize=(12, 24))
     for id, (index, row) in enumerate(sample_test.iterrows()):
-        filename = row['filename']
+        filename = row['filenames']
         category = row['category']
         img = load_img(os.path.join(cons.test_fdir, filename), target_size=cons.IMAGE_SIZE)
         plt.subplot(6, 3, id+1)
