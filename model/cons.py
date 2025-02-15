@@ -78,5 +78,5 @@ height_shift_range = 0.1
 shuffle = False
 
 # multiprocessing
-num_workers = os.environ.get("PARAM_NUM_WORKERS", os.cpu_count())
+num_workers = os.environ.get("PARAM_NUM_WORKERS", 0)
 check_gpu = os.environ.get("PARAM_CHECK_GPU", False)
