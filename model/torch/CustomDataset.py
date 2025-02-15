@@ -17,11 +17,11 @@ class CustomDataset(Dataset):
         category_tensor = self.category_tensors[idx]
         return image_tensor, category_tensor
     
-    #def __getitems__(self, idx_list):
-    #    image_tensors = self.image_tensors[idx_list].tolist()
-    #    category_tensors = self.category_tensors[idx_list].tolist()
-    #    return image_tensors, category_tensors
+    def __getitems__(self, idx_list):
+        image_tensors = torch.stack(self.image_tensors[idx_list].tolist())
+        category_tensors = torch.stack(self.category_tensors[idx_list].tolist())
+        return image_tensors, category_tensors
 
-def collate_fn(data):
-    arrays, categories = data
-    return arrays, categories
+    def collate_fn(data):
+        arrays, categories = data
+        return arrays, categories
