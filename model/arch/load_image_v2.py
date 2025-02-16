@@ -45,7 +45,12 @@ class TorchLoadImages():
             labelTensor = torch.tensor(label)
         # load image file and apply torch transforms
         image = Image.open(filepath)
-        imageTensor = self.torch_transforms(image)
+        torch_transform_error = None
+        try:
+            imageTensor = self.torch_transforms(image)
+        except Exception as e:
+            imageTensor = None
+            torch_transform_error = str(e)
         imageArray = np.asarray(image)
         image.close()
         nDims = len(imageArray.shape)
@@ -59,7 +64,8 @@ class TorchLoadImages():
             "images":imageArray,
             "ndims":nDims,
             "category_tensors":labelTensor,
-            "image_tensors":imageTensor
+            "image_tensors":imageTensor,
+            "torch_transform_error":torch_transform_error
             }
         # close open image
         return record
