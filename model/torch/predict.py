@@ -24,6 +24,6 @@ def predict(model, dataloader:torch.utils.data.DataLoader, device:torch.device) 
             images = images.to(device)
             labels = labels.to(device)
             outputs = model.forward(images)
-            fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+            fin_outputs.extend(torch.sigmoid(outputs).tolist())
             proba = np.array(fin_outputs)
     return proba

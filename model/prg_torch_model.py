@@ -3,8 +3,6 @@ import platform
 import logging
 import pandas as pd 
 import numpy as np
-import random
-from PIL import Image
 
 # set huggingface hub directory
 huggingface_hub_dir = 'E:\\huggingface'
@@ -16,12 +14,12 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from tensorflow.keras.preprocessing.image import load_img
 
 # load custom scripts
 import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.AlexNet8 import AlexNet8
+from model.torch.LeNet5 import LeNet5
 from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
@@ -30,12 +28,12 @@ from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.TimeIt import TimeIt
 from model.utilities.commandline_interface import commandline_interface
-
-# hyper-parameters
-num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
+from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
+
+random_state = 42
 
 torch_transforms = transforms.Compose([
     transforms.Resize(size=[cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT])  # resize the input image to a uniform size
@@ -53,39 +51,48 @@ if __name__ == "__main__":
     lgr.setLevel(logging.INFO)
     timeLogger = TimeIt()
     
+    logging.info("Parsing command line arguments...")
     # handle input parameters
     input_params_dict = commandline_interface()
-
+    logging.info(input_params_dict)
+    timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
+    
     if input_params_dict["run_model_training"]:
-
+        
         logging.info("Generating dataframe of images...")
-        # create a dataframe of filenames and categories
-        filenames = os.listdir(cons.train_fdir)
-        categories = [1 if filename.split('.')[0] == 'dog' else 0 for filename in filenames]
-        df = pd.DataFrame({'filename': filenames, 'category': categories})
-        frac = 0.05
-        df = df.sample(frac = frac)
-        df["categoryname"] = df["category"].replace(cons.category_mapper) 
-        df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
-        df["filepath"] = cons.train_fdir + '/' + df['filename']
-        df["ndims"] = df['filepath'].apply(lambda x: len(np.array(Image.open(x)).shape))
-        df = df.loc[df["ndims"] == 3, :].copy()
+        # load and shuffle the image file paths
+        np.random.seed(random_state)
+        image_filepaths=np.array([os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)])
+        np.random.shuffle(image_filepaths)
+        # create torch load images object
+        sample_size = 30000
+        torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
+        df = pd.DataFrame.from_records(torchLoadImages.loadImages(image_filepaths[0:sample_size]))
+        # only consider images with 3 dimensions
+        df = df.loc[df["ndims"]==3, :]
+        # flush data from memory
+        del image_filepaths
+        logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
         logging.info("Plot sample image...")
         # random image plot
-        sample = random.choice(filenames)
-        image = load_img(os.path.join(cons.train_fdir, sample))
-        plot_image(image, output_fpath=cons.torch_random_image_fpath, show_plot=False)
+        plot_image(df['images'].values[1], output_fpath=cons.torch_random_image_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="SampleImage")
+        
+        logging.info("Plot example data loader images...")
+        # data generator example
+        plot_generator(generator=df['image_tensors'].values[:16].tolist(), mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
+        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Split into training, validation and test dataset...")
         # prepare data
-        random_state = 42
-        validate_df = df[df['source'] == 'kaggle'].sample(n=int(5000 * frac), random_state=random_state)
+        validate_df = df.sample(frac=0.05, random_state=random_state, replace=False)
         train_df = df[~df.index.isin(validate_df.index)]
         train_df = train_df.reset_index(drop=True)
         validate_df = validate_df.reset_index(drop=True)
+        logging.info(f"train_df.shape: {train_df.shape}")
+        logging.info(f"validate_df.shape: {validate_df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
         
         logging.info("Creating training and validation data loaders...")
@@ -93,23 +100,28 @@ if __name__ == "__main__":
         total_train = train_df.shape[0]
         total_validate = validate_df.shape[0]
         # set train data loader
-        train_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-        train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+        train_dataset = CustomDataset(train_df)
+        train_loader = DataLoader(train_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
         # set validation data loader
-        validation_dataset = CustomDataset(train_df, transforms=torch_transforms, mode='train')
-        validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True)
+        validation_dataset = CustomDataset(validate_df)
+        validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
+        # flush data from memory
+        del df
+        del train_df
+        del train_dataset
+        del validate_df
+        del validation_dataset
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
-        logging.info("Plot example data loader images...")
-        # datagen example
-        example_generator = [(image.detach().numpy(), None) for images, labels in train_loader for image in images]
-        plot_generator(generator=example_generator, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
-        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
-        
         logging.info("Initiate torch model...")
+        logging.info(f"device: {device}")
         # initiate cnn architecture
+        #model = LeNet5(num_classes=2)
         #model = AlexNet8(num_classes=2).to(device)
         model = VGG16_pretrained(num_classes=2).to(device)
+        if device == "cuda":
+            model = nn.DataParallel(model)
+        model = model.to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='abs')
@@ -117,8 +129,13 @@ if __name__ == "__main__":
         timeLogger.logTime(parentKey="Modelling", subKey="InitiateTorchModel")
         
         logging.info("Fit torch model...")
+        # hyper-parameters
+        num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
         # fit torch model
-        model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper)
+        model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper, checkpoints_dir=cons.checkpoints_fdir, load_epoch_checkpoint=None)
+        # flush data from memory
+        del train_loader
+        del validation_loader
         timeLogger.logTime(parentKey="Modelling", subKey="Fit")
         
         logging.info("Plot model fit results...")
@@ -130,30 +147,28 @@ if __name__ == "__main__":
         # save model
         model.save(output_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Write")
-
+    
     if input_params_dict["run_testset_prediction"]:
         
         logging.info("Load fitted torch model from disk...")
         # load model
+        #model = LeNet5(num_classes=2).to(device)
         #model = AlexNet8(num_classes=2).to(device)
         model = VGG16_pretrained(num_classes=2).to(device)
         model.load(input_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
         logging.info("Generate test dataset...")
-        # prepare test data
-        test_filenames = os.listdir(cons.test_fdir)
-        test_df = pd.DataFrame({'filename': test_filenames})
-        test_df["filepath"] = cons.test_fdir + '/' + test_df['filename']
-        test_df["idx"] = test_df['filename'].str.extract(pat='([0-9]+)').astype(int)
-        test_df = test_df.set_index('idx').sort_index()
-        nb_samples = test_df.shape[0]
-        timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
+        # create torch load images object
+        torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
+        test_df = pd.DataFrame.from_records(torchLoadImages.loadImages(filepaths=[os.path.join(cons.test_fdir, x) for x in os.listdir(cons.test_fdir)]))
+        logging.info(f"test_df.shape: {test_df.shape}")
+        timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
         logging.info("Create test dataloader...")
         # set train data loader
-        test_dataset = CustomDataset(test_df, transforms=torch_transforms, mode='test')
-        test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
+        test_dataset = CustomDataset(test_df)
+        test_loader = DataLoader(test_dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
         timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
         
         logging.info("Generate test set predictions...")
@@ -161,6 +176,9 @@ if __name__ == "__main__":
         predict = model.predict(test_loader, device)
         test_df['category'] = np.argmax(predict, axis=-1)
         test_df["category"] = test_df["category"].replace(cons.category_mapper)
+        # flush data from memory
+        del test_dataset
+        del test_loader
         timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
         
         logging.info("Plot example test set predictions...")
@@ -171,7 +189,10 @@ if __name__ == "__main__":
         logging.info("Generate a sample submission file for kaggle...")
         # make submission
         submission_df = test_df.copy()
-        submission_df['id'] = submission_df['filename'].str.split('.').str[0]
+        submission_df['id'] = submission_df['filenames'].str.split('.').str[0]
         submission_df['label'] = submission_df['category'].replace(cons.category_mapper)
         submission_df.to_csv(cons.submission_csv_fpath, index=False)
+        # delete dataframes from memory
+        del test_df
+        del submission_df
         timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")

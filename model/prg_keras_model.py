@@ -10,6 +10,7 @@ import cons
 from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.plot_preds import plot_preds
+from model.keras.LeNet5 import LeNet5
 from model.keras.AlexNet8 import AlexNet8
 from model.keras.VGG16_pretrained import VGG16_pretrained
 from model.utilities.plot_model import plot_model_fit
@@ -42,6 +43,7 @@ if __name__ == "__main__":
         df = pd.DataFrame({'filename': filenames, 'category': categories})
         df["category"] = df["category"].replace(cons.category_mapper) 
         df['source'] = df['filename'].str.contains(pat='[cat|dog].[0-9]+.jpg', regex=True).map({True:'kaggle', False:'webscraper'})
+        logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
         logging.info("Plot sample image...")
@@ -60,6 +62,8 @@ if __name__ == "__main__":
         # set data constants
         total_train = train_df.shape[0]
         total_validate = validate_df.shape[0]
+        logging.info(f"train_df.shape: {train_df.shape}")
+        logging.info(f"validate_df.shape: {validate_df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
         
         logging.info("Creating training and validation data generators...")
@@ -80,8 +84,9 @@ if __name__ == "__main__":
         
         logging.info("Initiate keras model...")
         # initiate LeNet5 architecture
-        keras_model = AlexNet8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
-        #keras_model = VGG16_pretrained(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        #keras_model = LeNet5(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        #keras_model = AlexNet8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        keras_model = VGG16_pretrained(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
         keras_model.summary()
         # set gradient decent compiler
         optimizer = optimizers.SGD(learning_rate=cons.learning_rate)
@@ -129,7 +134,7 @@ if __name__ == "__main__":
         # prepare test data
         test_filenames = os.listdir(cons.test_fdir)
         test_df = pd.DataFrame({'filename': test_filenames})
-        nb_samples = test_df.shape[0]
+        logging.info(f"train_df.shape: {test_df.shape}")
         timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
 
         logging.info("Create test data generator...")
@@ -140,7 +145,7 @@ if __name__ == "__main__":
         
         logging.info("Generate test set predictions...")
         # make test set predictions
-        predict = keras_model.predict(test_generator, steps=int(np.ceil(nb_samples/cons.batch_size)))
+        predict = keras_model.predict(test_generator, steps=int(np.ceil(test_df.shape[0]/cons.batch_size)))
         test_df['category'] = np.argmax(predict, axis=-1)
         test_df['category'] = test_df['category'].replace(cons.category_mapper)
         timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")

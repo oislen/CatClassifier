@@ -35,7 +35,7 @@ def validate(model, device:torch.device, dataloader:torch.utils.data.DataLoader,
             v_corr += torch.sum(preds.argmax(1) == labels) 
         # update training loss and accuarcy
         valid_loss = v_loss / len(dataloader.dataset)
-        valid_acc = v_corr.cpu().numpy() / len(dataloader.dataset)
+        valid_acc = v_corr.item() / len(dataloader.dataset)
     return (valid_loss, valid_acc)
 
 
