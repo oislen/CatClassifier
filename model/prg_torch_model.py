@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
         logging.info("Generating dataframe of images...")
         # create torch load images object
-        sample_size = 15000
+        sample_size = 20000
         torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
         df = pd.DataFrame.from_records(torchLoadImages.loadImages(filepaths=[os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)[0:sample_size]]))
         logging.info(f"df.shape: {df.shape}")
@@ -74,13 +74,18 @@ if __name__ == "__main__":
         
         logging.info("Split into training, validation and test dataset...")
         # prepare data
-        validate_df = df.sample(n=cons.batch_size*3, random_state=random_state)
+        validate_df = df.sample(frac=0.05, random_state=random_state, replace=False)
         train_df = df[~df.index.isin(validate_df.index)]
         train_df = train_df.reset_index(drop=True)
         validate_df = validate_df.reset_index(drop=True)
         logging.info(f"train_df.shape: {train_df.shape}")
         logging.info(f"validate_df.shape: {validate_df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
+        
+        logging.info("Plot example data loader images...")
+        # data generator example
+        plot_generator(generator=train_df['image_tensors'].values[:16].tolist(), mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
+        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Creating training and validation data loaders...")
         # set data constants
@@ -92,13 +97,11 @@ if __name__ == "__main__":
         # set validation data loader
         validation_dataset = CustomDataset(validate_df)
         validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
+        # flush dataframes from memory
+        del df
+        del train_df
+        del validate_df
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
-        
-        logging.info("Plot example data loader images...")
-        # datagen example
-        example_data = train_df['image_tensors'].values[:16].tolist()
-        plot_generator(generator=example_data, mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
-        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Initiate torch model...")
         logging.info(f"device: {device}")
@@ -119,7 +122,7 @@ if __name__ == "__main__":
         # hyper-parameters
         num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
         # fit torch model
-        model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper)
+        model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper, checkpoints_dir=cons.checkpoints_fdir, load_epoch_checkpoint=None)
         timeLogger.logTime(parentKey="Modelling", subKey="Fit")
         
         logging.info("Plot model fit results...")
@@ -173,4 +176,6 @@ if __name__ == "__main__":
         submission_df['id'] = submission_df['filenames'].str.split('.').str[0]
         submission_df['label'] = submission_df['category'].replace(cons.category_mapper)
         submission_df.to_csv(cons.submission_csv_fpath, index=False)
+        # delete dataframes from memory
+        del test_df
         timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")
