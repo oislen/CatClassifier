@@ -10,6 +10,7 @@ import cons
 from model.utilities.plot_image import plot_image
 from model.utilities.plot_generator import plot_generator
 from model.utilities.plot_preds import plot_preds
+from model.keras.LeNet5 import LeNet5
 from model.keras.AlexNet8 import AlexNet8
 from model.keras.VGG16_pretrained import VGG16_pretrained
 from model.utilities.plot_model import plot_model_fit
@@ -83,8 +84,9 @@ if __name__ == "__main__":
         
         logging.info("Initiate keras model...")
         # initiate LeNet5 architecture
-        keras_model = AlexNet8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
-        #keras_model = VGG16_pretrained(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        #keras_model = LeNet5(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        #keras_model = AlexNet8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        keras_model = VGG16_pretrained(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
         keras_model.summary()
         # set gradient decent compiler
         optimizer = optimizers.SGD(learning_rate=cons.learning_rate)
