@@ -13,7 +13,7 @@ class CustomDataset(Dataset):
         return len(self.image_tensors)
 
     def __getitem__(self, idx):
-        image_tensor = self.image_tensors[idx]
+        image_tensor = self.image_tensors[idx].unsqueeze(0)
         category_tensor = self.category_tensors[idx]
         return image_tensor, category_tensor
     
