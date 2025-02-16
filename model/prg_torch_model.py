@@ -55,15 +55,23 @@ if __name__ == "__main__":
     # handle input parameters
     input_params_dict = commandline_interface()
     logging.info(input_params_dict)
-    timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
-
+    timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
+    
     if input_params_dict["run_model_training"]:
-
+        
         logging.info("Generating dataframe of images...")
+        # load and shuffle the image file paths
+        np.random.seed(random_state)
+        image_filepaths=np.array([os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)])
+        np.random.shuffle(image_filepaths)
         # create torch load images object
-        sample_size = 20000
+        sample_size = 30000
         torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
-        df = pd.DataFrame.from_records(torchLoadImages.loadImages(filepaths=[os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)[0:sample_size]]))
+        df = pd.DataFrame.from_records(torchLoadImages.loadImages(image_filepaths[0:sample_size]))
+        # only consider images with 3 dimensions
+        df = df.loc[df["ndims"]==3, :]
+        # flush data from memory
+        del image_filepaths
         logging.info(f"df.shape: {df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
         
@@ -71,6 +79,11 @@ if __name__ == "__main__":
         # random image plot
         plot_image(df['images'].values[1], output_fpath=cons.torch_random_image_fpath, show_plot=False)
         timeLogger.logTime(parentKey="Plots", subKey="SampleImage")
+        
+        logging.info("Plot example data loader images...")
+        # data generator example
+        plot_generator(generator=df['image_tensors'].values[:16].tolist(), mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
+        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
         
         logging.info("Split into training, validation and test dataset...")
         # prepare data
@@ -82,11 +95,6 @@ if __name__ == "__main__":
         logging.info(f"validate_df.shape: {validate_df.shape}")
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
         
-        logging.info("Plot example data loader images...")
-        # data generator example
-        plot_generator(generator=train_df['image_tensors'].values[:16].tolist(), mode='torch', output_fpath=cons.torch_generator_plot_fpath, show_plot=False)
-        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
-        
         logging.info("Creating training and validation data loaders...")
         # set data constants
         total_train = train_df.shape[0]
@@ -97,10 +105,12 @@ if __name__ == "__main__":
         # set validation data loader
         validation_dataset = CustomDataset(validate_df)
         validation_loader = DataLoader(validation_dataset, batch_size=cons.batch_size, shuffle=True, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
-        # flush dataframes from memory
+        # flush data from memory
         del df
         del train_df
+        del train_dataset
         del validate_df
+        del validation_dataset
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
         logging.info("Initiate torch model...")
@@ -123,6 +133,9 @@ if __name__ == "__main__":
         num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
         # fit torch model
         model.fit(device=device, criterion=criterion, optimizer=optimizer, train_dataloader=train_loader, num_epochs=num_epochs, scheduler=scheduler, valid_dataLoader=validation_loader, early_stopper=early_stopper, checkpoints_dir=cons.checkpoints_fdir, load_epoch_checkpoint=None)
+        # flush data from memory
+        del train_loader
+        del validation_loader
         timeLogger.logTime(parentKey="Modelling", subKey="Fit")
         
         logging.info("Plot model fit results...")
@@ -134,7 +147,7 @@ if __name__ == "__main__":
         # save model
         model.save(output_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Write")
-
+    
     if input_params_dict["run_testset_prediction"]:
         
         logging.info("Load fitted torch model from disk...")
@@ -163,6 +176,9 @@ if __name__ == "__main__":
         predict = model.predict(test_loader, device)
         test_df['category'] = np.argmax(predict, axis=-1)
         test_df["category"] = test_df["category"].replace(cons.category_mapper)
+        # flush data from memory
+        del test_dataset
+        del test_loader
         timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
         
         logging.info("Plot example test set predictions...")
@@ -178,4 +194,5 @@ if __name__ == "__main__":
         submission_df.to_csv(cons.submission_csv_fpath, index=False)
         # delete dataframes from memory
         del test_df
+        del submission_df
         timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")
