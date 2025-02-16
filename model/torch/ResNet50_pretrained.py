@@ -14,6 +14,7 @@ from beartype import beartype
 
 class ResNet50_pretrained(nn.Module):
     def __init__(self, num_classes=1000):
+        self.model_id = "ResNet50_pretrained"
         super(ResNet50_pretrained, self).__init__()
         self.resnet = models.resnet50(pretrained=True)
         self.num_ftrs = self.resnet.fc.out_features
@@ -38,7 +39,7 @@ class ResNet50_pretrained(nn.Module):
         return x
 
     @beartype
-    def fit(self, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None):
+    def fit(self, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None, checkpoints_dir:Union[str,None]=None, load_epoch_checkpoint:Union[int,None]=None):
         """Fits model to specified data loader given the criterion and optimizer
         
         Parameters
@@ -59,11 +60,15 @@ class ResNet50_pretrained(nn.Module):
             The torch data loader to use for validation when fitting the model, default is None
         early_stopper : EarlyStopper
             The EarlyStopper object for halting fitting when performing validation, default is None
+        checkpoints_dir : str
+            The local folder location where model epoch checkpoints are to be read and wrote to, default is None
+        load_epoch_checkpoint : int
+            The epoch checkpoint to load and start from, default is None
         
         Returns
         -------
         """
-        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper)
+        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper, checkpoints_dir, load_epoch_checkpoint)
 
     @beartype
     def validate(self, device:torch.device, dataloader:torch.utils.data.DataLoader, criterion:torch.nn.CrossEntropyLoss) -> tuple:

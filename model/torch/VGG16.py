@@ -15,6 +15,7 @@ from beartype import beartype
 class VGG16(nn.Module):
     def __init__(self, num_classes=1000):
         super(VGG16, self).__init__()
+        self.model_id = "VGG16"
         self.features = nn.Sequential(
             # first convulation and pooling layer
             nn.Conv2d(in_channels=3, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
@@ -85,7 +86,7 @@ class VGG16(nn.Module):
         return x
 
     @beartype
-    def fit(self, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None):
+    def fit(self, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None, checkpoints_dir:Union[str,None]=None, load_epoch_checkpoint:Union[int,None]=None):
         """Fits model to specified data loader given the criterion and optimizer
         
         Parameters
@@ -106,11 +107,15 @@ class VGG16(nn.Module):
             The torch data loader to use for validation when fitting the model, default is None
         early_stopper : EarlyStopper
             The EarlyStopper object for halting fitting when performing validation, default is None
+        checkpoints_dir : str
+            The local folder location where model epoch checkpoints are to be read and wrote to, default is None
+        load_epoch_checkpoint : int
+            The epoch checkpoint to load and start from, default is None
         
         Returns
         -------
         """
-        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper)
+        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper, checkpoints_dir, load_epoch_checkpoint)
 
     @beartype
     def validate(self, device:torch.device, dataloader:torch.utils.data.DataLoader, criterion:torch.nn.CrossEntropyLoss) -> tuple:
