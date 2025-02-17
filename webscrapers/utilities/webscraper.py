@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
 from beartype import beartype
+from typing import Union
 import cons
 
 @beartype
@@ -101,7 +102,7 @@ def download_src(src:str, output_dir:str, search:str):
         logging.error(e)
 
 @beartype
-def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
+def multiprocess(func, args, ncpu:int) -> list:
     """This utility function applyies another function in parallel given a specified number of cpus
     
     Parameters
@@ -111,7 +112,7 @@ def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
     args : dict
         The arguments to pass to the function
     ncpu : int
-        The number of cpus to use for parallel processing, default is os.cpu_count()
+        The number of cpus to use for parallel processing
     
     Returns
     -------
@@ -124,7 +125,7 @@ def multiprocess(func, args, ncpu:int=os.cpu_count()) -> list:
     return results
 
 @beartype
-def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url, output_dir:str=cons.train_fdir):
+def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_url, output_dir:str=cons.train_fdir, ncpu:Union[int,None]=None):
     """The main beautiful soup webscrapping programme
 
     Parameters
@@ -137,6 +138,8 @@ def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_ur
         The url for the home page to web scrape from, default is cons.home_url
     output_dir : str
         The output file directory to download the scraped images to, default is cons.train_fdir
+    ncpu : int
+        The number of cpus to use for parallel processing, default is None
 
     Returns
     -------
@@ -151,4 +154,8 @@ def webscraper(search:str, n_images:int=cons.n_images, home_url:str=cons.home_ur
     # run function and scrape srcs
     srcs = scrape_srcs(urls=urls, n_images=n_images, home_url=home_url)
     # run function to download src
-    multiprocess(download_src, [(src, output_dir, search) for src in srcs])
+    if ncpu == None:
+        for src in srcs:
+            download_src(src=src,output_dir=output_dir,search=search)
+    else:
+        multiprocess(func=download_src, args=[(src, output_dir, search) for src in srcs], ncpu=ncpu)
