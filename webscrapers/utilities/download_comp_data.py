@@ -79,7 +79,7 @@ def download_comp_data(
     # if deleting zip file
     if del_zip == True:
         for zip_fpath in zip_fpaths_list:
-            logging.info("deleting zip file {zip_fpath} ...")
+            logging.info(f"deleting zip file {zip_fpath} ...")
             os.remove(path = zip_fpath)
 
 @beartype

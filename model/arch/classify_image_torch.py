@@ -31,6 +31,8 @@ from torchvision import transforms
 import cons
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.CustomDataset import CustomDataset
+from model.arch.load_image_v2 import TorchLoadImages
+from model.utilities.TimeIt import TimeIt
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
@@ -45,13 +47,15 @@ torch_transforms = transforms.Compose([
 ])
 
 @beartype
-def classify_image_torch(image_fpath:str, model_fpath:str=cons.torch_model_pt_fpath):
+def classify_image_torch(image_fpath:str, timeLogger:TimeIt, model_fpath:str=cons.torch_model_pt_fpath):
     """Classifies an input image using the torch model
     
     Parameters
     ----------
     image_fpath : str
         The full filepath to the image to classify using the torch model
+    timeLogger : TimeIt
+        Timer object for logging execution time of process
     model_fpath : str
         The full filepath to the torch model to use for classification, default is cons.torch_model_pt_fpath
     
@@ -66,22 +70,29 @@ def classify_image_torch(image_fpath:str, model_fpath:str=cons.torch_model_pt_fp
     #model = AlexNet8(num_classes=2).to(device)
     model = VGG16_pretrained(num_classes=2).to(device)
     model.load(input_fpath=model_fpath)
+    timeLogger.logTime(parentKey="Preparation", subKey="ModelLoad")
     
     logging.info("Generating dataset...")
     # prepare test data
-    dataframe = pd.DataFrame({'filepath': [image_fpath]})
+    torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
+    dataframe = pd.DataFrame.from_records(torchLoadImages.loadImages(filepaths=[image_fpath]))
+    dataframe["model_fpath"] = model_fpath
+    timeLogger.logTime(parentKey="Preparation", subKey="DataFrame")
     
     logging.info("Creating dataloader...")
     # set train data loader
-    dataset = CustomDataset(dataframe, transforms=torch_transforms, mode='test')
-    loader = DataLoader(dataset, batch_size=cons.batch_size, shuffle=False, num_workers=cons.num_workers, pin_memory=True)
+    dataset = CustomDataset(dataframe)
+    loader = DataLoader(dataset, batch_size=None, shuffle=False, num_workers=cons.num_workers, pin_memory=True, collate_fn=CustomDataset.collate_fn)
+    timeLogger.logTime(parentKey="Preparation", subKey="DataLoader")
     
     logging.info("Classifying image...")
     # make test set predictions
     predict = model.predict(loader, device)
     dataframe['category'] = np.argmax(predict, axis=-1)
-    dataframe["category"] = dataframe["category"].replace(cons.category_mapper)
-    response = dataframe.to_dict(orient="records")
+    dataframe["categoryname"] = dataframe["category"].replace(cons.category_mapper)
+    sub_cols = ["model_fpath", "filepaths", "categoryname"]
+    response = dataframe[sub_cols].to_dict(orient="records")
+    timeLogger.logTime(parentKey="Model", subKey="Classification")
     logging.info(response)
     return response
 
@@ -90,6 +101,7 @@ if __name__ == "__main__":
     # set up logging
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
+    timeLogger = TimeIt()
     
     # define argument parser object
     parser = argparse.ArgumentParser(description="Classify Image (Torch Model)")
@@ -100,5 +112,6 @@ if __name__ == "__main__":
     input_params_dict = {}
     # extract input arguments
     args = parser.parse_args()
+    timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
     # classify image using torch model
-    response = classify_image_torch(image_fpath=args.image_fpath, model_fpath=args.model_fpath)
+    response = classify_image_torch(image_fpath=args.image_fpath, model_fpath=args.model_fpath, timeLogger=timeLogger)

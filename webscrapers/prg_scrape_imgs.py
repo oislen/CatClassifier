@@ -50,7 +50,8 @@ def scrape_imags(
             search="cat", 
             n_images=cons.n_images, 
             home_url=cons.home_url, 
-            output_dir=cons.train_fdir
+            output_dir=cons.train_fdir,
+            ncpu=cons.ncpu
             )
         logging.info("Running dog image webscraper ...")
         # run dog webscraper
@@ -58,7 +59,8 @@ def scrape_imags(
             search="dog", 
             n_images=cons.n_images, 
             home_url=cons.home_url, 
-            output_dir=cons.train_fdir
+            output_dir=cons.train_fdir,
+            ncpu=cons.ncpu
             )
 
 # if running as main programme

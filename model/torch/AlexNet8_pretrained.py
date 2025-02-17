@@ -12,12 +12,12 @@ from model.torch.EarlyStopper import EarlyStopper
 from typing import Union
 from beartype import beartype
 
-class ResNet50_pretrained(nn.Module):
+class AlexNet8_pretrained(nn.Module):
     def __init__(self, num_classes=1000):
-        self.model_id = "ResNet50_pretrained"
-        super(ResNet50_pretrained, self).__init__()
-        self.resnet = models.resnet50(weights ="DEFAULT")
-        self.num_ftrs = self.resnet.fc.out_features
+        super(AlexNet8_pretrained, self).__init__()
+        self.model_id = "AlexNet8_pretrained"
+        self.alexnet = models.alexnet(weights ="DEFAULT")
+        self.num_ftrs = self.alexnet.classifier[len(self.alexnet.classifier)-1].out_features
         self.classifier = nn.Sequential(nn.Linear(in_features=self.num_ftrs, out_features=num_classes))
 
     @beartype
@@ -34,7 +34,7 @@ class ResNet50_pretrained(nn.Module):
         array
             The output array from the forward pass
         """
-        x = self.resnet(x)
+        x = self.alexnet(x)
         x = self.classifier(x)
         return x
 

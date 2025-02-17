@@ -29,9 +29,10 @@ unzip_data = True
 del_zip = True
 
 # set kaggle model detailes
-model_instance_url="oislen/cat-classifier-cnn-models/pyTorch/default/1"
+model_instance_url="oislen/cat-classifier-cnn-models/pyTorch/default/2"
 
 # webscraping constants
 n_images = 6000
+ncpu = os.cpu_count()-1
 home_url = "https://free-images.com"
 output_dir =  os.path.join(data_fdir, "{search}")

@@ -17,9 +17,9 @@ from torchvision import transforms
 
 # load custom scripts
 import cons
+from model.torch.ResNet50_pretrained import ResNet50_pretrained
 from model.torch.VGG16_pretrained import VGG16_pretrained
-from model.torch.AlexNet8 import AlexNet8
-from model.torch.LeNet5 import LeNet5
+from model.torch.AlexNet8_pretrained import AlexNet8_pretrained
 from model.torch.CustomDataset import CustomDataset
 from model.torch.EarlyStopper import EarlyStopper
 from model.utilities.plot_model import plot_model_fit
@@ -32,6 +32,11 @@ from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
+
+# initialise model
+#model = AlexNet8_pretrained(num_classes=2).to(device)
+model = VGG16_pretrained(num_classes=2).to(device)
+#model = ResNet50_pretrained(num_classes=2).to(device)
 
 random_state = 42
 
@@ -65,7 +70,7 @@ if __name__ == "__main__":
         image_filepaths=np.array([os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)])
         np.random.shuffle(image_filepaths)
         # create torch load images object
-        sample_size = 30000
+        sample_size = 20000
         torchLoadImages = TorchLoadImages(torch_transforms=torch_transforms, n_workers=None)
         df = pd.DataFrame.from_records(torchLoadImages.loadImages(image_filepaths[0:sample_size]))
         # only consider images with 3 dimensions
@@ -116,9 +121,6 @@ if __name__ == "__main__":
         logging.info("Initiate torch model...")
         logging.info(f"device: {device}")
         # initiate cnn architecture
-        #model = LeNet5(num_classes=2)
-        #model = AlexNet8(num_classes=2).to(device)
-        model = VGG16_pretrained(num_classes=2).to(device)
         if device == "cuda":
             model = nn.DataParallel(model)
         model = model.to(device)
@@ -152,9 +154,6 @@ if __name__ == "__main__":
         
         logging.info("Load fitted torch model from disk...")
         # load model
-        #model = LeNet5(num_classes=2).to(device)
-        #model = AlexNet8(num_classes=2).to(device)
-        model = VGG16_pretrained(num_classes=2).to(device)
         model.load(input_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
