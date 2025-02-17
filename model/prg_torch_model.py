@@ -32,6 +32,10 @@ from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
+# initialise model
+model = AlexNet8_pretrained(num_classes=2).to(device)
+#model = VGG16_pretrained(num_classes=2).to(device)
+
 random_state = 42
 
 torch_transforms = transforms.Compose([
@@ -115,8 +119,6 @@ if __name__ == "__main__":
         logging.info("Initiate torch model...")
         logging.info(f"device: {device}")
         # initiate cnn architecture
-        model = AlexNet8_pretrained(num_classes=2).to(device)
-        #model = VGG16_pretrained(num_classes=2).to(device)
         if device == "cuda":
             model = nn.DataParallel(model)
         model = model.to(device)
@@ -150,8 +152,6 @@ if __name__ == "__main__":
         
         logging.info("Load fitted torch model from disk...")
         # load model
-        model = AlexNet8_pretrained(num_classes=2).to(device)
-        #model = VGG16_pretrained(num_classes=2).to(device)
         model.load(input_fpath=cons.torch_model_pt_fpath)
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
