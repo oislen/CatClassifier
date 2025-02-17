@@ -17,6 +17,7 @@ from torchvision import transforms
 
 # load custom scripts
 import cons
+from model.torch.ResNet50_pretrained import ResNet50_pretrained
 from model.torch.VGG16_pretrained import VGG16_pretrained
 from model.torch.AlexNet8_pretrained import AlexNet8_pretrained
 from model.torch.CustomDataset import CustomDataset
@@ -33,8 +34,9 @@ from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
 # initialise model
-model = AlexNet8_pretrained(num_classes=2).to(device)
-#model = VGG16_pretrained(num_classes=2).to(device)
+#model = AlexNet8_pretrained(num_classes=2).to(device)
+model = VGG16_pretrained(num_classes=2).to(device)
+#model = ResNet50_pretrained(num_classes=2).to(device)
 
 random_state = 42
 
