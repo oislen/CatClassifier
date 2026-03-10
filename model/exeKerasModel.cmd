@@ -1,1 +1,1 @@
-call python -m pdb prg_keras_model.py --run_model_training --run_testset_prediction
+call uv run python prg_keras_model.py --run_model_training --run_testset_prediction
