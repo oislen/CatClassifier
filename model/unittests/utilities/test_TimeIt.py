@@ -2,9 +2,8 @@ import unittest
 import os
 import sys
 
-sys.path.append(os.path.join(os.getcwd(), "models"))
+sys.path.append(os.path.join(os.getcwd(), "model"))
 
-import cons
 from utilities.TimeIt import TimeIt
 
 parentKey="Test Parent Key"
