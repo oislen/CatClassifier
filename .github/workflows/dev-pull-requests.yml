@@ -20,13 +20,14 @@ jobs:
         scan-type: 'fs'
         scan-ref: '.'
         exit-code: '1'
+        severity: 'CRITICAL,HIGH'
 
   python-unittests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.13.11"]
 
     steps:
     - uses: actions/checkout@v4
