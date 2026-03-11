@@ -8,4 +8,4 @@ conda activate catclass
 conda update -n base conda --yes
 
 # install relevant libraries
-pip install -v -r ..\requirements.txt
+pip install -v -r ..\..\requirements.txt
