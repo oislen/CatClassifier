@@ -2,7 +2,7 @@ import unittest
 import os
 import sys
 
-sys.path.append(os.path.join(os.getcwd(), "models"))
+sys.path.append(os.path.join(os.getcwd(), "model"))
 
 from utilities.TimeIt import TimeIt
 
