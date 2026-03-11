@@ -4,7 +4,6 @@ import sys
 
 sys.path.append(os.path.join(os.getcwd(), "models"))
 
-import cons
 from utilities.TimeIt import TimeIt
 
 parentKey="Test Parent Key"
