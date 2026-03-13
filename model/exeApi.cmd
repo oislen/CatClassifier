@@ -1,1 +1,1 @@
-call flask run --debug
+call uv run flask --app api.py run --debug
