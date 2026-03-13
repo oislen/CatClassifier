@@ -1,0 +1,43 @@
+{
+  "info": {
+    "_postman_id": "f6459032-c92e-461e-86b6-805df94b48a3",
+    "name": "CatClassifier",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39794605"
+  },
+  "item": [
+    {
+      "name": "/catclassifier",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "uuid": "2ce7766a-d43d-434b-84e6-07f9ec83b062",
+              "src": "postman-cloud:///1f11eba0-977e-4a00-af4d-fbd3ff58882e"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/catclassifier",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "catclassifier"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
