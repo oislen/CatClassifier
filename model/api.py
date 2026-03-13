@@ -48,7 +48,10 @@ def classify_image(image_filepath):
     del test_dataset
     del test_loader
     timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
-    return test_df.to_dict(orient='records')[0]
+    # create api response
+    sub_cols = ['filepaths', 'filenames', 'category', 'ndims', 'torch_transform_error']
+    response = test_df[sub_cols].to_dict(orient='records')[0]
+    return response
 
 @app.route('/catclassifier', methods=['POST'])
 def endpoint():
@@ -64,31 +67,38 @@ def endpoint():
     -------
     JSON response containing the classification result or an error message.
     """
+    logging.info("Received POST request at /catclassifier endpoint")
     # check if the post request has the file part
     if 'image' not in request.files:
-        return jsonify({"error": "No 'image' part in the request"}), 400
-    # get the file object from the request
-    file = request.files['image']
-    # check if a file was actually selected for upload
-    if file.filename == '':
-        return jsonify({"error": "No file selected for uploading"}), 400
-
-    # 4. If everything is fine, process the image
-    if file:
-        # You can save the file locally if needed:
-        file.save(os.path.join('/path/to/save', file.filename))
-
-        # Pass the file object itself to the (mock) classification function.
-        # Note: 'file' is a Werkzeug FileStorage object. Your actual pipeline
-        # might require the byte data (file.read()) or a PIL image object.
-        # Ensure you adapt 'classify_image' to what your model needs.
-        classification_result = classify_image(file)
-
-        # 5. Return the classification result as a JSON response
-        return jsonify(classification_result), 200
+        response = jsonify({"error": "No 'image' part in the request"}), 400
     else:
-        # Handle cases where the file part might be present but invalid
-        return jsonify({"error": "Invalid file upload"}), 400
+        logging.info("Image file found in the request")
+        # get the file object from the request
+        file = request.files['image']
+        logging.info(f"Received file: {file.filename}")
+        # check if a file was actually selected for upload
+        if file.filename == '':
+            response = jsonify({"error": "No file selected for uploading"}), 400
+        else:
+            # process the uploaded file and classify the image
+            if file:
+                logging.info("Processing the uploaded image")
+                api_filepath = os.path.join(cons.api_fdir, file.filename)
+                # create api file directory if not exists
+                if not os.path.exists(cons.api_fdir):
+                    os.makedirs(os.path.dirname(api_filepath))
+                # save the file uploaded to the api directory
+                file.save(api_filepath)
+                logging.info("Classifying the image using the model")
+                # run the image through the classification pipeline
+                classification_result = classify_image(image_filepath=api_filepath)
+                # create response
+                response = jsonify(classification_result), 200
+            else:
+                # set default response
+                response = jsonify({"error": "Invalid file upload"}), 400
+    # return response
+    return response
 
 if __name__ == '__main__':
     # run the flask application
