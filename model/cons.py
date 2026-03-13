@@ -21,6 +21,7 @@ keras_report_fdir = os.path.join(report_fdir, 'keras')
 torch_report_fdir = os.path.join(report_fdir, 'torch')
 test_fdir = os.path.join(data_fdir, 'test1')
 train_fdir = os.path.join(data_fdir, 'train')
+api_fdir = os.path.join(data_fdir, 'api')
 webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
 
 # set subdirectories
