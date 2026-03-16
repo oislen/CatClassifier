@@ -33,10 +33,12 @@ from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 
-# initialise model
-#model = AlexNet8_pretrained(num_classes=2).to(device)
-model = VGG16_pretrained(num_classes=2).to(device)
-#model = ResNet50_pretrained(num_classes=2).to(device)
+# initialise model dict
+model_dict = {
+    "AlexNet8_pretrained": AlexNet8_pretrained(num_classes=2).to(device),
+    "VGG16_pretrained": VGG16_pretrained(num_classes=2).to(device),
+    "ResNet50_pretrained": ResNet50_pretrained(num_classes=2).to(device)
+}
 
 random_state = 42
 
@@ -61,6 +63,9 @@ if __name__ == "__main__":
     input_params_dict = commandline_interface()
     logging.info(input_params_dict)
     timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
+    
+    # set model architecture
+    model = cons.model_dict[input_params_dict['model_id']]
     
     if input_params_dict["run_model_training"]:
         
@@ -147,14 +152,14 @@ if __name__ == "__main__":
         
         logging.info("Save fitted torch model to disk...")
         # save model
-        model.save(output_fpath=cons.torch_model_pt_fpath)
+        model.save(output_fpath=cons.torch_model_pt_fpath.format(model_id=model.model_id))
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Write")
     
     if input_params_dict["run_testset_prediction"]:
         
         logging.info("Load fitted torch model from disk...")
         # load model
-        model.load(input_fpath=cons.torch_model_pt_fpath)
+        model.load(input_fpath=cons.torch_model_pt_fpath.format(model_id=model.model_id))
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
         logging.info("Generate test dataset...")
