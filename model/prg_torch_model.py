@@ -65,7 +65,7 @@ if __name__ == "__main__":
     timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
     
     # set model architecture
-    model = cons.model_dict[input_params_dict['model_id']]
+    model = model_dict[input_params_dict['model_id']]
     
     if input_params_dict["run_model_training"]:
         
