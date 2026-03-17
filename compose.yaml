@@ -1,0 +1,19 @@
+# named volume 'E' is marked as "external" (used by service 'latest'), so either remove "external" from volume definition or it needs to be created using: docker volume create E
+# named volume 'E' is marked as "external" (used by service 'latest'), so either remove "external" from volume definition or it needs to be created using: docker volume create E
+name: <your project name>
+services:
+    latest:
+        container_name: cc
+        shm_size: 512m
+        ports:
+            - 8888:8888
+        volumes:
+            - E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds
+            - E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report
+        stdin_open: true
+        tty: true
+        image: oislen:cat-classifier/latest
+volumes:
+    E:
+        external: true
+        name: E
