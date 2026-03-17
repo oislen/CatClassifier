@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 from torch.utils.data import DataLoader
 
 import cons
-from prg_torch_model import device, model, torch_transforms
+from prg_torch_model import device, model_dict, torch_transforms
 from model.torch.CustomDataset import CustomDataset
 from model.utilities.TimeIt import TimeIt
 from model.arch.load_image_v2 import TorchLoadImages
@@ -18,9 +18,26 @@ timeLogger = TimeIt()
 
 app = Flask(__name__)
 
-def classify_image(image_filepath):
+def classify_image(image_filepath:str, model_id:str) -> dict:
     """
+    Classify an image using the pre-trained model.
+    
+    Parameters
+    ----------
+    image_filepath : str
+        The file path of the image to classify.
+    model_id : str
+        The identifier of the model to use for classification.
+    
+    Returns
+    -------
+    dict
+        A dictionary containing the classification result and related information.
     """
+    
+    # set model architecture
+    model = model_dict[model_id]
+    
     logging.info("Load fitted torch model from disk...")
     # load model
     model.load(input_fpath=cons.torch_model_pt_fpath)
@@ -58,11 +75,11 @@ def endpoint():
     """
     API endpoint that accepts a POST request with an image file.
     Runs the image through the mock classification pipeline and returns the result.
-
+    
     Parameters
     ----------
     None
-
+    
     Returns
     -------
     JSON response containing the classification result or an error message.
@@ -73,8 +90,9 @@ def endpoint():
         response = jsonify({"error": "No 'image' part in the request"}), 400
     else:
         logging.info("Image file found in the request")
-        # get the file object from the request
+        # get the file object and target model from the request
         file = request.files['image']
+        model_id = request.form.get('model_id')
         logging.info(f"Received file: {file.filename}")
         # check if a file was actually selected for upload
         if file.filename == '':
@@ -91,7 +109,7 @@ def endpoint():
                 file.save(api_filepath)
                 logging.info("Classifying the image using the model")
                 # run the image through the classification pipeline
-                classification_result = classify_image(image_filepath=api_filepath)
+                classification_result = classify_image(image_filepath=api_filepath, model_id=model_id)
                 # create response
                 response = jsonify(classification_result), 200
             else:
