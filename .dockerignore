@@ -1,5 +1,11 @@
 # ignore sub repos
-data
+data/api
+data/cats
+data/checkpoints
+data/dogs
+data/models
+data/test1
+data/train
 .creds
 checkpoints
 
@@ -15,3 +21,8 @@ __pycache__
 *.woff
 *.js
 *.html
+
+# repo file types
+*.keras
+*.pickle
+*.csv
