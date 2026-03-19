@@ -60,14 +60,17 @@ def classify_image(image_filepath:str, model_id:str) -> dict:
     logging.info("Generate test set predictions...")
     # make test set predictions
     predict = model.predict(test_loader, device)
-    test_df["category"] = np.argmax(predict, axis=-1)
-    test_df["category"] = test_df["category"].replace(cons.category_mapper)
+    category = np.argmax(predict, axis=-1)
+    test_df["category_id"] = category
+    test_df["category_name"] = test_df["category_id"].replace(cons.category_mapper)
+    test_df["probability"] = test_df["category_id"].apply(lambda x: predict[0][x])
+    test_df = test_df.reset_index()
     # flush data from memory
     del test_dataset
     del test_loader
     timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
     # create api response
-    sub_cols = ["filepaths", "filenames", "category", "ndims", "torch_transform_error"]
+    sub_cols = ["index", "filepaths", "filenames", "category_id", "category_name", "probability", "ndims", "torch_transform_error"]
     response = test_df[sub_cols].to_dict(orient="records")[0]
     # add model id to repose
     response["model_id"] = model_id
@@ -92,36 +95,34 @@ def endpoint():
     logging.info("Received POST request at /catclassifier endpoint")
     # check if the post request has the file part
     if "image" not in request.files:
-        response, code = jsonify({"error": "No 'image' part in the request"}), 400
+        return jsonify({"error": "No 'image' part in the request"}), 400
+    logging.info("Image file found in the request")
+    # get the file object and target model from the request
+    file = request.files["image"]
+    model_id = request.form.get("model_id")
+    if model_id not in model_dict:
+        return jsonify({"error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"}), 400
+    logging.info(f"Received file: {file.filename}")
+    # check if a file was actually selected for upload
+    if file.filename == "":
+        return jsonify({"error": "No file selected for uploading"}), 400
+    # process the uploaded file and classify the image
+    if file:
+        logging.info("Processing the uploaded image")
+        api_filepath = os.path.join(cons.api_fdir, file.filename)
+        # create api file directory if not exists
+        if not os.path.exists(cons.api_fdir):
+            os.makedirs(os.path.dirname(api_filepath))
+        # save the file uploaded to the api directory
+        file.save(api_filepath)
+        logging.info("Classifying the image using the model")
+        # run the image through the classification pipeline
+        classification_result = classify_image(image_filepath=api_filepath, model_id=model_id)
+        # create response
+        return jsonify(classification_result), 200
     else:
-        logging.info("Image file found in the request")
-        # get the file object and target model from the request
-        file = request.files["image"]
-        model_id = request.form.get("model_id")
-        logging.info(f"Received file: {file.filename}")
-        # check if a file was actually selected for upload
-        if file.filename == "":
-            response, code = jsonify({"error": "No file selected for uploading"}), 400
-        else:
-            # process the uploaded file and classify the image
-            if file:
-                logging.info("Processing the uploaded image")
-                api_filepath = os.path.join(cons.api_fdir, file.filename)
-                # create api file directory if not exists
-                if not os.path.exists(cons.api_fdir):
-                    os.makedirs(os.path.dirname(api_filepath))
-                # save the file uploaded to the api directory
-                file.save(api_filepath)
-                logging.info("Classifying the image using the model")
-                # run the image through the classification pipeline
-                classification_result = classify_image(image_filepath=api_filepath, model_id=model_id)
-                # create response
-                response, code = jsonify(classification_result), 200
-            else:
-                # set default response
-                response, code = jsonify({"error": "Invalid file upload"}), 400
-    # return response
-    return response, code
+        # set default response
+        return jsonify({"error": "Invalid file upload"}), 400
 
 if __name__ == "__main__":
     # run the flask application
