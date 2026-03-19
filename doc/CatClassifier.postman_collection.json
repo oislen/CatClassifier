@@ -16,9 +16,17 @@
           "formdata": [
             {
               "key": "image",
+              "description": "Image for classification",
               "type": "file",
               "uuid": "2ce7766a-d43d-434b-84e6-07f9ec83b062",
               "src": "postman-cloud:///1f11eba0-977e-4a00-af4d-fbd3ff58882e"
+            },
+            {
+              "key": "model_id",
+              "value": "VGG16_pretrained",
+              "description": "Model to use",
+              "type": "text",
+              "uuid": "86cd6c83-b829-4572-8366-1a839b30e5a5"
             }
           ]
         },
