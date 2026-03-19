@@ -1,1 +1,1 @@
-uv run flask --app api.py run --debug
+uv run flask --app api.py run --debug --host 0.0.0.0 --port 5000
