@@ -5,6 +5,7 @@ import pandas as pd
 from flask import Flask, request, jsonify
 from torch.utils.data import DataLoader
 import datetime
+import torch
 
 import cons
 from prg_torch_model import torch_transforms, model_dict
@@ -19,7 +20,7 @@ timeLogger = TimeIt()
 
 app = Flask(__name__)
 
-def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
+def classify_image(image_filepath:str, model_id:str, device_type:str) -> dict:
     """
     Classify an image using the pre-trained model.
     
@@ -29,8 +30,8 @@ def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
         The file path of the image to classify.
     model_id : str
         The identifier of the model to use for classification.
-    device : str
-        The device to run the model on (e.g., 'cpu' or 'cuda').
+    device_type : str
+        The device type to run the model on (e.g., 'cpu' or 'cuda').
     
     Returns
     -------
@@ -39,6 +40,7 @@ def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
     """
     
     # set model architecture
+    device = torch.device(device_type)
     model = model_dict[model_id].to(device)
     
     logging.info("Load fitted torch model from disk...")
@@ -103,7 +105,7 @@ def endpoint():
     # get the file object and target model from the request
     file = request.files["image"]
     model_id = request.form.get("model_id", list(model_dict.keys())[1])
-    device = request.form.get("device", cons.device)
+    device_type = request.form.get("device_type", cons.device_type)
     if model_id not in model_dict:
         return jsonify({"error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"}), 400
     logging.info(f"Received file: {file.filename}")
@@ -121,7 +123,7 @@ def endpoint():
         file.save(api_filepath)
         logging.info("Classifying the image using the model")
         # run the image through the classification pipeline
-        classification_result = classify_image(image_filepath=api_filepath, model_id=model_id, device=device)
+        classification_result = classify_image(image_filepath=api_filepath, model_id=model_id, device_type=device_type)
         # create response
         return jsonify(classification_result), 200
     else:
