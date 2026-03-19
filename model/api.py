@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import datetime
 
 import cons
-from prg_torch_model import device as local_device, torch_transforms, retrieve_model
+from prg_torch_model import torch_transforms, model_dict
 from model.torch.CustomDataset import CustomDataset
 from model.utilities.TimeIt import TimeIt
 from model.arch.load_image_v2 import TorchLoadImages
@@ -39,7 +39,7 @@ def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
     """
     
     # set model architecture
-    model = retrieve_model(model_id=model_id, device=device)
+    model = model_dict[model_id].to(device)
     
     logging.info("Load fitted torch model from disk...")
     # load model
@@ -103,7 +103,7 @@ def endpoint():
     # get the file object and target model from the request
     file = request.files["image"]
     model_id = request.form.get("model_id", list(model_dict.keys())[1])
-    device = request.form.get("device", local_device)
+    device = request.form.get("device", cons.device)
     if model_id not in model_dict:
         return jsonify({"error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"}), 400
     logging.info(f"Received file: {file.filename}")
