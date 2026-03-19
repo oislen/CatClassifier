@@ -19,7 +19,7 @@ timeLogger = TimeIt()
 
 app = Flask(__name__)
 
-def classify_image(image_filepath:str, model_id:str) -> dict:
+def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
     """
     Classify an image using the pre-trained model.
     
@@ -29,6 +29,8 @@ def classify_image(image_filepath:str, model_id:str) -> dict:
         The file path of the image to classify.
     model_id : str
         The identifier of the model to use for classification.
+    device : str
+        The device to run the model on (e.g., 'cpu' or 'cuda').
     
     Returns
     -------
@@ -58,6 +60,7 @@ def classify_image(image_filepath:str, model_id:str) -> dict:
     timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
     
     logging.info("Generate test set predictions...")
+    logging.info(f"device: {device}")
     # make test set predictions
     predict = model.predict(test_loader, device)
     category = np.argmax(predict, axis=-1)
@@ -99,7 +102,8 @@ def endpoint():
     logging.info("Image file found in the request")
     # get the file object and target model from the request
     file = request.files["image"]
-    model_id = request.form.get("model_id")
+    model_id = request.form.get("model_id", list(model_dict.keys())[1])
+    device = request.form.get("device", device)
     if model_id not in model_dict:
         return jsonify({"error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"}), 400
     logging.info(f"Received file: {file.filename}")
@@ -117,7 +121,7 @@ def endpoint():
         file.save(api_filepath)
         logging.info("Classifying the image using the model")
         # run the image through the classification pipeline
-        classification_result = classify_image(image_filepath=api_filepath, model_id=model_id)
+        classification_result = classify_image(image_filepath=api_filepath, model_id=model_id, device=device)
         # create response
         return jsonify(classification_result), 200
     else:
