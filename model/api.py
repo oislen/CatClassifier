@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import datetime
 
 import cons
-from prg_torch_model import device as local_device, model_dict, torch_transforms
+from prg_torch_model import device as local_device, torch_transforms, retrieve_model
 from model.torch.CustomDataset import CustomDataset
 from model.utilities.TimeIt import TimeIt
 from model.arch.load_image_v2 import TorchLoadImages
@@ -39,7 +39,7 @@ def classify_image(image_filepath:str, model_id:str, device:str) -> dict:
     """
     
     # set model architecture
-    model = model_dict[model_id]
+    model = retrieve_model(model_id=model_id, device=device)
     
     logging.info("Load fitted torch model from disk...")
     # load model
