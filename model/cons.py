@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import platform
+import torch
 
 # set huggingface hub directory
 huggingface_hub_dir = 'E:\\huggingface'
@@ -81,3 +82,6 @@ shuffle = False
 # multiprocessing
 num_workers = int(os.environ.get("PARAM_NUM_WORKERS", "0"))
 check_gpu = os.environ.get("PARAM_CHECK_GPU", "False").lower() == "true"
+
+# device configuration
+device = torch.device('cuda' if torch.cuda.is_available() and check_gpu else 'cpu')
