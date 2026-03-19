@@ -63,9 +63,10 @@ if __name__ == "__main__":
     
     # set model architecture
     model_id = input_params_dict['model_id']
-    device = torch.device(input_params_dict['device_type'])
+    device_type = input_params_dict['device_type']
     logging.info(f"model_id: {model_id}")
-    logging.info(f"device: {device}")
+    logging.info(f"device_type: {device_type}")
+    device = torch.device(input_params_dict['device_type'])
     model = model_dict[model_id].to(device)
     
     if input_params_dict["run_model_training"]:

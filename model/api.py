@@ -40,6 +40,8 @@ def classify_image(image_filepath:str, model_id:str, device_type:str) -> dict:
     """
     
     # set model architecture
+    logging.info(f"model_id: {model_id}")
+    logging.info(f"device_type: {device_type}")
     device = torch.device(device_type)
     model = model_dict[model_id].to(device)
     
@@ -62,7 +64,6 @@ def classify_image(image_filepath:str, model_id:str, device_type:str) -> dict:
     timeLogger.logTime(parentKey="TestSet", subKey="DataLoader")
     
     logging.info("Generate test set predictions...")
-    logging.info(f"device: {device}")
     # make test set predictions
     predict = model.predict(test_loader, device)
     category = np.argmax(predict, axis=-1)
