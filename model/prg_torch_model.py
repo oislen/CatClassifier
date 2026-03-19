@@ -30,15 +30,29 @@ from model.utilities.TimeIt import TimeIt
 from model.utilities.commandline_interface import commandline_interface
 from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 
-# device configuration
-device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
-
 # initialise model dict
-model_dict = {
-    "AlexNet8_pretrained": AlexNet8_pretrained(num_classes=2).to(device),
-    "VGG16_pretrained": VGG16_pretrained(num_classes=2).to(device),
-    "ResNet50_pretrained": ResNet50_pretrained(num_classes=2).to(device)
-}
+def retrieve_model(model_id:str, device:str):
+    """
+    Retrieve a pre-trained model by its ID and move it to the specified device.
+    
+    Parameters
+    ----------
+    model_id : str
+        The identifier of the model to retrieve.
+    device : str
+        The device to move the model to (e.g., 'cpu' or 'cuda').
+    
+    Returns
+    -------
+    torch.nn.Module
+        The retrieved and moved model.
+    """
+    model_dict = {
+        "AlexNet8_pretrained": AlexNet8_pretrained(num_classes=2).to(device),
+        "VGG16_pretrained": VGG16_pretrained(num_classes=2).to(device),
+        "ResNet50_pretrained": ResNet50_pretrained(num_classes=2).to(device)
+    }
+    return model_dict[model_id]
 
 random_state = 42
 
@@ -65,7 +79,8 @@ if __name__ == "__main__":
     timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
     
     # set model architecture
-    model = model_dict[input_params_dict['model_id']]
+    device = input_params_dict['device']
+    model = retrieve_model(model_id=input_params_dict['model_id'], device=device)
     
     if input_params_dict["run_model_training"]:
         
