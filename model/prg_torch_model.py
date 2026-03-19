@@ -63,7 +63,9 @@ if __name__ == "__main__":
     
     # set model architecture
     model_id = input_params_dict['model_id']
-    device = input_params_dict['device']
+    device = torch.device(input_params_dict['device_type'])
+    logging.info(f"model_id: {model_id}")
+    logging.info(f"device: {device}")
     model = model_dict[model_id].to(device)
     
     if input_params_dict["run_model_training"]:
@@ -123,7 +125,6 @@ if __name__ == "__main__":
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
         logging.info("Initiate torch model...")
-        logging.info(f"device: {device}")
         # initiate cnn architecture
         if device == "cuda":
             model = nn.DataParallel(model)
