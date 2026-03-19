@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
 from torch.utils.data import DataLoader
+import datetime
 
 import cons
 from prg_torch_model import device, model_dict, torch_transforms
@@ -40,7 +41,7 @@ def classify_image(image_filepath:str, model_id:str) -> dict:
     
     logging.info("Load fitted torch model from disk...")
     # load model
-    model.load(input_fpath=cons.torch_model_pt_fpath)
+    model.load(input_fpath=cons.torch_model_pt_fpath.format(model_id=model_id))
     timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
     
     logging.info("Generate test dataset...")
@@ -59,18 +60,22 @@ def classify_image(image_filepath:str, model_id:str) -> dict:
     logging.info("Generate test set predictions...")
     # make test set predictions
     predict = model.predict(test_loader, device)
-    test_df['category'] = np.argmax(predict, axis=-1)
+    test_df["category"] = np.argmax(predict, axis=-1)
     test_df["category"] = test_df["category"].replace(cons.category_mapper)
     # flush data from memory
     del test_dataset
     del test_loader
     timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
     # create api response
-    sub_cols = ['filepaths', 'filenames', 'category', 'ndims', 'torch_transform_error']
-    response = test_df[sub_cols].to_dict(orient='records')[0]
+    sub_cols = ["filepaths", "filenames", "category", "ndims", "torch_transform_error"]
+    response = test_df[sub_cols].to_dict(orient="records")[0]
+    # add model id to repose
+    response["model_id"] = model_id
+    # append date time to response
+    response["datetime"] = str(datetime.datetime.now())
     return response
 
-@app.route('/catclassifier', methods=['POST'])
+@app.route("/catclassifier", methods=["POST"])
 def endpoint():
     """
     API endpoint that accepts a POST request with an image file.
@@ -86,17 +91,17 @@ def endpoint():
     """
     logging.info("Received POST request at /catclassifier endpoint")
     # check if the post request has the file part
-    if 'image' not in request.files:
-        response = jsonify({"error": "No 'image' part in the request"}), 400
+    if "image" not in request.files:
+        response, code = jsonify({"error": "No 'image' part in the request"}), 400
     else:
         logging.info("Image file found in the request")
         # get the file object and target model from the request
-        file = request.files['image']
-        model_id = request.form.get('model_id')
+        file = request.files["image"]
+        model_id = request.form.get("model_id")
         logging.info(f"Received file: {file.filename}")
         # check if a file was actually selected for upload
-        if file.filename == '':
-            response = jsonify({"error": "No file selected for uploading"}), 400
+        if file.filename == "":
+            response, code = jsonify({"error": "No file selected for uploading"}), 400
         else:
             # process the uploaded file and classify the image
             if file:
@@ -111,13 +116,13 @@ def endpoint():
                 # run the image through the classification pipeline
                 classification_result = classify_image(image_filepath=api_filepath, model_id=model_id)
                 # create response
-                response = jsonify(classification_result), 200
+                response, code = jsonify(classification_result), 200
             else:
                 # set default response
-                response = jsonify({"error": "Invalid file upload"}), 400
+                response, code = jsonify({"error": "Invalid file upload"}), 400
     # return response
-    return response
+    return response, code
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # run the flask application
     app.run(debug=True)
