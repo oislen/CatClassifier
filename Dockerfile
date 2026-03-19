@@ -42,4 +42,4 @@ EXPOSE 8888
 EXPOSE 5000
 
 #ENTRYPOINT ["uv", "run", "jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
-ENTRYPOINT ["uv", "run", "flask", "--app", "api.py", "run"]
+ENTRYPOINT ["uv", "run", "flask", "--app", "model/api.py", "run", "--host", "0.0.0.0", "--port", "5000"]
