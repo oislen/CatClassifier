@@ -1,5 +1,6 @@
 import torch
 from beartype import beartype
+import logging
 
 @beartype
 def load(model, input_fpath:str, weights_only:bool=False):
@@ -20,4 +21,5 @@ def load(model, input_fpath:str, weights_only:bool=False):
     model.load_state_dict(torch.load(input_fpath, weights_only=weights_only))
     model.eval()
     msg = f'Loaded from {input_fpath}'
+    logging.info(msg)
     return msg
