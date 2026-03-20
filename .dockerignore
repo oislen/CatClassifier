@@ -23,6 +23,6 @@ __pycache__
 *.csv
 
 # allow specific pytorch model files
-!data/AlexNet8_pretrained.pt
-!data/ResNet50_pretrained.pt
-!data/VGG16_pretrained.pt
+!data/models/AlexNet8_pretrained.pt
+!data/models/ResNet50_pretrained.pt
+!data/models/VGG16_pretrained.pt
