@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from torch.utils.data import DataLoader
 import datetime
 import torch
+from werkzeug.utils import secure_filename
 
 import cons
 from prg_torch_model import torch_transforms, model_dict
@@ -109,14 +110,15 @@ def endpoint():
     device_type = request.form.get("device_type", cons.device_type)
     if model_id not in model_dict:
         return jsonify({"error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"}), 400
-    logging.info(f"Received file: {file.filename}")
+    safe_filename = secure_filename(file.filename)
+    logging.info(f"Received file: {safe_filename}")
     # check if a file was actually selected for upload
-    if file.filename == "":
+    if safe_filename  == "":
         return jsonify({"error": "No file selected for uploading"}), 400
     # process the uploaded file and classify the image
     if file:
         logging.info("Processing the uploaded image")
-        api_filepath = os.path.join(cons.api_fdir, file.filename)
+        api_filepath = os.path.join(cons.api_fdir, safe_filename)
         # create api file directory if not exists
         if not os.path.exists(cons.api_fdir):
             os.makedirs(os.path.dirname(api_filepath))
@@ -132,5 +134,7 @@ def endpoint():
         return jsonify({"error": "Invalid file upload"}), 400
 
 if __name__ == "__main__":
+    # Determine debug mode from environment variable, defaulting to False
+    debug_mode = os.environ.get("FLASK_DEBUG", "").lower() in ("1", "true", "yes")
     # run the flask application
-    app.run(debug=True)
+    app.run(debug=debug_mode)
