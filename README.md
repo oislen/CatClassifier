@@ -28,32 +28,8 @@ Master serialised copies of the fine tuned models are available on Kaggle:
 
 * https://www.kaggle.com/models/oislen/cat-classifier-cnn-models
 
-## Running the Application (Windows)
+## Running the Application
 
-### Anaconda
-
-Create a local conda environment for the Cat Classifier app using [anaconda](https://www.anaconda.com/):
-
-```
-conda create --name CatClassifier python=3.12 --yes
-conda activate CatClassifier
-pip install -r requirements.txt
-```
-
-Execute the webscrapers and model training pipeline using the following commands and the local conda environment:
-
-```
-:: run webscrapers
-python webscrapers/prg_scrape_imgs.py --run_download_comp_data --run_webscraper
-:: run model training pipeline
-python model/prg_torch_model.py --run_model_training --run_testset_prediction
-```
-
-The model training and evaluation report can be opened with:
-
-```
-jupyter lab --ip=0.0.0.0 --allow-root "report/torch_analysis_results.ipynb"
-```
 ### Docker
 
 The latest version of the Cat Classifier app can be found as a [docker](https://www.docker.com/) image on dockerhub here:
@@ -66,8 +42,27 @@ The image can be pulled from dockerhub using the following command:
 docker pull oislen/cat-classifier:latest
 ```
 
-The Cat Classifier app can then be started within a jupyter lab session using the following command and the docker image:
+### Flask Rest API Endpoint
+
+A Flask Rest API Endpoint can be started to classify images using the following command and the docker image:
 
 ```
-docker run --name cc --shm-size=512m --publish 8888:8888 -it oislen/cat-classifier:latest
+docker run --name cc --gpus all --publish 5000:5000 --env PARAM_CHECK_GPU=True oislen/cat-classifier:latest
 ```
+
+An exported Postman POST request example is available in the repo docs folder here:
+* https://github.com/oislen/CatClassifier/tree/main/doc/CatClassifier.postman_collection.json
+
+### Jupyter Lab Session
+
+The Cat Classifier app can be started within a jupyter lab session using the following command and the docker image:
+
+```
+docker run --name cc --shm-size=512m  --entrypoint uv --publish 8888:8888 --gpus all --env PARAM_CHECK_GPU=True -it oislen/cat-classifier:latest run jupyter lab --ip=0.0.0.0 --allow-root --IdentityProvider.token='' --ServerApp.password=''
+```
+
+Once the Jupyter Lab session is running, navigate to localhost:8888 in your preferred browser
+
+* http://127.0.0.1:8888/lab
+
+Note, kaggle api credentials are required for pulling the training data from Kaggle.

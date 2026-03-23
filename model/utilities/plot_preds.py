@@ -2,7 +2,7 @@ import os
 from beartype import beartype
 import matplotlib.pyplot as plt
 import pandas as pd
-from tensorflow.keras.preprocessing.image import load_img
+from PIL import Image
 import cons
 
 @beartype
@@ -31,7 +31,8 @@ def plot_preds(
     for id, (index, row) in enumerate(sample_test.iterrows()):
         filename = row['filenames']
         category = row['category']
-        img = load_img(os.path.join(cons.test_fdir, filename), target_size=cons.IMAGE_SIZE)
+        img = Image.open(fp=os.path.join(cons.test_fdir, filename))
+        img = img.resize(size=(cons.IMAGE_SIZE[1], cons.IMAGE_SIZE[0]))
         plt.subplot(6, 3, id+1)
         plt.imshow(img)
         #plt.title(category)

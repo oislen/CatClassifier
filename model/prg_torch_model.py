@@ -1,7 +1,7 @@
 import os
 import platform
 import logging
-import pandas as pd 
+import pandas as pd
 import numpy as np
 
 # set huggingface hub directory
@@ -30,13 +30,12 @@ from model.utilities.TimeIt import TimeIt
 from model.utilities.commandline_interface import commandline_interface
 from model.arch.load_image_v2 import load_image_v2, TorchLoadImages
 
-# device configuration
-device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
-
-# initialise model
-#model = AlexNet8_pretrained(num_classes=2).to(device)
-model = VGG16_pretrained(num_classes=2).to(device)
-#model = ResNet50_pretrained(num_classes=2).to(device)
+# initialise model dict
+model_dict = {
+    "AlexNet8_pretrained": AlexNet8_pretrained(num_classes=2),
+    "VGG16_pretrained": VGG16_pretrained(num_classes=2),
+    "ResNet50_pretrained": ResNet50_pretrained(num_classes=2)
+}
 
 random_state = 42
 
@@ -61,6 +60,14 @@ if __name__ == "__main__":
     input_params_dict = commandline_interface()
     logging.info(input_params_dict)
     timeLogger.logTime(parentKey="Initialisation", subKey="CommandlineArguments")
+    
+    # set model architecture
+    model_id = input_params_dict['model_id']
+    device_type = input_params_dict['device_type']
+    logging.info(f"model_id: {model_id}")
+    logging.info(f"device_type: {device_type}")
+    device = torch.device(input_params_dict['device_type'])
+    model = model_dict[model_id].to(device)
     
     if input_params_dict["run_model_training"]:
         
@@ -119,7 +126,6 @@ if __name__ == "__main__":
         timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataLoaders")
         
         logging.info("Initiate torch model...")
-        logging.info(f"device: {device}")
         # initiate cnn architecture
         if device == "cuda":
             model = nn.DataParallel(model)
@@ -147,14 +153,14 @@ if __name__ == "__main__":
         
         logging.info("Save fitted torch model to disk...")
         # save model
-        model.save(output_fpath=cons.torch_model_pt_fpath)
+        model.save(output_fpath=cons.torch_model_pt_fpath.format(model_id=model.model_id))
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Write")
     
     if input_params_dict["run_testset_prediction"]:
         
         logging.info("Load fitted torch model from disk...")
         # load model
-        model.load(input_fpath=cons.torch_model_pt_fpath)
+        model.load(input_fpath=cons.torch_model_pt_fpath.format(model_id=model.model_id))
         timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
         
         logging.info("Generate test dataset...")

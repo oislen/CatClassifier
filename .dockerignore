@@ -15,3 +15,14 @@ __pycache__
 *.woff
 *.js
 *.html
+
+# repo file types
+*.pt
+*.keras
+*.pickle
+*.csv
+
+# allow specific pytorch model files
+!data/models/AlexNet8_pretrained.pt
+!data/models/ResNet50_pretrained.pt
+!data/models/VGG16_pretrained.pt

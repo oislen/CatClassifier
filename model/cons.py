@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import platform
+import torch
 
 # set huggingface hub directory
 huggingface_hub_dir = 'E:\\huggingface'
@@ -17,10 +18,14 @@ dataprep_fdir = os.path.join(root_fdir, 'data_prep')
 env_fdir = os.path.join(root_fdir, 'environments')
 model_fdir = os.path.join(root_fdir, 'model')
 report_fdir = os.path.join(root_fdir, 'report')
-keras_report_fdir = os.path.join(report_fdir, 'keras')
+report_archive_fdir = os.path.join(report_fdir, 'arch')
+keras_report_fdir = os.path.join(report_archive_fdir, 'keras')
 torch_report_fdir = os.path.join(report_fdir, 'torch')
 test_fdir = os.path.join(data_fdir, 'test1')
 train_fdir = os.path.join(data_fdir, 'train')
+api_fdir = os.path.join(data_fdir, 'api')
+data_models_fdir = os.path.join(data_fdir, 'models')
+data_archive_fdir = os.path.join(data_fdir, 'arch')
 webscrapers_fdir = os.path.join(root_fdir, 'webscrapers')
 
 # set subdirectories
@@ -29,12 +34,12 @@ arch_fdir = os.path.join(model_fdir, 'arch')
 utilities_fdir = os.path.join(dataprep_fdir, 'utilities')
 
 # set file paths
-train_data_pickle_fpath = os.path.join(data_fdir, 'train_data.pickle')
-test_data_pickle_fpath = os.path.join(data_fdir, 'test_data.pickle')
-model_fit_pickle_fpath = os.path.join(data_fdir, 'model_fit.pickle')
-keras_model_pickle_fpath = os.path.join(data_fdir, 'keras_model.keras')
-torch_model_pt_fpath = os.path.join(data_fdir, 'torch_model.pt')
-test_preds_pickle_fpath = os.path.join(data_fdir, 'test_preds.pickle')
+train_data_pickle_fpath = os.path.join(data_archive_fdir, 'train_data.pickle')
+test_data_pickle_fpath = os.path.join(data_archive_fdir, 'test_data.pickle')
+model_fit_pickle_fpath = os.path.join(data_archive_fdir, 'model_fit.pickle')
+keras_model_pickle_fpath = os.path.join(data_archive_fdir, 'keras_model.keras')
+torch_model_pt_fpath = os.path.join(data_models_fdir, '{model_id}.pt')
+test_preds_pickle_fpath = os.path.join(data_archive_fdir, 'test_preds.pickle')
 submission_csv_fpath = os.path.join(data_fdir, 'submission.csv')
 keras_random_image_fpath = os.path.join(keras_report_fdir, 'random_image.jpg')
 keras_generator_plot_fpath = os.path.join(keras_report_fdir, 'generator_plot.jpg')
@@ -80,3 +85,7 @@ shuffle = False
 # multiprocessing
 num_workers = int(os.environ.get("PARAM_NUM_WORKERS", "0"))
 check_gpu = os.environ.get("PARAM_CHECK_GPU", "False").lower() == "true"
+
+# device configuration
+device_type = 'cuda' if torch.cuda.is_available() and check_gpu else 'cpu'
+device = torch.device(device_type)
