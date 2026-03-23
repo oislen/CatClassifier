@@ -42,14 +42,27 @@ The image can be pulled from dockerhub using the following command:
 docker pull oislen/cat-classifier:latest
 ```
 
-The Cat Classifier app can then be started within a jupyter lab session using the following command and the docker image:
+### Flask Rest API Endpoint
+
+A Flask Rest API Endpoint can be started to classify images using the following command and the docker image:
 
 ```
-docker run --name cc --shm-size=512m --publish 8888:8888 -it oislen/cat-classifier:latest
+docker run --name cc --gpus all --publish 5000:5000 --env PARAM_CHECK_GPU=True oislen/cat-classifier:latest
 ```
+
+An exported Postman POST request example is available in the repo docs folder here:
+* https://github.com/oislen/CatClassifier/tree/main/doc/CatClassifier.postman_collection.json
+
+### Jupyter Lab Session
+
+The Cat Classifier app can be started within a jupyter lab session using the following command and the docker image:
+
+```
+docker run --name cc --shm-size=512m  --entrypoint uv --publish 8888:8888 --gpus all --env PARAM_CHECK_GPU=True -it oislen/cat-classifier:latest run jupyter lab --ip=0.0.0.0 --allow-root --IdentityProvider.token='' --ServerApp.password=''
+```
+
+Once the Jupyter Lab session is running, navigate to localhost:8888 in your preferred browser
+
+* http://127.0.0.1:8888/lab
 
 Note, kaggle api credentials are required for pulling the training data from Kaggle.
-
-```
-docker cp kaggle.json cc:/home/ubuntu/CatClassifier/.creds/kaggle.json
-```
