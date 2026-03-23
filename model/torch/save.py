@@ -1,5 +1,6 @@
 import torch
 from beartype import beartype
+import logging
 
 @beartype
 def save(model, output_fpath:str) -> str:
@@ -20,4 +21,5 @@ def save(model, output_fpath:str) -> str:
     """
     torch.save(model.state_dict(), output_fpath)
     msg = f'Saved to {output_fpath}'
+    logging.info(msg)
     return msg

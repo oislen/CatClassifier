@@ -29,7 +29,8 @@ unzip_data = True
 del_zip = True
 
 # set kaggle model detailes
-model_instance_url="oislen/cat-classifier-cnn-models/pyTorch/default/2"
+model_version = 3
+model_instance_url=f"oislen/cat-classifier-cnn-models/pyTorch/default/{model_version}"
 
 # webscraping constants
 n_images = 6000

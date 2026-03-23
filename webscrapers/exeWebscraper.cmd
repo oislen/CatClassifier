@@ -1,1 +1,1 @@
-call uv run python prg_scrape_imgs.py --run_download_comp_data --run_webscraper
+call uv run python prg_scrape_imgs.py --run_download_models --run_download_comp_data --run_webscraper
