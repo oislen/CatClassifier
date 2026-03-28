@@ -1,7 +1,12 @@
 # ignore sub repos
-data
+data/*
 .creds
 checkpoints
+
+# allow specific pytorch model files
+!data/models/AlexNet8_pretrained.pt
+!data/models/ResNet50_pretrained.pt
+!data/models/VGG16_pretrained.pt
 
 # python cache
 __pycache__
@@ -22,7 +27,5 @@ __pycache__
 *.pickle
 *.csv
 
-# allow specific pytorch model files
-!data/models/AlexNet8_pretrained.pt
-!data/models/ResNet50_pretrained.pt
-!data/models/VGG16_pretrained.pt
+# allow specific torch files from model sub-directory
+!data/models/*.pt
