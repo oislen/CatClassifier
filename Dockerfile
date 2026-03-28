@@ -27,6 +27,7 @@ RUN mkdir -p /home/${user} && chown -R ${user}: /home/${user}
 
 # copy cat-classifier repo
 COPY . /home/${user}/CatClassifier
+COPY data/models/ /home/${user}/CatClassifier/data/models/
 # set working directory
 WORKDIR /home/${user}/CatClassifier
 

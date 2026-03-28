@@ -89,6 +89,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Debug Docker Context
+        run: |
+          # This shows exactly what Docker "sees" before building
+          find . -maxdepth 3 -not -path '*/.*'
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
