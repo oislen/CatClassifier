@@ -78,7 +78,9 @@ jobs:
       - name: Download Model Files from Kaggle
         run: |
           cd webscrapers
+          ls -la ../data
           uv run python prg_scrape_imgs.py --run_download_models
+          ls -la ../data/models
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
