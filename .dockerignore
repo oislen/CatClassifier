@@ -23,7 +23,3 @@ __pycache__
 **/*.keras
 **/*.pickle
 **/*.csv
-
-# allow specific torch files from model sub-directory
-**/*.pt
-!data/models/*.pt
