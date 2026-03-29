@@ -3,10 +3,8 @@ data/*
 .creds
 checkpoints
 
-# allow specific pytorch model files
-!data/models/AlexNet8_pretrained.pt
-!data/models/ResNet50_pretrained.pt
-!data/models/VGG16_pretrained.pt
+# allow specific data model files
+!data/models/
 
 # python cache
 __pycache__
@@ -28,4 +26,6 @@ __pycache__
 *.csv
 
 # allow specific torch files from model sub-directory
-!data/models/*.pt
+!data/models/AlexNet8_pretrained.pt
+!data/models/ResNet50_pretrained.pt
+!data/models/VGG16_pretrained.pt

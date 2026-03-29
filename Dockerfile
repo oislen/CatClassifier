@@ -26,13 +26,12 @@ RUN adduser ${user}
 RUN mkdir -p /home/${user} && chown -R ${user}: /home/${user}
 
 # copy cat-classifier repo
-COPY . /home/${user}/CatClassifier
-COPY data/models/ /home/${user}/CatClassifier/data/models/
+COPY --chown=${user}:${user} . /home/${user}/CatClassifier
 # set working directory
 WORKDIR /home/${user}/CatClassifier
 
 # make data directory
-RUN mkdir -p /home/${user}/CatClassifier/data
+#RUN mkdir -p /home/${user}/CatClassifier/data
 RUN mkdir -p /home/${user}/CatClassifier/model/checkpoints
 
 # install required python packages
