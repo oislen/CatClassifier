@@ -2,9 +2,14 @@
 .creds
 checkpoints
 
-# allow specific data model files
-data/*
-!data/models/
+# ignore specific data subdirectories
+data/api
+data/arch
+data/cats
+data/checkpoints
+data/dogs
+data/test1
+data/train
 
 # python cache
 __pycache__
@@ -20,6 +25,6 @@ __pycache__
 *.html
 
 # repo file types
-**/*.keras
-**/*.pickle
-**/*.csv
+*.keras
+*.pickle
+*.csv
