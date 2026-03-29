@@ -1,6 +1,5 @@
 # ignore sub repos
 .creds
-checkpoints
 
 # ignore specific data subdirectories
 data/api
