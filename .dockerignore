@@ -1,6 +1,7 @@
 # ignore sub repos
 .creds
 checkpoints
+.venv
 
 # allow specific data model files
 data/*
