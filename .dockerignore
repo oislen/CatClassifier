@@ -1,14 +1,10 @@
 # ignore sub repos
 .creds
+checkpoints
 
-# ignore specific data subdirectories
-data/api
-data/arch
-data/cats
-data/checkpoints
-data/dogs
-data/test1
-data/train
+# allow specific data model files
+data/*
+!data/models/
 
 # python cache
 __pycache__
@@ -24,6 +20,10 @@ __pycache__
 *.html
 
 # repo file types
-*.keras
-*.pickle
-*.csv
+**/*.keras
+**/*.pickle
+**/*.csv
+
+# allow specific torch files from model sub-directory
+**/*.pt
+!data/models/*.pt
