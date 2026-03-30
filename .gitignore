@@ -2,6 +2,7 @@
 data
 .creds
 checkpoints
+.venv
 
 # python cache
 __pycache__
