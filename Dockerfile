@@ -26,13 +26,14 @@ RUN adduser ${user}
 RUN mkdir -p /home/${user} && chown -R ${user}: /home/${user}
 
 # copy cat-classifier repo
-COPY . /home/${user}/CatClassifier
+COPY --chown=${user}:${user} . /home/${user}/CatClassifier
+RUN ls -R /home/${user}/CatClassifier/data
 # set working directory
 WORKDIR /home/${user}/CatClassifier
 
 # make data directory
-RUN mkdir -p /home/${user}/CatClassifier/data
-RUN mkdir -p /home/${user}/CatClassifier/model/checkpoints
+#RUN mkdir -p /home/${user}/CatClassifier/data
+#RUN mkdir -p /home/${user}/CatClassifier/data/checkpoints
 
 # install required python packages
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
