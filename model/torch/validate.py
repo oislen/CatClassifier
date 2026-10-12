@@ -29,7 +29,7 @@ def validate(
     model.eval()
     with torch.no_grad():
         v_loss, v_corr = 0.0, 0.0
-        for i, (images, labels) in enumerate(dataloader):
+        for _i, (images, labels) in enumerate(dataloader):
             # load images and labels to device
             images = images.to(device)
             labels = labels.to(device)

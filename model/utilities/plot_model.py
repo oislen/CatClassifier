@@ -47,7 +47,7 @@ def plot_model_fit(model_fit, output_fdir: str | None = None, show_plot: bool = 
     plt.legend(["train", "val"], loc="upper left")
 
     #  show save, plot and close
-    if output_fdir != None:
+    if output_fdir is not None:
         accuracy_output_fpath = os.path.join(output_fdir, "model_accuracy.png")
         plt.savefig(accuracy_output_fpath)
     if show_plot:
@@ -71,7 +71,7 @@ def plot_model_fit(model_fit, output_fdir: str | None = None, show_plot: bool = 
     plt.legend(["train", "val"], loc="upper left")
 
     #  show save, plot and close
-    if output_fdir != None:
+    if output_fdir is not None:
         loss_output_fpath = os.path.join(output_fdir, "model_loss.png")
         plt.savefig(loss_output_fpath)
     if show_plot:

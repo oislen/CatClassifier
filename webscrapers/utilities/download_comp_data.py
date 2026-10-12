@@ -57,20 +57,20 @@ def download_comp_data(
 
     logging.info("checking for data directory ...")
     # check data directory exists
-    if os.path.exists(data_dir) == False:
+    if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     else:
         logging.info(f"data directory exists: {data_dir}")
 
     # if downloading the data
-    if download_data == True:
+    if download_data:
         logging.info("downing kaggle data ..")
         kaggle_cmd = f"kaggle competitions download --competition {comp_name} --path {data_dir} --force"
         subprocess.run(kaggle_cmd.split())
 
     # if unzipping the data
-    if unzip_data == True:
-        if os.path.exists(zip_data_fpath) == False:
+    if unzip_data:
+        if not os.path.exists(zip_data_fpath):
             raise OSError(f"file not found: {zip_data_fpath}")
         else:
             for zip_fpath in zip_fpaths_list:
@@ -79,7 +79,7 @@ def download_comp_data(
                     zip_ref.extractall(data_dir)
 
     # if deleting zip file
-    if del_zip == True:
+    if del_zip:
         for zip_fpath in zip_fpaths_list:
             logging.info(f"deleting zip file {zip_fpath} ...")
             os.remove(path=zip_fpath)
@@ -110,7 +110,7 @@ def download_models(model_instance_url: str, model_dir: str):
 
     logging.info("checking for data directory ...")
     # check data directory exists
-    if os.path.exists(model_dir) == False:
+    if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     else:
         logging.info(f"model directory exists: {model_dir}")

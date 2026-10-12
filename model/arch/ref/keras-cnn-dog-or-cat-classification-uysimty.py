@@ -122,7 +122,7 @@ example_generator = train_datagen.flow_from_dataframe(
 plt.figure(figsize=(12, 12))
 for i in range(0, 15):
     plt.subplot(5, 3, i + 1)
-    for X_batch, Y_batch in example_generator:
+    for X_batch, _Y_batch in example_generator:
         image = X_batch[0]
         plt.imshow(image)
         break
@@ -177,7 +177,7 @@ test_generator = test_gen.flow_from_dataframe(
 # make test set predictions
 predict = lenet5_arch.predict(test_generator, steps=np.ceil(nb_samples / batch_size))
 test_df["category"] = np.argmax(predict, axis=-1)
-label_map = dict((v, k) for k, v in train_generator.class_indices.items())
+label_map = {v: k for k, v in train_generator.class_indices.items()}
 test_df["category"] = test_df["category"].replace(label_map)
 test_df["category"] = test_df["category"].replace({"dog": 1, "cat": 0})
 

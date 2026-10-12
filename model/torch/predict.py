@@ -23,7 +23,7 @@ def predict(
     """
     fin_outputs = []
     with torch.no_grad():
-        for i, (images, labels) in enumerate(dataloader):
+        for _i, (images, labels) in enumerate(dataloader):
             images = images.to(device)
             labels = labels.to(device)
             outputs = model.forward(images)

@@ -39,7 +39,7 @@ def fit_model(
     """
 
     # check that the output directory exists
-    if os.path.exists(output_dir) == False:
+    if not os.path.exists(output_dir):
         raise OSError(f"Input Error: Output directory does not exist {output_dir}.")
 
     # create verbose_int
@@ -53,7 +53,7 @@ def fit_model(
         model.summary()
 
     # if reloading previous model
-    if starting_epoch != None:
+    if starting_epoch is not None:
         check_in_filename = model_name + f"{starting_epoch:02d}.keras"
         check_in_fpath = os.path.join(output_dir, check_in_filename)
         model = load_model(check_in_fpath)
@@ -72,7 +72,7 @@ def fit_model(
         validation_steps = None
 
     # if not applying data augmentation
-    if datagen == None:
+    if datagen is None:
         # define validation, x and y data accordingly
         validation_data = (X_val, Y_val)
         x = X_train
@@ -86,7 +86,7 @@ def fit_model(
         batch_size = None
 
     # if not apply learning rate reduction
-    if lrate_red == None:
+    if lrate_red is None:
         # assign empty list
         lrate_red = []
     # otherwise

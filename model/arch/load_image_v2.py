@@ -81,7 +81,7 @@ class TorchLoadImages:
 
     def loadImages(self, filepaths):
         """ """
-        if self.n_workers == None:
+        if self.n_workers is None:
             records = [self.loadImage(filepath) for filepath in filepaths]
         else:
             records = self.multiProcess(self.loadImage, filepaths)

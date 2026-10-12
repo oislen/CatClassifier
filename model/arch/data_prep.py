@@ -85,7 +85,7 @@ def data_prep():
     # create list to hold image data
     image_data = []
     # iterate over image fpaths and classes to create image data object
-    for idx, (image_fpath, image_list) in enumerate(image_fpaths.items()):
+    for _idx, (image_fpath, image_list) in enumerate(image_fpaths.items()):
         # extract out image target class
         target_class = image_list[0]
         dataset = image_list[1]

@@ -26,7 +26,7 @@ def plot_preds(data: pd.DataFrame, output_fpath: str = None, show_plot: bool = T
     """
     sample_test = data.head(18)
     plt.figure(figsize=(12, 24))
-    for id, (index, row) in enumerate(sample_test.iterrows()):
+    for id, (_index, row) in enumerate(sample_test.iterrows()):
         filename = row["filenames"]
         category = row["category"]
         img = Image.open(fp=os.path.join(cons.test_fdir, filename))
@@ -37,7 +37,7 @@ def plot_preds(data: pd.DataFrame, output_fpath: str = None, show_plot: bool = T
         plt.xlabel(filename + "(" + f"{category}" + ")")
     plt.tight_layout()
     #  show save, plot and close
-    if output_fpath != None:
+    if output_fpath is not None:
         plt.savefig(output_fpath)
     if show_plot:
         plt.show()

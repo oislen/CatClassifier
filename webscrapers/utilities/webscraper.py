@@ -169,7 +169,7 @@ def webscraper(
     # run function and scrape srcs
     srcs = scrape_srcs(urls=urls, n_images=n_images, home_url=home_url)
     # run function to download src
-    if ncpu == None:
+    if ncpu is None:
         for src in srcs:
             download_src(src=src, output_dir=output_dir, search=search)
     else:

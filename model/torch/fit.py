@@ -61,7 +61,7 @@ def fit(
     model = model.to(device)
     n_total_steps = len(train_dataloader)
     # load previous model epoch checkpoint
-    if (load_epoch_checkpoint != None) and (checkpoints_dir != None):
+    if (load_epoch_checkpoint is not None) and (checkpoints_dir is not None):
         checkpoints_filename = (
             f"checkpoint_{model.model_id}_epoch_{load_epoch_checkpoint}.pt"
         )
@@ -88,7 +88,7 @@ def fit(
             # forward pass
             preds = model.forward(images)
             loss = criterion(preds, labels)
-            if scheduler != None:
+            if scheduler is not None:
                 scheduler.step(loss)
             # backward and optimise
             optimizer.zero_grad()
@@ -107,7 +107,7 @@ def fit(
         train_acc_list.append(train_acc)
         logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
         # calculate validation loss and accuracy if applicable
-        if valid_dataLoader != None:
+        if valid_dataLoader is not None:
             valid_loss, valid_acc = validate(
                 model=model,
                 device=device,
@@ -120,13 +120,13 @@ def fit(
                 f"Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}"
             )
             # if implementing early stopping
-            if early_stopper != None and early_stopper.early_stop(valid_loss):
+            if early_stopper is not None and early_stopper.early_stop(valid_loss):
                 logging.info(
                     f"Applying early stopping criteria at validation loss: {valid_loss}"
                 )
                 break
         # writing model checkpoints
-        if checkpoints_dir != None:
+        if checkpoints_dir is not None:
             checkpoints_filename = f"checkpoint_{model.model_id}_epoch_{epoch}.pt"
             checkpoint_filepath = os.path.join(checkpoints_dir, checkpoints_filename)
             checkpoint = {

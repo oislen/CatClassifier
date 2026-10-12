@@ -32,7 +32,7 @@ class ScrapyWebscraperSpiderMiddleware:
 
         # Must return an iterable of Request, or item objects.
         for i in result:
-            yield i
+            yield from i
 
     def process_spider_exception(self, response, exception, spider):
         # Called when a spider or process_spider_input() method
@@ -48,10 +48,10 @@ class ScrapyWebscraperSpiderMiddleware:
 
         # Must return only requests (not items).
         for r in start_requests:
-            yield r
+            yield from r
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        spider.logger.info(f"Spider opened: {spider.name}")
 
 
 class ScrapyWebscraperDownloaderMiddleware:
@@ -98,4 +98,4 @@ class ScrapyWebscraperDownloaderMiddleware:
         pass
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        spider.logger.info(f"Spider opened: {spider.name}")

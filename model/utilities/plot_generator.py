@@ -31,7 +31,7 @@ def plot_generator(
     for i in range(0, 15):
         plt.subplot(5, 3, i + 1)
         if mode == "keras":
-            for X_batch, Y_batch in generator:
+            for X_batch, _Y_batch in generator:
                 image = X_batch[0]
                 plt.imshow(image)
                 break
@@ -41,7 +41,7 @@ def plot_generator(
             plt.imshow(image)
     plt.tight_layout()
     #  show save, plot and close
-    if output_fpath != None:
+    if output_fpath is not None:
         plt.savefig(output_fpath)
     if show_plot:
         plt.show()

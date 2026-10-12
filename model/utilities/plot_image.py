@@ -24,7 +24,7 @@ def plot_image(image_array, output_fpath: str | None = None, show_plot: bool = T
     # plot image
     plt.imshow(image_array)
     #  show save, plot and close
-    if output_fpath != None:
+    if output_fpath is not None:
         plt.savefig(output_fpath)
     if show_plot:
         # show plot
