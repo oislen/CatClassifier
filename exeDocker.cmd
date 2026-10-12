@@ -6,7 +6,9 @@ SET DOCKER_IMAGE=%DOCKER_USER%/%DOCKER_REPO%:%DOCKER_TAG%
 SET DOCKER_CONTAINER_NAME=cc
 
 :: remove existing docker containers and images
-docker image rm -f %DOCKER_IMAGE%
+call docker container rm --force %DOCKER_CONTAINER_NAME%
+call docker image rm --force %DOCKER_IMAGE%
+call docker builder prune -f
 
 :: build docker image
 call docker build --no-cache -t %DOCKER_IMAGE% .
