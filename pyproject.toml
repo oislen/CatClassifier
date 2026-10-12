@@ -33,6 +33,9 @@ explicit = true
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+extend-exclude = [
+    "model/arch/keras_model.py"
+]
 
 [tool.ruff.lint]
 select = [
