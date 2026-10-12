@@ -1,11 +1,18 @@
 import logging
+
 import cons
-from utilities.EC2Client import EC2Client
-from utilities.commandline_interface import commandline_interface
 from beartype import beartype
+from utilities.commandline_interface import commandline_interface
+from utilities.EC2Client import EC2Client
+
 
 @beartype
-def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=False, isFleet:bool=False):
+def run_ec2_instance(
+    launch: bool = False,
+    terminate: bool = False,
+    describe: bool = False,
+    isFleet: bool = False,
+):
     """
 
     Parameters
@@ -32,7 +39,9 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=Fals
             response = ec2_client.describe_fleets()
         else:
             logging.info("Listing EC2 instances")
-            Filters=[{"Name":"instance-state-name","Values":["running","pending"]}]
+            Filters = [
+                {"Name": "instance-state-name", "Values": ["running", "pending"]}
+            ]
             response = ec2_client.describe_instances(Filters=Filters)
         logging.info(response)
     # if launch ec2 instance
@@ -40,7 +49,9 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=Fals
         logging.info("Launching EC2 instance.")
         try:
             # delete any existing launch template
-            ec2_client.delete_launch_template(LaunchTemplateName=cons.launch_template_config["LaunchTemplateName"])
+            ec2_client.delete_launch_template(
+                LaunchTemplateName=cons.launch_template_config["LaunchTemplateName"]
+            )
         except Exception as e:
             logging.warning(e)
         # create a new launch template
@@ -52,7 +63,7 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=Fals
             # create ec2 instance
             ec2_client.run_instances(cons.run_instances_config)
         # list any instances
-        Filters=[{"Name":"instance-state-name","Values":["running","pending"]}]
+        Filters = [{"Name": "instance-state-name", "Values": ["running", "pending"]}]
         response = ec2_client.describe_instances(Filters=Filters)
         logging.info(response)
     # if terminating ec2 instance
@@ -62,18 +73,24 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=Fals
             # list any fleets
             response = ec2_client.describe_fleets()
             # set instance ids to shut down
-            fleetIds = [fleet['FleetId'] for fleet in response['Fleets']]
+            fleetIds = [fleet["FleetId"] for fleet in response["Fleets"]]
             if fleetIds != []:
-                response = ec2_client.delete_fleets(FleetIds=fleetIds, TerminateInstances=True)
+                response = ec2_client.delete_fleets(
+                    FleetIds=fleetIds, TerminateInstances=True
+                )
             # list any fleets
             response = ec2_client.describe_fleets()
         else:
             logging.info("Terminating EC2 instances.")
             # list any running instances
-            Filters=[{"Name":"instance-state-name","Values":["running"]}]
+            Filters = [{"Name": "instance-state-name", "Values": ["running"]}]
             response = ec2_client.describe_instances(Filters=Filters)
             # set instance ids to shut down
-            InstanceIds=[instance["InstanceId"] for reservation in response["Reservations"] for instance in reservation["Instances"]]
+            InstanceIds = [
+                instance["InstanceId"]
+                for reservation in response["Reservations"]
+                for instance in reservation["Instances"]
+            ]
             if InstanceIds != []:
                 ec2_client.stop_instances(InstanceIds=InstanceIds)
                 ec2_client.terminate_instances(InstanceIds=InstanceIds)
@@ -81,8 +98,8 @@ def run_ec2_instance(launch:bool=False, terminate:bool=False, describe:bool=Fals
             response = ec2_client.describe_instances(Filters=Filters)
         logging.info(response)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # set up logging
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
@@ -93,5 +110,5 @@ if __name__ == "__main__":
         launch=input_params_dict["launch"],
         terminate=input_params_dict["terminate"],
         describe=input_params_dict["describe"],
-        isFleet=input_params_dict["isFleet"]
-        )
+        isFleet=input_params_dict["isFleet"],
+    )

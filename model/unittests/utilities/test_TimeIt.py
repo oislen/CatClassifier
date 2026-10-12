@@ -1,17 +1,18 @@
-import unittest
 import os
 import sys
+import unittest
 
 sys.path.append(os.path.join(os.getcwd(), "model"))
 
 from utilities.TimeIt import TimeIt
 
-parentKey="Test Parent Key"
-subKey="Test Sub Key"
+parentKey = "Test Parent Key"
+subKey = "Test Sub Key"
 exp_log_keys = ["parentKey", "subKey", "stepTime", "cumulativeTime"]
 obs_timeit = TimeIt()
 obs_timeit.logTime(parentKey=parentKey, subKey=subKey)
 obs_log_keys = list(obs_timeit.log[0].keys())
+
 
 class Test_TimeIt(unittest.TestCase):
     """"""
@@ -28,6 +29,7 @@ class Test_TimeIt(unittest.TestCase):
 
     def test_values(self):
         self.assertEqual(self.obs_log_keys, self.exp_log_keys)
+
 
 if __name__ == "__main__":
     unittest.main()

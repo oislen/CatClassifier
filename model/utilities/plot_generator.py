@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
-from typing import Union
 from beartype import beartype
+
 
 @beartype
 def plot_generator(
     generator,
-    mode:str='keras',
-    output_fpath:Union[str,None]=None,
-    show_plot:bool=True
-    ):
+    mode: str = "keras",
+    output_fpath: str | None = None,
+    show_plot: bool = True,
+):
     """
     Plots multiple images from a generator.
 
@@ -29,13 +29,13 @@ def plot_generator(
     # plot example
     plt.figure(figsize=(12, 12))
     for i in range(0, 15):
-        plt.subplot(5, 3, i+1)
-        if mode == 'keras':
+        plt.subplot(5, 3, i + 1)
+        if mode == "keras":
             for X_batch, Y_batch in generator:
                 image = X_batch[0]
                 plt.imshow(image)
                 break
-        elif mode == 'torch':
+        elif mode == "torch":
             X_batch = generator[i]
             image = X_batch[0]
             plt.imshow(image)

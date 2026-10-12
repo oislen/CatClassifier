@@ -1,69 +1,148 @@
 import numpy as np
 import torch
+from beartype import beartype
 from torch import nn
-from torchvision import models
+
+from model.torch.EarlyStopper import EarlyStopper
+from model.torch.fit import fit as fit_module
+from model.torch.load import load as load_module
+
 # load custom modules
 from model.torch.predict import predict as predict_module
 from model.torch.save import save as save_module
-from model.torch.load import load as load_module
-from model.torch.fit import fit as fit_module
 from model.torch.validate import validate as validate_module
-from model.torch.EarlyStopper import EarlyStopper
-from typing import Union
-from beartype import beartype
+
 
 class VGG16(nn.Module):
     def __init__(self, num_classes=1000):
-        super(VGG16, self).__init__()
+        super().__init__()
         self.model_id = "VGG16"
         self.features = nn.Sequential(
             # first convulation and pooling layer
-            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=3,
+                out_channels=64,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=64,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
             # second convulation and pooling layer
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=64,
+                out_channels=128,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=128,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
             # third convulation and pooling layer
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=256,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=256,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=256,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
             # fourth convulation and pooling layer
-            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
             # fifth convulation and pooling layer
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channels=512, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding='same'),
+            nn.Conv2d(
+                in_channels=512,
+                out_channels=512,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
         )
         self.classifier = nn.Sequential(
             # first dense layer with dropout regularization
-            nn.Linear(in_features=512*4*4, out_features=4096),
+            nn.Linear(in_features=512 * 4 * 4, out_features=4096),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.25),
             # second dense layer with dropout regularization
             nn.Linear(in_features=4096, out_features=4096),
             nn.ReLU(inplace=True),
             # third dense layer for prediction
-            nn.Linear(in_features=4096, out_features=num_classes)
+            nn.Linear(in_features=4096, out_features=num_classes),
         )
 
     @beartype
@@ -86,9 +165,21 @@ class VGG16(nn.Module):
         return x
 
     @beartype
-    def fit(self, device:torch.device, criterion:torch.nn.CrossEntropyLoss, optimizer:torch.optim.SGD, train_dataloader:torch.utils.data.DataLoader, num_epochs:int=4, scheduler:Union[torch.optim.lr_scheduler.ReduceLROnPlateau,None]=None, valid_dataLoader:Union[torch.utils.data.DataLoader,None]=None, early_stopper:Union[EarlyStopper,None]=None, checkpoints_dir:Union[str,None]=None, load_epoch_checkpoint:Union[int,None]=None):
+    def fit(
+        self,
+        device: torch.device,
+        criterion: torch.nn.CrossEntropyLoss,
+        optimizer: torch.optim.SGD,
+        train_dataloader: torch.utils.data.DataLoader,
+        num_epochs: int = 4,
+        scheduler: torch.optim.lr_scheduler.ReduceLROnPlateau | None = None,
+        valid_dataLoader: torch.utils.data.DataLoader | None = None,
+        early_stopper: EarlyStopper | None = None,
+        checkpoints_dir: str | None = None,
+        load_epoch_checkpoint: int | None = None,
+    ):
         """Fits model to specified data loader given the criterion and optimizer
-        
+
         Parameters
         ----------
         device : torch.device
@@ -111,16 +202,33 @@ class VGG16(nn.Module):
             The local folder location where model epoch checkpoints are to be read and wrote to, default is None
         load_epoch_checkpoint : int
             The epoch checkpoint to load and start from, default is None
-        
+
         Returns
         -------
         """
-        self, self.model_fit = fit_module(self, device, criterion, optimizer, train_dataloader, num_epochs, scheduler, valid_dataLoader, early_stopper, checkpoints_dir, load_epoch_checkpoint)
+        self, self.model_fit = fit_module(
+            self,
+            device,
+            criterion,
+            optimizer,
+            train_dataloader,
+            num_epochs,
+            scheduler,
+            valid_dataLoader,
+            early_stopper,
+            checkpoints_dir,
+            load_epoch_checkpoint,
+        )
 
     @beartype
-    def validate(self, device:torch.device, dataloader:torch.utils.data.DataLoader, criterion:torch.nn.CrossEntropyLoss) -> tuple:
+    def validate(
+        self,
+        device: torch.device,
+        dataloader: torch.utils.data.DataLoader,
+        criterion: torch.nn.CrossEntropyLoss,
+    ) -> tuple:
         """Calculates validation loss and accuracy
-        
+
         Parameters
         ----------
         device : torch.device
@@ -129,7 +237,7 @@ class VGG16(nn.Module):
             The torch data loader to use when fitting the model
         criterion : torch.nn.CrossEntropyLoss
             The criterion to use when fitting the model
-        
+
         Returns
         -------
         tuple
@@ -139,16 +247,18 @@ class VGG16(nn.Module):
         return (valid_loss, valid_acc)
 
     @beartype
-    def predict(self, dataloader:torch.utils.data.DataLoader, device:torch.device) -> np.ndarray:
+    def predict(
+        self, dataloader: torch.utils.data.DataLoader, device: torch.device
+    ) -> np.ndarray:
         """Predicts probabilities for a given data loader
-        
+
         Parameters
         ----------
         dataloader : torch.utils.data.DataLoader
             The torch data loader to use when fitting the model
         device : torch.device
             The torch device to use when fitting the model
-        
+
         Returns
         -------
         np.ndarry
@@ -156,17 +266,16 @@ class VGG16(nn.Module):
         """
         proba = predict_module(self, dataloader, device)
         return proba
-    
-    
+
     @beartype
-    def save(self, output_fpath:str) -> str:
+    def save(self, output_fpath: str) -> str:
         """Writes a torch model to disk as a file
-        
+
         Parameters
         ----------
         output_fpath : str
             The output file location to write the torch model to disk
-        
+
         Returns
         -------
         str
@@ -174,18 +283,18 @@ class VGG16(nn.Module):
         """
         msg = save_module(self, output_fpath)
         return msg
-    
+
     @beartype
-    def load(self, input_fpath:str, weights_only:bool=False) -> str:
+    def load(self, input_fpath: str, weights_only: bool = False) -> str:
         """Loads a torch model from disk as a file
-        
+
         Parameters
         ----------
         input_fpath : str
             The input file location to load the torch model from disk
         weights_only : bool
             Whether loading just the model weights or the full serialised model object, default is False
-        
+
         Returns
         -------
         str

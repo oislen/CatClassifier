@@ -1,9 +1,10 @@
-import numpy as np
 import cv2
+import numpy as np
 from beartype import beartype
 
+
 @beartype
-def load_image(image_fpath:str) -> np.array:
+def load_image(image_fpath: str) -> np.array:
     """
     Loads an image file as an image array from disk
 
@@ -11,7 +12,7 @@ def load_image(image_fpath:str) -> np.array:
     ----------
     image_fpath : str
         The file path to the image file to load as an image array
-    
+
     Returns
     -------
     numpy.array

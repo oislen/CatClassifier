@@ -1,28 +1,25 @@
 # load relevant libraries
 import os
+
 from beartype import beartype
-from typing import Union
 from matplotlib import pyplot as plt
- 
+
+
 @beartype
-def plot_model_fit(
-    model_fit,
-    output_fdir:Union[str,None]=None,
-    show_plot:bool=True
-    ):
+def plot_model_fit(model_fit, output_fdir: str | None = None, show_plot: bool = True):
     """
     Plots the model's fit during training in relation to a validation set.
-    
+
     Parameters
     ----------
-    
-    model_fit : model.predict(), 
+
+    model_fit : model.predict(),
         the Keras model predict object
     output_fdir : str
         The file path to save the model fit plots to disk, default is None
     show_plot : bool
         Whether to show the generated plot, default is True
-    
+
     Returns
     -------
 
@@ -30,52 +27,52 @@ def plot_model_fit(
     ----------
 
     https://github.com/jiadaizhao/Advanced-Machine-Learning-Specialization
-    
+
     """
-    
-    #-- Accuracy Plot --#
-    
+
+    # -- Accuracy Plot --#
+
     # plot training and validation accuracy
-    plt.plot(model_fit.history['accuracy'])
-    plt.plot(model_fit.history['val_accuracy'])
-    
+    plt.plot(model_fit.history["accuracy"])
+    plt.plot(model_fit.history["val_accuracy"])
+
     # assign plot title
-    plt.title('model accuracy')
-    
+    plt.title("model accuracy")
+
     # assign x and y labels
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    
+    plt.ylabel("accuracy")
+    plt.xlabel("epoch")
+
     # assign plot legend
-    plt.legend(['train', 'val'], loc='upper left')
-    
+    plt.legend(["train", "val"], loc="upper left")
+
     #  show save, plot and close
     if output_fdir != None:
-        accuracy_output_fpath = os.path.join(output_fdir, 'model_accuracy.png')
+        accuracy_output_fpath = os.path.join(output_fdir, "model_accuracy.png")
         plt.savefig(accuracy_output_fpath)
     if show_plot:
         plt.show()
     plt.close()
-    
-    #-- Loss Plot --#
-    
+
+    # -- Loss Plot --#
+
     # plot training validation loss
-    plt.plot(model_fit.history['loss'])
-    plt.plot(model_fit.history['val_loss'])
-    
+    plt.plot(model_fit.history["loss"])
+    plt.plot(model_fit.history["val_loss"])
+
     # assign plot title
-    plt.title('model loss')
-    
+    plt.title("model loss")
+
     # assign x and y labels
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    
+    plt.ylabel("loss")
+    plt.xlabel("epoch")
+
     # assign plot legend
-    plt.legend(['train', 'val'], loc='upper left')
-    
+    plt.legend(["train", "val"], loc="upper left")
+
     #  show save, plot and close
     if output_fdir != None:
-        loss_output_fpath = os.path.join(output_fdir, 'model_loss.png')
+        loss_output_fpath = os.path.join(output_fdir, "model_loss.png")
         plt.savefig(loss_output_fpath)
     if show_plot:
         plt.show()
