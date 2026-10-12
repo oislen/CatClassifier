@@ -7,20 +7,63 @@ on:
   pull_request:
     branches: [ dev, main ]
 
+# Cancel outdated runs on the same branch when new commits are pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+
+  validate-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Match your regex pattern: type(#issue): description
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+
+  ruff-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Run Ruff Checks
+        uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89
+        with:
+          version: "0.15.15"
 
   trivy-fs-scan:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Run Trivy vulnerability scanner in fs mode
-      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - name: Run Trivy to show all vulnerabilities
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
       with:
         scan-type: 'fs'
         scan-ref: '.'
+        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+        exit-code: '0'
+    - name: Fail build on High or Critical vulnerabilities
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        severity: 'HIGH,CRITICAL'
         exit-code: '1'
-        severity: 'CRITICAL,HIGH'
 
   python-unittests:
     runs-on: ubuntu-latest
@@ -28,15 +71,14 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.13.11"]
-
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Set environment variable
       run: echo "GITHUB_ACTIONS_UNITTEST_FLAG=1" >> $GITHUB_ENV
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install python dependencies
