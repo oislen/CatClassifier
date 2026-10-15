@@ -19,6 +19,40 @@ jobs:
         with:
           version: "0.15.15"
 
+
+  sonarqube-scan:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Check if SonarQube is Online
+        id: check-sonar
+        shell: powershell
+        run: |
+          try {
+              $response = Invoke-WebRequest -Uri "${{ secrets.SONAR_HOST_URL }}/api/system/status" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+              if ($response.StatusCode -eq 200) {
+                  echo "online=true" >> $env:GITHUB_OUTPUT
+              } else {
+                  echo "online=false" >> $env:GITHUB_OUTPUT
+              }
+          } catch {
+              Write-Host "SonarQube server is offline or unreachable."
+              echo "online=false" >> $env:GITHUB_OUTPUT
+          }
+      - name: Run SonarQube Scan
+        if: steps.check-sonar.outputs.online == 'true'
+        timeout-minutes: 3
+        env:
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        shell: cmd
+        run: |
+          sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
+
   python-unittests:
     runs-on: ubuntu-latest
     strategy:

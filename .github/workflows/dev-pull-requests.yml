@@ -45,6 +45,45 @@ jobs:
         with:
           version: "0.15.15"
 
+  sonarqube-scan:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Check if SonarQube is Online
+        id: check-sonar
+        timeout-minutes: 1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'SilentlyContinue'
+          try {
+              $response = Invoke-WebRequest -Uri "${{ secrets.SONAR_HOST_URL }}/api/system/status" -TimeoutSec 5 -UseBasicParsing
+              if ($response -and $response.StatusCode -eq 200) {
+                  Write-Host "SonarQube is online."
+                  echo "online=true" >> $env:GITHUB_OUTPUT
+              } else {
+                  Write-Host "SonarQube returned non-200 status."
+                  echo "online=false" >> $env:GITHUB_OUTPUT
+              }
+          } catch {
+              Write-Host "SonarQube server is offline or unreachable."
+              echo "online=false" >> $env:GITHUB_OUTPUT
+          }
+          # Force the step to exit successfully so downstream steps can evaluate the output flag
+          exit 0
+      - name: Run SonarQube Scan
+        if: steps.check-sonar.outputs.online == 'true'
+        timeout-minutes: 5
+        env:
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        shell: cmd
+        run: |
+          sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
+
   trivy-fs-scan:
     runs-on: ubuntu-latest
     steps:
