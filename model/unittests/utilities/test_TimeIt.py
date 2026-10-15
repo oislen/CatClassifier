@@ -4,7 +4,7 @@ import unittest
 
 sys.path.append(os.path.join(os.getcwd(), "model"))
 
-from utilities.TimeIt import TimeIt
+from utilities import TimeIt
 
 parentKey = "Test Parent Key"
 subKey = "Test Sub Key"

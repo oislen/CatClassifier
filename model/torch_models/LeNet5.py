@@ -3,14 +3,14 @@ import torch
 from beartype import beartype
 from torch import nn
 
-from model.torch.EarlyStopper import EarlyStopper
-from model.torch.fit import fit as fit_module
-from model.torch.load import load as load_module
+from .EarlyStopper import EarlyStopper
+from .fit import fit as fit_module
+from .load import load as load_module
 
 # load custom modules
-from model.torch.predict import predict as predict_module
-from model.torch.save import save as save_module
-from model.torch.validate import validate as validate_module
+from .predict import predict as predict_module
+from .save import save as save_module
+from .validate import validate as validate_module
 
 
 class LeNet5(nn.Module):

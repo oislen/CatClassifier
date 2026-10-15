@@ -34,9 +34,8 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from model.arch.load_image_v2 import TorchLoadImages
-from model.torch.CustomDataset import CustomDataset
-from model.torch.VGG16_pretrained import VGG16_pretrained
-from model.utilities.TimeIt import TimeIt
+from model.torch_models import CustomDataset, VGG16_pretrained
+from model.utilities import TimeIt
 
 # device configuration
 device = torch.device("cuda" if torch.cuda.is_available() and cons.check_gpu else "cpu")

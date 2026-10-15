@@ -2,26 +2,73 @@ import numpy as np
 import torch
 from beartype import beartype
 from torch import nn
-from torchvision import models
 
-from model.torch.EarlyStopper import EarlyStopper
-from model.torch.fit import fit as fit_module
-from model.torch.load import load as load_module
+from .EarlyStopper import EarlyStopper
+from .fit import fit as fit_module
+from .load import load as load_module
 
 # load custom modules
-from model.torch.predict import predict as predict_module
-from model.torch.save import save as save_module
-from model.torch.validate import validate as validate_module
+from .predict import predict as predict_module
+from .save import save as save_module
+from .validate import validate as validate_module
 
 
-class ResNet50_pretrained(nn.Module):
+class AlexNet8(nn.Module):
     def __init__(self, num_classes=1000):
-        self.model_id = "ResNet50_pretrained"
         super().__init__()
-        self.resnet = models.resnet50(weights="DEFAULT")
-        self.num_ftrs = self.resnet.fc.out_features
+        self.model_id = "AlexNet8"
+        self.features = nn.Sequential(
+            nn.Conv2d(
+                in_channels=3,
+                out_channels=96,
+                kernel_size=(11, 11),
+                stride=(4, 4),
+                padding="valid",
+            ),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2)),
+            nn.Conv2d(
+                in_channels=96,
+                out_channels=256,
+                kernel_size=(5, 5),
+                stride=(1, 1),
+                padding="same",
+            ),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2)),
+            nn.Conv2d(
+                in_channels=256,
+                out_channels=384,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(
+                in_channels=384,
+                out_channels=384,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(
+                in_channels=384,
+                out_channels=256,
+                kernel_size=(3, 3),
+                stride=(1, 1),
+                padding="same",
+            ),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2)),
+        )
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=self.num_ftrs, out_features=num_classes)
+            nn.Linear(256 * 2 * 2, out_features=4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.25),
+            nn.Linear(4096, out_features=4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
         )
 
     @beartype
@@ -38,7 +85,8 @@ class ResNet50_pretrained(nn.Module):
         array
             The output array from the forward pass
         """
-        x = self.resnet(x)
+        x = self.features(x)
+        x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
 

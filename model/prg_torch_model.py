@@ -19,17 +19,21 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from model.arch.load_image_v2 import TorchLoadImages
-from model.torch.AlexNet8_pretrained import AlexNet8_pretrained
-from model.torch.CustomDataset import CustomDataset
-from model.torch.EarlyStopper import EarlyStopper
-from model.torch.ResNet50_pretrained import ResNet50_pretrained
-from model.torch.VGG16_pretrained import VGG16_pretrained
-from model.utilities.commandline_interface import commandline_interface
-from model.utilities.plot_generator import plot_generator
-from model.utilities.plot_image import plot_image
-from model.utilities.plot_model import plot_model_fit
-from model.utilities.plot_preds import plot_preds
-from model.utilities.TimeIt import TimeIt
+from model.torch_models import (
+    AlexNet8_pretrained,
+    CustomDataset,
+    EarlyStopper,
+    ResNet50_pretrained,
+    VGG16_pretrained,
+)
+from model.utilities import (
+    TimeIt,
+    commandline_interface,
+    plot_generator,
+    plot_image,
+    plot_model_fit,
+    plot_preds,
+)
 
 # initialise model dict
 model_dict = {

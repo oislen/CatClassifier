@@ -4,23 +4,23 @@ from beartype import beartype
 from torch import nn
 from torchvision import models
 
-from model.torch.EarlyStopper import EarlyStopper
-from model.torch.fit import fit as fit_module
-from model.torch.load import load as load_module
+from .EarlyStopper import EarlyStopper
+from .fit import fit as fit_module
+from .load import load as load_module
 
 # load custom modules
-from model.torch.predict import predict as predict_module
-from model.torch.save import save as save_module
-from model.torch.validate import validate as validate_module
+from .predict import predict as predict_module
+from .save import save as save_module
+from .validate import validate as validate_module
 
 
-class VGG16_pretrained(nn.Module):
+class AlexNet8_pretrained(nn.Module):
     def __init__(self, num_classes=1000):
         super().__init__()
-        self.model_id = "VGG16_pretrained"
-        self.resnet = models.vgg16(weights="DEFAULT")
-        self.num_ftrs = self.resnet.classifier[
-            len(self.resnet.classifier) - 1
+        self.model_id = "AlexNet8_pretrained"
+        self.alexnet = models.alexnet(weights="DEFAULT")
+        self.num_ftrs = self.alexnet.classifier[
+            len(self.alexnet.classifier) - 1
         ].out_features
         self.classifier = nn.Sequential(
             nn.Linear(in_features=self.num_ftrs, out_features=num_classes)
@@ -40,7 +40,7 @@ class VGG16_pretrained(nn.Module):
         array
             The output array from the forward pass
         """
-        x = self.resnet(x)
+        x = self.alexnet(x)
         x = self.classifier(x)
         return x
 

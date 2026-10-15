@@ -5,7 +5,7 @@ import unittest
 sys.path.append(os.path.join(os.getcwd(), "webscrapers"))
 
 import cons
-from utilities.webscraper import scrape_srcs
+from utilities import scrape_srcs
 
 exp_srcs = [
     "https://free-images.com/sm/d790/cat_home_cat_looking.jpg",

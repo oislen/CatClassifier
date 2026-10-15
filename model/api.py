@@ -12,8 +12,8 @@ from torch.utils.data import DataLoader
 from werkzeug.utils import secure_filename
 
 from model.arch.load_image_v2 import TorchLoadImages
-from model.torch.CustomDataset import CustomDataset
-from model.utilities.TimeIt import TimeIt
+from model.torch_models import CustomDataset
+from model.utilities import TimeIt
 
 # set up logging
 lgr = logging.getLogger()

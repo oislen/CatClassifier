@@ -2,9 +2,7 @@ import logging
 
 import cons
 from beartype import beartype
-from utilities.commandline_interface import commandline_interface
-from utilities.download_comp_data import download_comp_data, download_models
-from utilities.webscraper import webscraper
+from utilities import commandline_interface, download_comp_data, download_models, webscraper
 
 
 @beartype

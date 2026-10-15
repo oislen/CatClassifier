@@ -4,10 +4,10 @@ import os
 import torch
 from beartype import beartype
 
-from model.torch.checkpoints import load_checkpoint, save_checkpoint
-from model.torch.EarlyStopper import EarlyStopper
-from model.torch.ModelFit import ModelFit
-from model.torch.validate import validate
+from .checkpoints import load_checkpoint, save_checkpoint
+from .EarlyStopper import EarlyStopper
+from .ModelFit import ModelFit
+from .validate import validate
 
 
 @beartype

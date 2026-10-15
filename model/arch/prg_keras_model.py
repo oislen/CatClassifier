@@ -15,12 +15,14 @@ from model.keras.VGG16_pretrained import VGG16_pretrained
 # load tensorflow / keras modules
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img
 
-from model.utilities.commandline_interface import commandline_interface
-from model.utilities.plot_generator import plot_generator
-from model.utilities.plot_image import plot_image
-from model.utilities.plot_model import plot_model_fit
-from model.utilities.plot_preds import plot_preds
-from model.utilities.TimeIt import TimeIt
+from model.utilities import (
+    TimeIt,
+    commandline_interface,
+    plot_generator,
+    plot_image,
+    plot_model_fit,
+    plot_preds,
+)
 
 if __name__ == "__main__":
     # set up logging

@@ -5,7 +5,7 @@ import unittest
 sys.path.append(os.path.join(os.getcwd(), "webscrapers"))
 
 import cons
-from utilities.webscraper import gen_urls
+from utilities import gen_urls
 
 exp_urls = [
     "https://free-images.com/search/?q=cat&skip=0",
