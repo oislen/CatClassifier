@@ -140,6 +140,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Run zizmor security analysis
-        uses: zizmorcore/zizmor-action@effdb35fa7868863f11655db256d9008922fa427
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e
         with:
           advanced-security: false
