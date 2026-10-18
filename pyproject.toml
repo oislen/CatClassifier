@@ -25,6 +25,10 @@ dependencies = [
 exclude-newer = "7 days"
 exclude-newer-package = { torch = false }
 
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu129"
