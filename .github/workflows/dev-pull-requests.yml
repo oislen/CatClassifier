@@ -133,11 +133,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
       - name: Run zizmor security analysis
         uses: zizmorcore/zizmor-action@effdb35fa7868863f11655db256d9008922fa427
         with:
           advanced-security: false
-          annotations: true
