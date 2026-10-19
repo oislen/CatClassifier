@@ -1,7 +1,6 @@
 name: Development Workflow
 permissions:
   contents: read
-  pull-requests: write
 
 on:
   pull_request:
@@ -16,6 +15,8 @@ jobs:
 
   validate-pr-title:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
         env:
@@ -40,6 +41,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
       - name: Run Ruff Checks
         uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89
         with:
@@ -52,6 +55,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Check if SonarQube is Online
         id: check-sonar
         timeout-minutes: 1
@@ -80,7 +84,7 @@ jobs:
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        shell: cmd
+        shell: powershell
         run: |
           sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
 
@@ -89,6 +93,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Run Trivy to show all vulnerabilities
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
       with:
@@ -112,6 +118,8 @@ jobs:
         python-version: ["3.13.11"]
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Set environment variable
       run: echo "GITHUB_ACTIONS_UNITTEST_FLAG=1" >> $GITHUB_ENV
     - name: Install uv

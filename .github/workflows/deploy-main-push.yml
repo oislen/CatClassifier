@@ -1,7 +1,6 @@
 name: Deployment Workflow
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 on:
   push:
@@ -14,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
       - name: Run Ruff Checks
         uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89
         with:
@@ -27,6 +28,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Check if SonarQube is Online
         id: check-sonar
         shell: powershell
@@ -49,7 +51,7 @@ jobs:
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        shell: cmd
+        shell: powershell
         run: |
           sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
 
@@ -61,6 +63,8 @@ jobs:
         python-version: ["3.13.11"]
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Set environment variable
       run: echo "GITHUB_ACTIONS_UNITTEST_FLAG=1" >> $GITHUB_ENV
     - name: Install uv
@@ -82,6 +86,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Run Trivy to show all vulnerabilities
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
       with:
@@ -116,6 +122,9 @@ jobs:
   release-please:
     needs: [trivy-fs-scan, python-unittests, ruff-linter]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -135,11 +144,15 @@ jobs:
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
       KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
+        with:
+          enable-cache: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install python dependencies
@@ -178,6 +191,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Run Trivy vulnerability scanner to show all vulnerabilities
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
       with:
