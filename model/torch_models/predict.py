@@ -1,9 +1,12 @@
-import torch
 import numpy as np
+import torch
 
-def predict(model, dataloader:torch.utils.data.DataLoader, device:torch.device) -> np.ndarray:
+
+def predict(
+    model, dataloader: torch.utils.data.DataLoader, device: torch.device
+) -> np.ndarray:
     """Predicts probabilities for a given data loader
-    
+
     Parameters
     ----------
     model : CustomModelClass
@@ -12,7 +15,7 @@ def predict(model, dataloader:torch.utils.data.DataLoader, device:torch.device) 
         The torch data loader to use when fitting the model
     device : torch.device
         The torch device to use when fitting the model
-    
+
     Returns
     -------
     np.ndarry
@@ -20,7 +23,7 @@ def predict(model, dataloader:torch.utils.data.DataLoader, device:torch.device) 
     """
     fin_outputs = []
     with torch.no_grad():
-        for i, (images, labels) in enumerate(dataloader):
+        for _i, (images, labels) in enumerate(dataloader):
             images = images.to(device)
             labels = labels.to(device)
             outputs = model.forward(images)

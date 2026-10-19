@@ -1,16 +1,14 @@
 import os
-from beartype import beartype
+
+import cons
 import matplotlib.pyplot as plt
 import pandas as pd
+from beartype import beartype
 from PIL import Image
-import cons
+
 
 @beartype
-def plot_preds(
-    data:pd.DataFrame,
-    output_fpath:str = None,
-    show_plot:bool=True
-    ):
+def plot_preds(data: pd.DataFrame, output_fpath: str = None, show_plot: bool = True):
     """
     Shows model predictions as a grid of images with labels
 
@@ -28,18 +26,18 @@ def plot_preds(
     """
     sample_test = data.head(18)
     plt.figure(figsize=(12, 24))
-    for id, (index, row) in enumerate(sample_test.iterrows()):
-        filename = row['filenames']
-        category = row['category']
+    for id, (_index, row) in enumerate(sample_test.iterrows()):
+        filename = row["filenames"]
+        category = row["category"]
         img = Image.open(fp=os.path.join(cons.test_fdir, filename))
         img = img.resize(size=(cons.IMAGE_SIZE[1], cons.IMAGE_SIZE[0]))
-        plt.subplot(6, 3, id+1)
+        plt.subplot(6, 3, id + 1)
         plt.imshow(img)
-        #plt.title(category)
-        plt.xlabel(filename + '(' + "{}".format(category) + ')' )
+        # plt.title(category)
+        plt.xlabel(filename + "(" + f"{category}" + ")")
     plt.tight_layout()
     #  show save, plot and close
-    if output_fpath != None:
+    if output_fpath is not None:
         plt.savefig(output_fpath)
     if show_plot:
         plt.show()

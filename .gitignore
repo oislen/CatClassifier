@@ -3,6 +3,10 @@ data
 .creds
 checkpoints
 .venv
+.kilo
+.ruff_cache
+.scannerwork
+actions-runner
 
 # python cache
 __pycache__

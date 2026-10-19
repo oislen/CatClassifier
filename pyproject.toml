@@ -9,7 +9,7 @@ dependencies = [
     "beautifulsoup4==4.13.3",
     "boto3==1.36.13",
     "flask==3.0.2",
-    "jupyterlab==4.2.5",
+    "jupyterlab==4.6.4",
     "kaggle==1.7.4.5",
     "matplotlib==3.10.8",
     "numpy==2.3.5",
@@ -21,7 +21,46 @@ dependencies = [
     "torchvision==0.23.0",
 ]
 
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { torch = false }
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu129"
 explicit = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = [
+    "model/arch/keras_model.py"
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (basic syntax/runtime errors)
+    "I",   # isort (import sorting)
+    "B",   # flake8-bugbear (common design flaws)
+    "C4",  # flake8-comprehensions (better list/dict comprehensions)
+    "UP",  # pyupgrade (upgrades syntax to newer Python versions)
+]
+ignore = [
+    "E402",
+    "E501",
+    "B018",
+    "B006",
+    "B904",
+    "B008",
+    "B017"
+]
+per-file-ignores = { }
+
+[tool.ruff.format]
+preview = false

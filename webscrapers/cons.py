@@ -4,7 +4,11 @@ import sys
 
 # set root file directories
 root_dir_re_match = re.findall(string=os.getcwd(), pattern="^.+CatClassifier")
-root_fdir = root_dir_re_match[0] if len(root_dir_re_match) > 0 else os.path.join(".", "CatClassifier")
+root_fdir = (
+    root_dir_re_match[0]
+    if len(root_dir_re_match) > 0
+    else os.path.join(".", "CatClassifier")
+)
 data_fdir = os.path.join(root_fdir, "data")
 creds_fdir = os.path.join(root_fdir, ".creds")
 dataprep_fdir = os.path.join(root_fdir, "data_prep")
@@ -15,7 +19,15 @@ models_fir = os.path.join(data_fdir, "models")
 webscrapers_fdir = os.path.join(root_fdir, "webscrapers")
 
 # set list containing all required directories
-root_fdirs = [root_fdir, data_fdir,  dataprep_fdir, report_fdir, test_fdir, train_fdir, webscrapers_fdir]
+root_fdirs = [
+    root_fdir,
+    data_fdir,
+    dataprep_fdir,
+    report_fdir,
+    test_fdir,
+    train_fdir,
+    webscrapers_fdir,
+]
 
 # append directories to path
 for fdir in root_fdirs:
@@ -30,10 +42,10 @@ del_zip = True
 
 # set kaggle model detailes
 model_version = 3
-model_instance_url=f"oislen/cat-classifier-cnn-models/pyTorch/default/{model_version}"
+model_instance_url = f"oislen/cat-classifier-cnn-models/pyTorch/default/{model_version}"
 
 # webscraping constants
 n_images = 6000
-ncpu = os.cpu_count()-1
+ncpu = os.cpu_count() - 1
 home_url = "https://free-images.com"
-output_dir =  os.path.join(data_fdir, "{search}")
+output_dir = os.path.join(data_fdir, "{search}")

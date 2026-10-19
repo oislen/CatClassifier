@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Read the commit message file provided as argument $1
+commit_msg=$(cat "$1")
+
+# Pattern: type(issue_number): message
+# e.g., feat(#1): new feature or fix(#42): fix crash
+pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\(#[0-9]+\): .+$"
+
+if ! echo "$commit_msg" | grep -Eq "$pattern"; then
+    echo "\n[ERROR] Invalid commit message format."
+    echo "Expected format: <type>(#<issue_number>): <description>"
+    echo "Example: feat(#1): new feature\n"
+    exit 1
+fi

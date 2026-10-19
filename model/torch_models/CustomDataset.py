@@ -1,14 +1,12 @@
 import torch
 from torch.utils.data import Dataset
-from PIL import Image
-import numpy as np
+
 
 class CustomDataset(Dataset):
-
     def __init__(self, df):
-        self.image_tensors = df['image_tensors'].values
-        self.category_tensors = df['category_tensors'].values
-        
+        self.image_tensors = df["image_tensors"].values
+        self.category_tensors = df["category_tensors"].values
+
     def __len__(self):
         return len(self.image_tensors)
 
@@ -16,7 +14,7 @@ class CustomDataset(Dataset):
         image_tensor = self.image_tensors[idx].unsqueeze(0)
         category_tensor = self.category_tensors[idx]
         return image_tensor, category_tensor
-    
+
     def __getitems__(self, idx_list):
         image_tensors = torch.stack(self.image_tensors[idx_list].tolist())
         category_tensors = torch.stack(self.category_tensors[idx_list].tolist())

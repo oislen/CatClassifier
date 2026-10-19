@@ -1,13 +1,11 @@
 import numpy as np
 from beartype import beartype
-from typing import Union
+
 
 @beartype
 def crop_image(
-    image_array:np.array,
-    pt1_wh:Union[tuple,list],
-    pt2_wh:Union[tuple,list]
-    ) -> np.array:
+    image_array: np.array, pt1_wh: tuple | list, pt2_wh: tuple | list
+) -> np.array:
     """Crops an image array to specified combination of two diagonal points
 
     Parameters
@@ -18,7 +16,7 @@ def crop_image(
         Diagonal point 1 coordinates for cropping the image
     pt2_wh : list, tuple
         Diagonal point 2 coordinates for cropping the image
-    
+
     Returns
     -------
     numpy.array
@@ -33,7 +31,7 @@ def crop_image(
     # extract out image shape
     n_image_dims = len(image_array.shape)
     if n_image_dims == 3:
-        crop_image_array = image_array[min(hpts):max(hpts), min(wpts):max(wpts), :] 
+        crop_image_array = image_array[min(hpts) : max(hpts), min(wpts) : max(wpts), :]
     else:
-        crop_image_array = image_array[min(hpts):max(hpts), min(wpts):max(wpts)] 
+        crop_image_array = image_array[min(hpts) : max(hpts), min(wpts) : max(wpts)]
     return crop_image_array

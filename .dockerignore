@@ -2,6 +2,10 @@
 .creds
 checkpoints
 .venv
+.kilo
+.ruff_cache
+.scannerwork
+actions-runner
 
 # allow specific data model files
 data/*
