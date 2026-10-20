@@ -25,7 +25,7 @@ class TorchLoadImages:
         self.torch_transforms = torch_transforms
         self.n_workers = n_workers
 
-    def load_imageee(self, filepath):
+    def load_image(self, filepath):
         """ """
         # determine the filename and source
         file_name = os.path.basename(filepath)

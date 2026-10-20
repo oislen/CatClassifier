@@ -59,7 +59,7 @@ def classify_image(image_filepath: str, model_id: str, device_type: str) -> dict
         torch_transforms=torch_transforms, n_workers=None
     )
     test_df = pd.DataFrame.from_records(
-        torch_load_images.loadImages(filepaths=[image_filepath])
+        torch_load_images.load_images(filepaths=[image_filepath])
     )
     logging.info(f"test_df.shape: {test_df.shape}")
     time_logger.log_time(parent_key="DataPrep", sub_key="TrainDataLoad")

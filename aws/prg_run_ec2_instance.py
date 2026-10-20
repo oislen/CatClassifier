@@ -76,7 +76,7 @@ def run_ec2_instance(
             fleet_ids = [fleet["FleetId"] for fleet in response["Fleets"]]
             if fleet_ids != []:
                 response = ec2_client.delete_fleets(
-                    fleet_ids=fleetIds, terminate_instances=True
+                    fleet_ids=fleet_ids, terminate_instances=True
                 )
             # list any fleets
             response = ec2_client.describe_fleets()

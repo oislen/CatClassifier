@@ -90,7 +90,7 @@ def classify_image_torch(
         torch_transforms=torch_transforms, n_workers=None
     )
     dataframe = pd.DataFrame.from_records(
-        torch_load_images.loadImages(filepaths=[image_fpath])
+        torch_load_images.load_images(filepaths=[image_fpath])
     )
     dataframe["model_fpath"] = model_fpath
     time_logger.log_time(parent_key="Preparation", sub_key="DataFrame")

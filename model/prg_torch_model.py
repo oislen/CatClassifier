@@ -93,7 +93,7 @@ if __name__ == "__main__":
             torch_transforms=torch_transforms, n_workers=None
         )
         df = pd.DataFrame.from_records(
-            torch_load_images.loadImages(image_filepaths[0:sample_size])
+            torch_load_images.load_images(image_filepaths[0:sample_size])
         )
         # only consider images with 3 dimensions
         df = df.loc[df["ndims"] == 3, :]
@@ -234,7 +234,7 @@ if __name__ == "__main__":
             torch_transforms=torch_transforms, n_workers=None
         )
         test_df = pd.DataFrame.from_records(
-            torch_load_images.loadImages(
+            torch_load_images.load_images(
                 filepaths=[
                     os.path.join(cons.test_fdir, x) for x in os.listdir(cons.test_fdir)
                 ]
