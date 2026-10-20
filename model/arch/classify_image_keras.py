@@ -1,4 +1,4 @@
-# python model/arch/classify_image_keras.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg --model_fpath E:/GitHub/CatClassifier/data/models/AlexNet8.keras
+# python model/arch/classify_image_keras.py --image_fpath E:/GitHub/CatClassifier/data/train/cat.0.jpg --model_fpath E:/GitHub/CatClassifier/data/models/alexnet_8.keras
 
 import argparse
 import logging

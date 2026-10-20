@@ -145,28 +145,28 @@ def data_prep():
 
     # extract out X dataframe and y series
     y_train = train["target"].values
-    X_train = np.stack(train["pad_image_array"].values)
-    X_test = np.stack(test["pad_image_array"].values)
+    x_train = np.stack(train["pad_image_array"].values)
+    x_test = np.stack(test["pad_image_array"].values)
 
     # standardise values between 0 and 1
-    X_train = X_train / 255
-    X_test = X_test / 255
+    x_train = x_train / 255
+    x_test = x_test / 255
 
     # split data into training and validation sets
-    X_train, X_valid, y_train, y_valid = train_test_split(
-        X_train, y_train, test_size=0.1
+    x_train, x_valid, y_train, y_valid = train_test_split(
+        x_train, y_train, test_size=0.1
     )
 
     # create model data dict
     train_data_dict = {
-        "X_train": X_train,
+        "x_train": x_train,
         "y_train": y_train,
-        "X_valid": X_valid,
+        "x_valid": x_valid,
         "y_valid": y_valid,
     }
 
     # create model data dict
-    test_data_dict = {"X_test": X_test}
+    test_data_dict = {"x_test": x_test}
 
     # save processed data as a pickle file
     with open(cons.train_data_pickle_fpath, "wb") as handle:

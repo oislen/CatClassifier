@@ -3,7 +3,7 @@ from keras.layers.merge import concatenate
 from keras.models import Model
 
 
-def Inception(layer_in, f1, f2_in, f2_out, f3_in, f3_out, f4_out):
+def inception(layer_in, f1, f2_in, f2_out, f3_in, f3_out, f4_out):
     """
     function for creating a projected inception module
     """
@@ -23,21 +23,21 @@ def Inception(layer_in, f1, f2_in, f2_out, f3_in, f3_out, f4_out):
     return layer_out
 
 
-def GoogleNet(input_shape=(256, 256, 3), name="GoogleNet"):
+def google_net(input_shape=(256, 256, 3), name="google_net"):
     """
-    function for creating GoogleNet
+    function for creating google_net
 
     from keras.utils import plot_model
-    model = GoogleNet()
+    model = google_net()
     model.summary()
-        plot_model(model, show_shapes=True, to_file='GoogleNet.png')
+        plot_model(model, show_shapes=True, to_file='google_net.png')
     """
     # define model input
     visible = Input(shape=input_shape)
     # add preliminary layer HERE
     # stacked inception layers
-    layer_1 = Inception(visible, 64, 96, 128, 16, 32, 32)
-    layer_2 = Inception(layer_1, 128, 128, 192, 32, 96, 64)
+    layer_1 = inception(visible, 64, 96, 128, 16, 32, 32)
+    layer_2 = inception(layer_1, 128, 128, 192, 32, 96, 64)
     # add drop out HERE
     # add output layers HERE
     model = Model(inputs=visible, outputs=layer_2, name=name)

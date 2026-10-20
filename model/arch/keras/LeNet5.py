@@ -4,13 +4,13 @@ from keras.models import Model
 
 
 @beartype
-def LeNet5(
+def lenet_5(
     input_shape: list | tuple = (28, 28, 1),
     n_classes: int = 10,
     output_activation: str = "softmax",
 ) -> Model:
     """
-    LeNet5 keras model
+    lenet_5 keras model
 
     Parameters
     ----------
@@ -63,6 +63,6 @@ def LeNet5(
     dense_layer_3 = Dense(units=n_classes, activation=output_activation)(drop_layer_2)
 
     # wrap architecture within keras Model
-    model = Model(inputs=inputs, outputs=dense_layer_3, name="LeNet5")
+    model = Model(inputs=inputs, outputs=dense_layer_3, name="lenet_5")
 
     return model

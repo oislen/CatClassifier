@@ -12,10 +12,10 @@ from keras.models import load_model
 
 def fit_model(
     model,
-    X_train,
-    Y_train,
+    x_train,
+    y_train,
     X_val,
-    Y_val,
+    y_val,
     optimizer,
     batch_size=32,
     valid_batch_size=8,
@@ -65,7 +65,7 @@ def fit_model(
 
     # calculate steps per epoch
     if (batch_size is not None) and (valid_batch_size is not None):
-        steps_per_epoch = len(X_train) // batch_size
+        steps_per_epoch = len(x_train) // batch_size
         validation_steps = len(X_val) // valid_batch_size
     else:
         steps_per_epoch = None
@@ -74,14 +74,14 @@ def fit_model(
     # if not applying data augmentation
     if datagen is None:
         # define validation, x and y data accordingly
-        validation_data = (X_val, Y_val)
-        x = X_train
-        y = Y_train
+        validation_data = (X_val, y_val)
+        x = x_train
+        y = y_train
     # others
     else:
         # define valudation, x and y data accordingly
-        validation_data = (datagen.standardize(X_val), Y_val)
-        x = datagen.flow(X_train, Y_train, batch_size=batch_size)
+        validation_data = (datagen.standardize(X_val), y_val)
+        x = datagen.flow(x_train, y_train, batch_size=batch_size)
         y = None
         batch_size = None
 
