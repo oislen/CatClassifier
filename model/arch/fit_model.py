@@ -14,7 +14,7 @@ def fit_model(
     model,
     x_train,
     y_train,
-    X_val,
+    x_val,
     y_val,
     optimizer,
     batch_size=32,
@@ -66,7 +66,7 @@ def fit_model(
     # calculate steps per epoch
     if (batch_size is not None) and (valid_batch_size is not None):
         steps_per_epoch = len(x_train) // batch_size
-        validation_steps = len(X_val) // valid_batch_size
+        validation_steps = len(x_val) // valid_batch_size
     else:
         steps_per_epoch = None
         validation_steps = None
@@ -74,13 +74,13 @@ def fit_model(
     # if not applying data augmentation
     if datagen is None:
         # define validation, x and y data accordingly
-        validation_data = (X_val, y_val)
+        validation_data = (x_val, y_val)
         x = x_train
         y = y_train
     # others
     else:
         # define valudation, x and y data accordingly
-        validation_data = (datagen.standardize(X_val), y_val)
+        validation_data = (datagen.standardize(x_val), y_val)
         x = datagen.flow(x_train, y_train, batch_size=batch_size)
         y = None
         batch_size = None

@@ -16,12 +16,12 @@ from keras.layers import (
 from keras.models import Model
 
 
-def identity_block(X, f, filters, training=True, initializer=random_uniform):
+def identity_block(x, f, filters, training=True, initializer=random_uniform):
     """
     Implementation of the identity block as defined in Figure 4
 
     Arguments:
-    X -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    x -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
     f -- integer, specifying the shape of the middle CONV's window for the main path
     filters -- python list of integers, defining the number of filters in the CONV layers of the main path
     training -- True: Behave in training mode
@@ -36,7 +36,7 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
     F1, F2, F3 = filters
 
     # Save the input value, will later add back to the main path.
-    shortcut = X
+    shortcut = x
 
     # First component of main path
     conv_comp_1 = Conv2D(
@@ -45,7 +45,7 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
         strides=(1, 1),
         padding="valid",
         kernel_initializer=initializer(seed=0),
-    )(X)
+    )(x)
     norm_comp_1 = BatchNormalization(axis=3)(conv_comp_1, training=training)
     act_comp_1 = Activation("relu")(norm_comp_1)
 
@@ -75,12 +75,12 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
     return act_comp_3
 
 
-def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_uniform):
+def convolutional_block(x, f, filters, s=2, training=True, initializer=glorot_uniform):
     """
     Implementation of the convolutional block as defined in Figure 4
 
     Arguments:
-    X -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    x -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
     f -- integer, specifying the shape of the middle CONV's window for the main path
     filters -- python list of integers, defining the number of filters in the CONV layers of the main path
     s -- Integer, specifying the stride to be used
@@ -97,7 +97,7 @@ def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_un
     F1, F2, F3 = filters
 
     # Save the input value
-    shortcut = X
+    shortcut = x
 
     # First component of main path glorot_uniform(seed=0)
     conv_comp_1 = Conv2D(
@@ -106,7 +106,7 @@ def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_un
         strides=(s, s),
         padding="valid",
         kernel_initializer=initializer(seed=0),
-    )(X)
+    )(x)
     norm_comp_1 = BatchNormalization(axis=3)(conv_comp_1, training=training)
     act_comp_1 = Activation("relu")(norm_comp_1)
 

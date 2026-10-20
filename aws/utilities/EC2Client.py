@@ -86,12 +86,12 @@ class EC2Client:
         response = self.client.describe_fleets()
         return response
 
-    def delete_fleets(self, FleetIds=[], terminate_instances=False) -> dict:
+    def delete_fleets(self, fleet_ids=[], terminate_instances=False) -> dict:
         """Delete an EC2 fleet
 
         Parameters
         ----------
-        FleetIds : list
+        fleet_ids : list
             The fleet ids to delete, default is []
         terminate_instances : bool
             Whether to delete the fleets, default is True
@@ -102,7 +102,7 @@ class EC2Client:
             The EC2 delete fleets EC2 response
         """
         response = self.client.delete_fleets(
-            FleetIds=FleetIds, terminate_instances=terminate_instances
+            fleet_ids=fleet_ids, terminate_instances=terminate_instances
         )
         return response
 

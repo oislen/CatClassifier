@@ -38,13 +38,6 @@ def vgg_16(
         activation="relu",
         padding="same",
     )(inputs)
-    con_layer_1 = Conv2D(
-        filters=64,
-        kernel_size=(3, 3),
-        strides=(1, 1),
-        activation="relu",
-        padding="same",
-    )(inputs)
     pool_layer_1 = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(con_layer_1)
 
     # second convulation and pooling layer

@@ -20,6 +20,6 @@ class CustomDataset(Dataset):
         category_tensors = torch.stack(self.category_tensors[idx_list].tolist())
         return image_tensors, category_tensors
 
-    def collate_fn(data):
+    def collate_fn(self, data):
         arrays, categories = data
         return arrays, categories

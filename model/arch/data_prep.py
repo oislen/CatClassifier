@@ -30,55 +30,36 @@ def data_prep():
 
     logging.info("Generating image file paths and classes ...")
 
-    if False:
-        # set image file directories
-        cat_image_fdir = os.path.join(cons.data_fdir, "cats")
-        dog_image_fdir = os.path.join(cons.data_fdir, "dogs")
+    # set image file directories
+    train_image_fdir = cons.train_fdir
+    test_image_fdir = cons.test_fdir
 
-        # create image file paths and classes
-        cat_image_fpaths = {
-            os.path.join(cat_image_fdir, cat_image_fname): ["cat", "train"]
-            for cat_image_fname in os.listdir(cat_image_fdir)
-        }
-        dog_image_fpaths = {
-            os.path.join(dog_image_fdir, dog_image_fname): ["dog", "train"]
-            for dog_image_fname in os.listdir(dog_image_fdir)
-        }
+    # create training image file paths and classes
+    shuffled_train_image_fnames = pd.Series(os.listdir(train_image_fdir)).sample(
+        frac=cons.train_sample_size, replace=False
+    )
+    train_image_fpaths = {
+        os.path.join(train_image_fdir, image_fname): [
+            image_fname.split(".")[0],
+            "train",
+        ]
+        for image_fname in shuffled_train_image_fnames
+    }
 
-        # combine image file paths and classes
-        image_fpaths = {**cat_image_fpaths, **dog_image_fpaths}
-
-    else:
-        # set image file directories
-        train_image_fdir = cons.train_fdir
-        test_image_fdir = cons.test_fdir
-
-        # create training image file paths and classes
-        shuffled_train_image_fnames = pd.Series(os.listdir(train_image_fdir)).sample(
-            frac=cons.train_sample_size, replace=False
+    if cons.test_sample_size > 0:
+        # create test image file paths and classes
+        shuffled_test_image_fnames = pd.Series(os.listdir(test_image_fdir)).sample(
+            frac=cons.test_sample_size, replace=False
         )
-        train_image_fpaths = {
-            os.path.join(train_image_fdir, image_fname): [
-                image_fname.split(".")[0],
-                "train",
-            ]
-            for image_fname in shuffled_train_image_fnames
+        test_image_fpaths = {
+            os.path.join(test_image_fdir, image_fname): [np.nan, "test"]
+            for image_fname in shuffled_test_image_fnames
         }
+    else:
+        test_image_fpaths = {}
 
-        if cons.test_sample_size > 0:
-            # create test image file paths and classes
-            shuffled_test_image_fnames = pd.Series(os.listdir(test_image_fdir)).sample(
-                frac=cons.test_sample_size, replace=False
-            )
-            test_image_fpaths = {
-                os.path.join(test_image_fdir, image_fname): [np.nan, "test"]
-                for image_fname in shuffled_test_image_fnames
-            }
-        else:
-            test_image_fpaths = {}
-
-        # combine train and test files
-        image_fpaths = {**train_image_fpaths, **test_image_fpaths}
+    # combine train and test files
+    image_fpaths = {**train_image_fpaths, **test_image_fpaths}
 
     logging.info("Creating image dataframe ...")
 
@@ -178,4 +159,4 @@ def data_prep():
 # if running as main programme
 if __name__ == "__main__":
     # run data prep
-    data_prep(cons=cons)
+    data_prep()

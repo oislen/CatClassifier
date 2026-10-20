@@ -128,7 +128,7 @@ def endpoint():
         return jsonify({"error": "No 'image' part in the request"}), 400
     logging.info("Image file found in the request")
     # get the file object and target model from the request
-    file = request.files["image"]
+    image_file = request.files["image"]
     model_id = request.form.get("model_id", list(model_dict.keys())[1])
     device_type = request.form.get("device_type", cons.device_type)
     if model_id not in model_dict:
@@ -140,20 +140,20 @@ def endpoint():
             ),
             400,
         )
-    safe_filename = secure_filename(file.filename)
+    safe_filename = secure_filename(image_file.filename)
     logging.info(f"Received file: {safe_filename}")
     # check if a file was actually selected for upload
     if safe_filename == "":
         return jsonify({"error": "No file selected for uploading"}), 400
     # process the uploaded file and classify the image
-    if file:
+    if image_file:
         logging.info("Processing the uploaded image")
         api_filepath = os.path.join(cons.api_fdir, safe_filename)
         # create api file directory if not exists
         if not os.path.exists(cons.api_fdir):
             os.makedirs(os.path.dirname(api_filepath))
         # save the file uploaded to the api directory
-        file.save(api_filepath)
+        image_file.save(api_filepath)
         logging.info("Classifying the image using the model")
         # run the image through the classification pipeline
         classification_result = classify_image(
