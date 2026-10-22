@@ -33,7 +33,7 @@ class TorchLoadImages:
         if ("cat" in file_name) or ("dog" in file_name):
             file_source = (
                 "kaggle"
-                if len(re.findall(pattern="^(cat|dog)(.[0-9]+.jpg)$", string=file_name))
+                if len(re.findall(pattern=r"^(cat|dog)(\.\d+\.jpg)$", string=file_name))
                 > 0
                 else "webscraper"
             )

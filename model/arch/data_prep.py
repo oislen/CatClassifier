@@ -75,7 +75,12 @@ def data_prep():
         # convert image to grey scale
         grey_image_array = greyscale_image(rgb_image_array)
         # create target variable
-        target = 1 if target_class == "cat" else 0 if target_class == "dog" else np.nan
+        if target_class == "cat":
+            target = 1
+        elif target_class == "dog":
+            target = 0
+        else:
+            target = np.nan
         # generate row dict with relevant image info
         row_dict = {
             "image_fpath": image_fpath,
