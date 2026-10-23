@@ -1,17 +1,17 @@
 from beartype import beartype
-from keras.applications import VGG16
+from keras.applications import vgg_16
 from keras.layers import Dense, Dropout, GlobalMaxPooling2D
 from keras.models import Model
 
 
 @beartype
-def VGG16_pretrained(
+def vgg_16_pretrained(
     input_shape: list | tuple = (224, 224, 3),
     n_classes: int = 1,
     output_activation: str = "sigmoid",
 ) -> Model:
     """
-    Pretrained VGG16 keras model
+    Pretrained vgg_16 keras model
 
     Parameters
     ----------
@@ -25,14 +25,14 @@ def VGG16_pretrained(
     Returns
     -------
     Model
-        Keras.Model, the pretrained VGG16 model
+        Keras.Model, the pretrained vgg_16 model
 
     Example
     -------
-    model = VGG16_pretrained(input_shape = (224, 224, 3),
+    model = vgg_16_pretrained(input_shape = (224, 224, 3),
                              n_classes = 1,
                              output_activation = 'sigmoid',
-                             name = 'VGG16_pretrained'
+                             name = 'vgg_16_pretrained'
                              )
 
     model.compile(loss='binary_crossentropy',
@@ -43,17 +43,17 @@ def VGG16_pretrained(
     model.summary()
     """
 
-    VGG16_pretrained = VGG16(
+    vgg_16_pretrained = vgg_16(
         input_shape=input_shape, include_top=False, weights="imagenet"
     )
 
-    for layer in VGG16_pretrained.layers[:15]:
+    for layer in vgg_16_pretrained.layers[:15]:
         layer.trainable = False
 
-    for layer in VGG16_pretrained.layers[15:]:
+    for layer in vgg_16_pretrained.layers[15:]:
         layer.trainable = True
 
-    last_layer = VGG16_pretrained.get_layer("block5_pool")
+    last_layer = vgg_16_pretrained.get_layer("block5_pool")
     last_output = last_layer.output
 
     # Flatten the output layer to 1 dimension
@@ -65,6 +65,6 @@ def VGG16_pretrained(
     # Add a final sigmoid layer for classification
     x = Dense(n_classes, activation=output_activation)(x)
 
-    model = Model(inputs=VGG16_pretrained.input, outputs=x, name="VGG16_pretrained")
+    model = Model(inputs=vgg_16_pretrained.input, outputs=x, name="vgg_16_pretrained")
 
     return model

@@ -1,4 +1,3 @@
-# TODO: apply multiprocessing to for loops
 import logging
 import os
 from multiprocessing import Pool

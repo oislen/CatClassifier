@@ -6,13 +6,13 @@ from keras.models import Model
 
 
 @beartype
-def AlexNet8(
+def alexnet_8(
     input_shape: list | tuple = (227, 227, 3),
     n_classes: int = 1000,
     output_activation: str = "softmax",
 ) -> Model:
     """
-    AlexNet8 Keras model
+    alexnet_8 Keras model
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ def AlexNet8(
     Returns
     -------
     Model
-        The keras AlexNet8 model
+        The keras alexnet_8 model
     """
 
     # set input shapes
@@ -89,6 +89,6 @@ def AlexNet8(
     dense_layer_3 = Dense(units=n_classes, activation=output_activation)(drop_layer_2)
 
     # wrap architecture within keras Model
-    model = Model(inputs=inputs, outputs=dense_layer_3, name="AlexNet8")
+    model = Model(inputs=inputs, outputs=dense_layer_3, name="alexnet_8")
 
     return model

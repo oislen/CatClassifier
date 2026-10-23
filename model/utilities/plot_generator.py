@@ -31,13 +31,13 @@ def plot_generator(
     for i in range(0, 15):
         plt.subplot(5, 3, i + 1)
         if mode == "keras":
-            for X_batch, _Y_batch in generator:
-                image = X_batch[0]
+            for x_batch, _y_batch in generator:
+                image = x_batch[0]
                 plt.imshow(image)
                 break
         elif mode == "torch":
-            X_batch = generator[i]
-            image = X_batch[0]
+            x_batch = generator[i]
+            image = x_batch[0]
             plt.imshow(image)
     plt.tight_layout()
     #  show save, plot and close

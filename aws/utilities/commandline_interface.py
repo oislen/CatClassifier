@@ -42,9 +42,9 @@ def commandline_interface() -> dict:
         help="Boolean, whether to describe all running ec2 instances / fleets",
     )
     parser.add_argument(
-        "--isFleet",
+        "--is_fleet",
         action=argparse.BooleanOptionalAction,
-        dest="isFleet",
+        dest="is_fleet",
         type=bool,
         default=False,
         help="Boolean, whether to ec2 type is a Fleet, otherwise a single instance",

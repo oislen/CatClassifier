@@ -14,10 +14,10 @@ from .save import save as save_module
 from .validate import validate as validate_module
 
 
-class AlexNet8_pretrained(nn.Module):
+class alexnet_8_pretrained(nn.Module):
     def __init__(self, num_classes=1000):
         super().__init__()
-        self.model_id = "AlexNet8_pretrained"
+        self.model_id = "alexnet_8_pretrained"
         self.alexnet = models.alexnet(weights="DEFAULT")
         self.num_ftrs = self.alexnet.classifier[
             len(self.alexnet.classifier) - 1
@@ -53,7 +53,7 @@ class AlexNet8_pretrained(nn.Module):
         train_dataloader: torch.utils.data.DataLoader,
         num_epochs: int = 4,
         scheduler: torch.optim.lr_scheduler.ReduceLROnPlateau | None = None,
-        valid_dataLoader: torch.utils.data.DataLoader | None = None,
+        valid_data_loader: torch.utils.data.DataLoader | None = None,
         early_stopper: EarlyStopper | None = None,
         checkpoints_dir: str | None = None,
         load_epoch_checkpoint: int | None = None,
@@ -74,7 +74,7 @@ class AlexNet8_pretrained(nn.Module):
             The number of training epochs, default is 4
         scheduler : torch.optim.lr_scheduler.ReduceLROnPlateau
             The torch scheduler to use when fitting the model, default is None
-        valid_dataLoader : torch.utils.data.DataLoader
+        valid_data_loader : torch.utils.data.DataLoader
             The torch data loader to use for validation when fitting the model, default is None
         early_stopper : EarlyStopper
             The EarlyStopper object for halting fitting when performing validation, default is None
@@ -94,7 +94,7 @@ class AlexNet8_pretrained(nn.Module):
             train_dataloader,
             num_epochs,
             scheduler,
-            valid_dataLoader,
+            valid_data_loader,
             early_stopper,
             checkpoints_dir,
             load_epoch_checkpoint,

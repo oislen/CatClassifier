@@ -37,9 +37,9 @@ def commandline_interface():
         "--model_id",
         dest="model_id",
         type=str,
-        default="VGG16_pretrained",
-        choices=["AlexNet8_pretrained", "VGG16_pretrained", "ResNet50_pretrained"],
-        help="String, id of the model architecture to use, default is VGG16_pretrained",
+        default="vgg_16_pretrained",
+        choices=["alexnet_8_pretrained", "vgg_16_pretrained", "resnet_50_pretrained"],
+        help="String, id of the model architecture to use, default is vgg_16_pretrained",
     )
     parser.add_argument(
         "--device_type",

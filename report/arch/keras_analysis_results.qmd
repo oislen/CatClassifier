@@ -34,11 +34,11 @@ The images were further processed using rotations, scaling, zooming, flipping an
 
 ![Generator Plot](keras/generator_plot.jpg)
 
-## AlexNet8 Model Architecture
+## alexnet_8 Model Architecture
 
 An AlexNet CNN model with 8 layers was trained using the processed images via Keras. See AlexNet diagram below, as well as Keras model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
 
-![AlexNet Architecture](keras/AlexNet8_architecture.png)
+![AlexNet Architecture](keras/alexnet_8_architecture.png)
 
 ```{python}
 # load trained keras model
