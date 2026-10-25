@@ -11,7 +11,7 @@ from keras.optimizers import RMSprop
 sys.path.append(os.getcwd())
 import cons
 from fit_model import fit_model
-from keras.LeNet5 import LeNet5
+from keras.lenet_5 import lenet_5
 from utilities.plot_model import plot_model_fit
 
 print("Loading data ...")
@@ -30,8 +30,8 @@ print("Training Keras model ...")
 print("Training Keras model ...")
 
 # initiate lenet model
-keras_model = LeNet5(
-    input_shape=X_train[0].shape, n_classes=1, output_activation="sigmoid"
+keras_model = lenet_5(
+    input_shape=x_train[0].shape, n_classes=1, output_activation="sigmoid"
 )
 
 # intiate rms prop optimiser
@@ -53,10 +53,10 @@ model_fit = fit_model(
     optimizer=optimizer,
     lrate_red=learning_rate_reduction,
     datagen=None,
-    X_train=X_train,
-    X_val=X_valid,
-    Y_train=y_train,
-    Y_val=y_valid,
+    x_train=x_train,
+    x_val=x_valid,
+    y_train=y_train,
+    y_val=y_valid,
     output_dir=cons.checkpoints_fdir,
 )
 
@@ -75,7 +75,7 @@ if cons.test_sample_size > 0:
     print("Making test predictions ...")
     # make model predictions
     test.loc[:, "preds"] = pd.Series(
-        keras_model.predict(X_test).reshape(
+        keras_model.predict(x_test).reshape(
             cons.test_sample_size,
         ),
         index=test.index,

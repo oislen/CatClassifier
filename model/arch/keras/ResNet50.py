@@ -16,12 +16,12 @@ from keras.layers import (
 from keras.models import Model
 
 
-def identity_block(X, f, filters, training=True, initializer=random_uniform):
+def identity_block(x, f, filters, training=True, initializer=random_uniform):
     """
     Implementation of the identity block as defined in Figure 4
 
     Arguments:
-    X -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    x -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
     f -- integer, specifying the shape of the middle CONV's window for the main path
     filters -- python list of integers, defining the number of filters in the CONV layers of the main path
     training -- True: Behave in training mode
@@ -32,11 +32,11 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
     X -- output of the identity block, tensor of shape (m, n_H, n_W, n_C)
     """
 
-    # Retrieve Filters
+    # Retrieve filters
     F1, F2, F3 = filters
 
     # Save the input value, will later add back to the main path.
-    shortcut = X
+    shortcut = x
 
     # First component of main path
     conv_comp_1 = Conv2D(
@@ -45,7 +45,7 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
         strides=(1, 1),
         padding="valid",
         kernel_initializer=initializer(seed=0),
-    )(X)
+    )(x)
     norm_comp_1 = BatchNormalization(axis=3)(conv_comp_1, training=training)
     act_comp_1 = Activation("relu")(norm_comp_1)
 
@@ -75,12 +75,12 @@ def identity_block(X, f, filters, training=True, initializer=random_uniform):
     return act_comp_3
 
 
-def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_uniform):
+def convolutional_block(x, f, filters, s=2, training=True, initializer=glorot_uniform):
     """
     Implementation of the convolutional block as defined in Figure 4
 
     Arguments:
-    X -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
+    x -- input tensor of shape (m, n_H_prev, n_W_prev, n_C_prev)
     f -- integer, specifying the shape of the middle CONV's window for the main path
     filters -- python list of integers, defining the number of filters in the CONV layers of the main path
     s -- Integer, specifying the stride to be used
@@ -93,11 +93,11 @@ def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_un
     X -- output of the convolutional block, tensor of shape (m, n_H, n_W, n_C)
     """
 
-    # Retrieve Filters
+    # Retrieve filters
     F1, F2, F3 = filters
 
     # Save the input value
-    shortcut = X
+    shortcut = x
 
     # First component of main path glorot_uniform(seed=0)
     conv_comp_1 = Conv2D(
@@ -106,7 +106,7 @@ def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_un
         strides=(s, s),
         padding="valid",
         kernel_initializer=initializer(seed=0),
-    )(X)
+    )(x)
     norm_comp_1 = BatchNormalization(axis=3)(conv_comp_1, training=training)
     act_comp_1 = Activation("relu")(norm_comp_1)
 
@@ -146,9 +146,9 @@ def convolutional_block(X, f, filters, s=2, training=True, initializer=glorot_un
     return act_comp_3
 
 
-def ResNet50(input_shape=(64, 64, 3), n_classes=6, output_activation="softmax"):
+def resnet_50(input_shape=(64, 64, 3), n_classes=6, output_activation="softmax"):
     """
-    Stage-wise implementation of the architecture of the popular ResNet50:
+    Stage-wise implementation of the architecture of the popular resnet_50:
     CONV2D -> BATCHNORM -> RELU -> MAXPOOL -> CONVBLOCK -> IDBLOCK*2 -> CONVBLOCK -> IDBLOCK*3
     -> CONVBLOCK -> IDBLOCK*5 -> CONVBLOCK -> IDBLOCK*2 -> AVGPOOL -> FLATTEN -> DENSE
 
@@ -160,12 +160,12 @@ def ResNet50(input_shape=(64, 64, 3), n_classes=6, output_activation="softmax"):
     model -- a Model() instance in Keras
 
     Example:
-    model = ResNet50(input_shape = (64, 64, 3), n_classes = 6)
+    model = resnet_50(input_shape = (64, 64, 3), n_classes = 6)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
-    X_train = X_train_orig / 255.
-    Y_train = convert_to_one_hot(Y_train_orig, 6).T
-    model.fit(X_train, Y_train, epochs = 10, batch_size = 32)
+    x_train_orig, y_train_orig, x_test_orig, Y_test_orig, classes = load_dataset()
+    x_train = x_train_orig / 255.
+    y_train = convert_to_one_hot(y_train_orig, 6).T
+    model.fit(x_train, y_train, epochs = 10, batch_size = 32)
 
     """
 
@@ -223,6 +223,6 @@ def ResNet50(input_shape=(64, 64, 3), n_classes=6, output_activation="softmax"):
     )(flat_outputs)
 
     # Create model
-    model = Model(inputs=inputs, outputs=outputs, name="ResNet50")
+    model = Model(inputs=inputs, outputs=outputs, name="resnet_50")
 
     return model

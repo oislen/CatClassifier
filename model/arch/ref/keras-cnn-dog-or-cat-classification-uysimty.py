@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
-from LeNet5 import LeNet5
+from lenet_5 import lenet_5
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import load_img
 
@@ -38,9 +38,9 @@ image = load_img(os.path.join(cons.train_fdir, sample))
 plt.imshow(image)
 plt.show()
 
-# initiate LeNet5 architecture
-lenet5_arch = LeNet5(
-    input_shape=input_shape, n_classes=2, output_activation="softmax", name="LeNet5"
+# initiate lenet_5 architecture
+lenet5_arch = lenet_5(
+    input_shape=input_shape, n_classes=2, output_activation="softmax", name="lenet_5"
 )
 
 # set gradient decent compiler
@@ -122,8 +122,8 @@ example_generator = train_datagen.flow_from_dataframe(
 plt.figure(figsize=(12, 12))
 for i in range(0, 15):
     plt.subplot(5, 3, i + 1)
-    for X_batch, _Y_batch in example_generator:
-        image = X_batch[0]
+    for x_batch, _y_batch in example_generator:
+        image = x_batch[0]
         plt.imshow(image)
         break
 plt.tight_layout()

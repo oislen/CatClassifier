@@ -11,7 +11,7 @@ def run_ec2_instance(
     launch: bool = False,
     terminate: bool = False,
     describe: bool = False,
-    isFleet: bool = False,
+    is_fleet: bool = False,
 ):
     """
 
@@ -23,7 +23,7 @@ def run_ec2_instance(
         Whether to stop and terminate all running ec2 instance
     describe : bool
         Whether to list all recorded instances
-    isFleet : bool
+    is_fleet : bool
         Whether : the type to launch is a fleet, otherwise single instance
 
     Returns
@@ -31,18 +31,18 @@ def run_ec2_instance(
     """
     logging.info("Creating EC2 client.")
     # create EC2 client
-    ec2_client = EC2Client(sessionToken=cons.session_token_fpath)
+    ec2_client = EC2Client(session_token=cons.session_token_fpath)
     # if listing available instances
     if describe:
-        if isFleet:
+        if is_fleet:
             logging.info("Listing EC2 fleets")
             response = ec2_client.describe_fleets()
         else:
             logging.info("Listing EC2 instances")
-            Filters = [
+            filters = [
                 {"Name": "instance-state-name", "Values": ["running", "pending"]}
             ]
-            response = ec2_client.describe_instances(Filters=Filters)
+            response = ec2_client.describe_instances(filters=filters)
         logging.info(response)
     # if launch ec2 instance
     if launch:
@@ -50,52 +50,52 @@ def run_ec2_instance(
         try:
             # delete any existing launch template
             ec2_client.delete_launch_template(
-                LaunchTemplateName=cons.launch_template_config["LaunchTemplateName"]
+                launch_template_name=cons.launch_template_config["launch_template_name"]
             )
         except Exception as e:
             logging.warning(e)
         # create a new launch template
         ec2_client.create_launch_template(cons.launch_template_config)
-        if isFleet:
+        if is_fleet:
             # create ec2 fleet
             ec2_client.create_fleet(cons.create_fleet_config)
         else:
             # create ec2 instance
             ec2_client.run_instances(cons.run_instances_config)
         # list any instances
-        Filters = [{"Name": "instance-state-name", "Values": ["running", "pending"]}]
-        response = ec2_client.describe_instances(Filters=Filters)
+        filters = [{"Name": "instance-state-name", "Values": ["running", "pending"]}]
+        response = ec2_client.describe_instances(filters=filters)
         logging.info(response)
     # if terminating ec2 instance
     if terminate:
-        if isFleet:
+        if is_fleet:
             logging.info("Terminating EC2 fleets.")
             # list any fleets
             response = ec2_client.describe_fleets()
             # set instance ids to shut down
-            fleetIds = [fleet["FleetId"] for fleet in response["Fleets"]]
-            if fleetIds != []:
+            fleet_ids = [fleet["FleetId"] for fleet in response["Fleets"]]
+            if fleet_ids != []:
                 response = ec2_client.delete_fleets(
-                    FleetIds=fleetIds, TerminateInstances=True
+                    fleet_ids=fleet_ids, terminate_instances=True
                 )
             # list any fleets
             response = ec2_client.describe_fleets()
         else:
             logging.info("Terminating EC2 instances.")
             # list any running instances
-            Filters = [{"Name": "instance-state-name", "Values": ["running"]}]
-            response = ec2_client.describe_instances(Filters=Filters)
+            filters = [{"Name": "instance-state-name", "Values": ["running"]}]
+            response = ec2_client.describe_instances(filters=filters)
             # set instance ids to shut down
-            InstanceIds = [
+            instance_ids = [
                 instance["InstanceId"]
                 for reservation in response["Reservations"]
                 for instance in reservation["Instances"]
             ]
-            if InstanceIds != []:
-                ec2_client.stop_instances(InstanceIds=InstanceIds)
-                ec2_client.terminate_instances(InstanceIds=InstanceIds)
+            if instance_ids != []:
+                ec2_client.stop_instances(instance_ids=instance_ids)
+                ec2_client.terminate_instances(instance_ids=instance_ids)
             # list any running instances
-            response = ec2_client.describe_instances(Filters=Filters)
+            response = ec2_client.describe_instances(filters=filters)
         logging.info(response)
 
 
@@ -110,5 +110,5 @@ if __name__ == "__main__":
         launch=input_params_dict["launch"],
         terminate=input_params_dict["terminate"],
         describe=input_params_dict["describe"],
-        isFleet=input_params_dict["isFleet"],
+        is_fleet=input_params_dict["is_fleet"],
     )

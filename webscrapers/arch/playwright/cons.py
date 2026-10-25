@@ -5,10 +5,12 @@ page_idx = 0
 image_idx = 1
 scrap_images = True
 
+image_selector_default = "#ol > div > table > tbody > tr:nth-child(2) > td:nth-child(4)"
+
 image_size_selector_dict = {
     "tiny": "#ol > div > table > tbody > tr:nth-child(1) > td:nth-child(4)",
-    "small": "#ol > div > table > tbody > tr:nth-child(2) > td:nth-child(4)",
-    "medium": "#ol > div > table > tbody > tr:nth-child(2) > td:nth-child(4)",
+    "small": image_selector_default,
+    "medium": image_selector_default,
 }
 
 search_bar_selector = (

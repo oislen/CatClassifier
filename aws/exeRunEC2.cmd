@@ -1,1 +1,1 @@
-call uv run python prg_run_ec2_instance.py --isFleet --launch --terminate --describe
+call uv run python prg_run_ec2_instance.py --is_fleet --launch --terminate --describe

@@ -7,5 +7,5 @@
 
 
 class ScrapyWebscraperPipeline:
-    def process_item(self, item, spider):
+    def process_item(self, item, _spider):
         return item

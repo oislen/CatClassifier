@@ -7,7 +7,7 @@
     "LaunchTemplateConfigs": [
         {
             "LaunchTemplateSpecification": {
-                "LaunchTemplateName": "catclassifier",
+                "launch_template_name": "catclassifier",
                 "Version": "$Latest"
             },
             "Overrides": [

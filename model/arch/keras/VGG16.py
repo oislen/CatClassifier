@@ -4,13 +4,13 @@ from keras.models import Model
 
 
 @beartype
-def VGG16(
+def vgg_16(
     input_shape: list | tuple = (224, 224, 3),
     n_classes: int = 1000,
     output_activation: str = "softmax",
 ) -> Model:
     """
-    VGG16 keras model
+    vgg_16 keras model
 
     Parameters
     ----------
@@ -24,20 +24,13 @@ def VGG16(
     Returns
     -------
     Model
-        Keras.Model, the VGG16 model
+        Keras.Model, the vgg_16 model
     """
 
     # set input shapes
     inputs = Input(shape=input_shape)
 
     # first convulation and pooling layer
-    con_layer_1 = Conv2D(
-        filters=64,
-        kernel_size=(3, 3),
-        strides=(1, 1),
-        activation="relu",
-        padding="same",
-    )(inputs)
     con_layer_1 = Conv2D(
         filters=64,
         kernel_size=(3, 3),
@@ -149,6 +142,6 @@ def VGG16(
     dense_layer_3 = Dense(units=n_classes, activation=output_activation)(drop_layer_2)
 
     # wrap architecture within keras Model
-    model = Model(inputs=inputs, outputs=dense_layer_3, name="VGG16")
+    model = Model(inputs=inputs, outputs=dense_layer_3, name="vgg_16")
 
     return model

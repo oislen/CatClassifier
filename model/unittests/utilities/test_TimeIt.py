@@ -6,11 +6,11 @@ sys.path.append(os.path.join(os.getcwd(), "model"))
 
 from utilities import TimeIt
 
-parentKey = "Test Parent Key"
-subKey = "Test Sub Key"
-exp_log_keys = ["parentKey", "subKey", "stepTime", "cumulativeTime"]
+parent_key = "Test Parent Key"
+sub_key = "Test Sub Key"
+exp_log_keys = ["parent_key", "sub_key", "step_time", "cumulative_time"]
 obs_timeit = TimeIt()
-obs_timeit.logTime(parentKey=parentKey, subKey=subKey)
+obs_timeit.log_time(parent_key=parent_key, sub_key=sub_key)
 obs_log_keys = list(obs_timeit.log[0].keys())
 
 

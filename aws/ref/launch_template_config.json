@@ -1,6 +1,6 @@
 {
     "DryRun": false,
-    "LaunchTemplateName": "catclassifier",
+    "launch_template_name": "catclassifier",
     "VersionDescription": "Initial version",
     "LaunchTemplateData": {
         "BlockDeviceMappings": [

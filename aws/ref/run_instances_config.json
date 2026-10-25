@@ -1,7 +1,7 @@
 {
     "DryRun": false,
     "LaunchTemplate": {
-        "LaunchTemplateName": "catclassifier",
+        "launch_template_name": "catclassifier",
         "Version": "$Latest"
     },
     "InstanceMarketOptions": {

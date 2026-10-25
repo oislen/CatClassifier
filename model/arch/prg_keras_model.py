@@ -10,7 +10,7 @@ import pandas as pd
 from keras import optimizers
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
-from model.keras.VGG16_pretrained import VGG16_pretrained
+from model.keras.vgg_16_pretrained import vgg_16_pretrained
 
 # load tensorflow / keras modules
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # set up logging
     lgr = logging.getLogger()
     lgr.setLevel(logging.INFO)
-    timeLogger = TimeIt()
+    time_logger = TimeIt()
 
     # handle input parameters
     input_params_dict = commandline_interface()
@@ -48,14 +48,14 @@ if __name__ == "__main__":
             .map({True: "kaggle", False: "webscraper"})
         )
         logging.info(f"df.shape: {df.shape}")
-        timeLogger.logTime(parentKey="DataPrep", subKey="TrainDataLoad")
+        time_logger.log_time(parent_key="DataPrep", sub_key="TrainDataLoad")
 
         logging.info("Plot sample image...")
         # random image plot
         sample = random.choice(filenames)
         image = load_img(os.path.join(cons.train_fdir, sample))
         plot_image(image, output_fpath=cons.keras_random_image_fpath, show_plot=False)
-        timeLogger.logTime(parentKey="Plots", subKey="SampleImage")
+        time_logger.log_time(parent_key="Plots", sub_key="SampleImage")
 
         logging.info("Split into training, validation and test dataset...")
         # prepare data
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         total_validate = validate_df.shape[0]
         logging.info(f"train_df.shape: {train_df.shape}")
         logging.info(f"validate_df.shape: {validate_df.shape}")
-        timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationSplit")
+        time_logger.log_time(parent_key="DataPrep", sub_key="TrainValidationSplit")
 
         logging.info("Creating training and validation data generators...")
         # set train data generator
@@ -101,7 +101,9 @@ if __name__ == "__main__":
             class_mode="categorical",
             batch_size=cons.batch_size,
         )
-        timeLogger.logTime(parentKey="DataPrep", subKey="TrainValidationDataGenerators")
+        time_logger.log_time(
+            parent_key="DataPrep", sub_key="TrainValidationDataGenerators"
+        )
 
         logging.info("Plot example data generator images...")
         # data generator example
@@ -119,13 +121,13 @@ if __name__ == "__main__":
             output_fpath=cons.keras_generator_plot_fpath,
             show_plot=False,
         )
-        timeLogger.logTime(parentKey="Plots", subKey="DataLoader")
+        time_logger.log_time(parent_key="Plots", sub_key="DataLoader")
 
         logging.info("Initiate keras model...")
-        # initiate LeNet5 architecture
-        # keras_model = LeNet5(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
-        # keras_model = AlexNet8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
-        keras_model = VGG16_pretrained(
+        # initiate lenet_5 architecture
+        # keras_model = lenet_5(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        # keras_model = alexnet_8(input_shape=cons.input_shape, n_classes=2, output_activation='softmax')
+        keras_model = vgg_16_pretrained(
             input_shape=cons.input_shape, n_classes=2, output_activation="softmax"
         )
         keras_model.summary()
@@ -147,7 +149,7 @@ if __name__ == "__main__":
         check_points = ModelCheckpoint(check_out_fpath, save_best_only=False, verbose=1)
         # combine model callbacks
         callbacks = [earlystop, learning_rate_reduction, check_points]
-        timeLogger.logTime(parentKey="Modelling", subKey="InitiateKerasModel")
+        time_logger.log_time(parent_key="Modelling", sub_key="InitiateKerasModel")
 
         logging.info("Fit keras model...")
         # fit model
@@ -163,32 +165,32 @@ if __name__ == "__main__":
         # save trained keras model
         with open(cons.model_fit_pickle_fpath, "wb") as handle:
             pickle.dump(model_fit, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        timeLogger.logTime(parentKey="Modelling", subKey="Fit")
+        time_logger.log_time(parent_key="Modelling", sub_key="Fit")
 
         logging.info("Plot model fit results...")
         # plot model fits
         plot_model_fit(
             model_fit=model_fit, output_fdir=cons.keras_report_fdir, show_plot=False
         )
-        timeLogger.logTime(parentKey="Plots", subKey="ModelFit")
+        time_logger.log_time(parent_key="Plots", sub_key="ModelFit")
 
         logging.info("Save fitted keras model to disk...")
         # save model fit
         keras_model.save(cons.keras_model_pickle_fpath)
-        timeLogger.logTime(parentKey="ModelSerialisation", subKey="Write")
+        time_logger.log_time(parent_key="ModelSerialisation", sub_key="Write")
 
     if input_params_dict["run_testset_prediction"]:
         logging.info("Load fitted keras model from disk...")
         # load model
         keras_model = load_model(cons.keras_model_pickle_fpath)
-        timeLogger.logTime(parentKey="ModelSerialisation", subKey="Load")
+        time_logger.log_time(parent_key="ModelSerialisation", sub_key="Load")
 
         logging.info("Generate test dataset...")
         # prepare test data
         test_filenames = os.listdir(cons.test_fdir)
         test_df = pd.DataFrame({"filename": test_filenames})
         logging.info(f"train_df.shape: {test_df.shape}")
-        timeLogger.logTime(parentKey="TestSet", subKey="RawLoad")
+        time_logger.log_time(parent_key="TestSet", sub_key="RawLoad")
 
         logging.info("Create test data generator...")
         # set validation data generator
@@ -203,7 +205,7 @@ if __name__ == "__main__":
             batch_size=cons.batch_size,
             shuffle=cons.shuffle,
         )
-        timeLogger.logTime(parentKey="TestSet", subKey="DataGenerator")
+        time_logger.log_time(parent_key="TestSet", sub_key="DataGenerator")
 
         logging.info("Generate test set predictions...")
         # make test set predictions
@@ -212,14 +214,14 @@ if __name__ == "__main__":
         )
         test_df["category"] = np.argmax(predict, axis=-1)
         test_df["category"] = test_df["category"].replace(cons.category_mapper)
-        timeLogger.logTime(parentKey="TestSet", subKey="ModelPredictions")
+        time_logger.log_time(parent_key="TestSet", sub_key="ModelPredictions")
 
         logging.info("Plot example test set predictions...")
         # plot random sample predictions
         plot_preds(
             data=test_df, output_fpath=cons.keras_pred_images_fpath, show_plot=False
         )
-        timeLogger.logTime(parentKey="Plots", subKey="TestSetPredictions")
+        time_logger.log_time(parent_key="Plots", sub_key="TestSetPredictions")
 
         logging.info("Generate a sample submission file for kaggle...")
         # make submission
@@ -227,4 +229,4 @@ if __name__ == "__main__":
         submission_df["id"] = submission_df["filename"].str.split(".").str[0]
         submission_df["label"] = submission_df["category"].replace(cons.category_mapper)
         submission_df.to_csv(cons.submission_csv_fpath, index=False)
-        timeLogger.logTime(parentKey="TestSet", subKey="SubmissionFile")
+        time_logger.log_time(parent_key="TestSet", sub_key="SubmissionFile")

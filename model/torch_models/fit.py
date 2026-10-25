@@ -19,7 +19,7 @@ def fit(
     train_dataloader: torch.utils.data.DataLoader,
     num_epochs: int = 4,
     scheduler: torch.optim.lr_scheduler.ReduceLROnPlateau | None = None,
-    valid_dataLoader: torch.utils.data.DataLoader | None = None,
+    valid_data_loader: torch.utils.data.DataLoader | None = None,
     early_stopper: EarlyStopper | None = None,
     checkpoints_dir: str | None = None,
     load_epoch_checkpoint: int | None = None,
@@ -43,7 +43,7 @@ def fit(
         The number of training epochs, default is 4
     scheduler : torch.optim.lr_scheduler.ReduceLROnPlateau
         The torch scheduler to use when fitting the model, default is None
-    valid_dataLoader : torch.utils.data.DataLoader
+    valid_data_loader : torch.utils.data.DataLoader
         The torch data loader to use for validation when fitting the model, default is None
     early_stopper : EarlyStopper
         The EarlyStopper object for halting fitting when performing validation
@@ -107,11 +107,11 @@ def fit(
         train_acc_list.append(train_acc)
         logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
         # calculate validation loss and accuracy if applicable
-        if valid_dataLoader is not None:
+        if valid_data_loader is not None:
             valid_loss, valid_acc = validate(
                 model=model,
                 device=device,
-                dataloader=valid_dataLoader,
+                dataloader=valid_data_loader,
                 criterion=criterion,
             )
             valid_loss_list.append(valid_loss)

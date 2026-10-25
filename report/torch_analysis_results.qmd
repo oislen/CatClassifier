@@ -20,7 +20,7 @@ sys.path.append("../model")
 import cons
 
 import torch
-from model.torch.VGG16_pretrained import VGG16_pretrained
+from model.torch.vgg_16_pretrained import vgg_16_pretrained
 ```
 
 This project aims to create a model to classify cat and dog images. The data was sourced from the [dogs-vs-cats](https://www.kaggle.com/competitions/dogs-vs-cats/overview) Kaggle competition, and also from [freeimages.com](https://www.freeimages.com/) using a web scraper. Docker containers were used to deploy the application on an EC2 spot instances in order to scale up hardware and computation power. 
@@ -35,17 +35,17 @@ The images were resized to a uniform dimension and the colour channels normalise
 
 ![Generator Plot](torch/generator_plot.jpg)
 
-## VGG16 Model Architecture
+## vgg_16 Model Architecture
 
-A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See VGG16 diagram below, as well as torch model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
+A pre-trained VGG CNN model with 16 layers was trained using the processed images via PyTorch. See vgg_16 diagram below, as well as torch model summary. Stochastic gradient descent was implemented to optimize the training criterion function cross entropy loss.
 
-![AlexNet Architecture](torch/VGG16_architecture.png)
+![AlexNet Architecture](torch/vgg_16_architecture.png)
 
 ```{python}
 # device configuration
 device = torch.device('cuda' if torch.cuda.is_available() and cons.check_gpu else 'cpu')
 # load trained torch model
-model = VGG16_pretrained(num_classes=2).to(device)
+model = vgg_16_pretrained(num_classes=2).to(device)
 model.load(input_fpath=cons.torch_model_pt_fpath)
 # print model summary
 print(model)

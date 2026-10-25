@@ -1,17 +1,17 @@
 from beartype import beartype
-from keras.applications import ResNet50
+from keras.applications import resnet_50
 from keras.layers import Dense, Dropout, Flatten
 from keras.models import Model
 
 
 @beartype
-def ResNet50_pretrained(
+def resnet_50_pretrained(
     input_shape: list | tuple = (224, 224, 3),
     n_classes: int = 2,
     output_activation: str = "softmax",
 ) -> Model:
     """
-    Pretrained ResNet50 keras model
+    Pretrained resnet_50 keras model
 
     Parameters
     ----------
@@ -25,14 +25,14 @@ def ResNet50_pretrained(
     Returns
     -------
     Model
-        Keras.Model, the pretrained ResNet50 model
+        Keras.Model, the pretrained resnet_50 model
 
     Example
     -------
-    model = ResNet50_pretrained(input_shape = (224, 224, 3),
+    model = resnet_50_pretrained(input_shape = (224, 224, 3),
                                 n_classes = 2,
                                 output_activation = 'softmax',
-                                name = 'ResNet50_pretrained'
+                                name = 'resnet_50_pretrained'
                                 )
 
     model.compile(loss='categorical_crossentropy',
@@ -44,14 +44,14 @@ def ResNet50_pretrained(
     """
 
     # loading resent
-    ResNet50_pretrained = ResNet50(
+    resnet_50_pretrained = resnet_50(
         input_shape=input_shape, include_top=False, weights="imagenet"
     )
 
     # Freeze layers
-    ResNet50_pretrained.trainable = False
+    resnet_50_pretrained.trainable = False
 
-    last_output = ResNet50_pretrained.output
+    last_output = resnet_50_pretrained.output
 
     # Flatten the output layer to 1 dimension
     x = Flatten()(last_output)
@@ -63,7 +63,7 @@ def ResNet50_pretrained(
     x = Dense(n_classes, activation=output_activation)(x)
 
     model = Model(
-        inputs=ResNet50_pretrained.input, outputs=x, name="ResNet50_pretrained"
+        inputs=resnet_50_pretrained.input, outputs=x, name="resnet_50_pretrained"
     )
 
     return model
