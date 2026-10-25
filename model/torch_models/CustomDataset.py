@@ -17,5 +17,5 @@ class CustomDataset(Dataset):
 
     @staticmethod
     def collate_fn(data_list):
-        arrays, categories = zip(*data_list)
+        arrays, categories = zip(*data_list, strict=False)
         return torch.stack(list(arrays)), torch.stack(list(categories))
