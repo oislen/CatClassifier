@@ -78,8 +78,8 @@ jobs:
         uv sync
     - name: Test with unittest
       run: |
-        uv run python -m unittest discover ./webscrapers/unittests/utilities
-        uv run python -m unittest discover ./model/unittests/utilities
+        uv run python -m unittest discover ./webscrapers/unittests
+        uv run python -m unittest discover ./model/unittests
 
   trivy-fs-scan:
     runs-on: ubuntu-latest
