@@ -6,7 +6,7 @@ import unittest.mock
 import cv2
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 with unittest.mock.patch("beartype.beartype", new=lambda f, **_kw: f):
     from arch.resize_image import resize_image

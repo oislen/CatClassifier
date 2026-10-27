@@ -5,7 +5,7 @@ import unittest.mock
 
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 with unittest.mock.patch("beartype.beartype", new=lambda f, **_kw: f):
     from arch.crop_image import crop_image

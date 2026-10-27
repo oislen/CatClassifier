@@ -5,7 +5,7 @@ import unittest
 
 import torch
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from torch_models.checkpoints import load_checkpoint, save_checkpoint
 

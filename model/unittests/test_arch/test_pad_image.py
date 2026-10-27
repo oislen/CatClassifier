@@ -5,7 +5,7 @@ import unittest.mock
 
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # beartype in this environment rejects np.array as a type hint at decoration
 # time.  Neutralise it before importing source modules so the decorator becomes

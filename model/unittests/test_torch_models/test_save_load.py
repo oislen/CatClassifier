@@ -6,7 +6,7 @@ import unittest
 import torch
 import torch.nn as nn
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from torch_models.load import load
 from torch_models.save import save
