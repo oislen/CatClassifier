@@ -103,19 +103,22 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
   set MLFLOW_RUN_ID=<run_id from first call>
   uv run python prg_torch_model.py --run_testset_prediction --model_id alexnet_8_pretrained --device_type cpu
   ```
-- Log hyperparameters at run start, guarded so they are only logged on a fresh run (not when resuming), since MLflow params are immutable and re-logging raises an exception:
+- Log hyperparameters at run start, guarded so they are only logged on a fresh run (not when resuming), since MLflow params are immutable and re-logging raises an exception. This block must be placed **inside** the `run_model_training` conditional and **after** the `num_epochs` assignment (line ~188 of `prg_torch_model.py`), since `num_epochs` is only defined within that block:
   ```python
-  if mlflow_run_id is None:
-      mlflow.log_params({
-          "model_id": model_id,
-          "num_epochs": num_epochs,
-          "batch_size": cons.batch_size,
-          "learning_rate": cons.learning_rate,
-          "image_width": cons.IMAGE_WIDTH,
-          "image_height": cons.IMAGE_HEIGHT,
-          "random_state": random_state,
-          "device_type": device_type,
-      })
+  if input_params_dict["run_model_training"]:
+      num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
+      if mlflow_run_id is None:
+          mlflow.log_params({
+              "model_id": model_id,
+              "num_epochs": num_epochs,
+              "batch_size": cons.batch_size,
+              "learning_rate": cons.learning_rate,
+              "image_width": cons.IMAGE_WIDTH,
+              "image_height": cons.IMAGE_HEIGHT,
+              "random_state": random_state,
+              "device_type": device_type,
+          })
+      # ... rest of training logic ...
   ```
 
 ---
@@ -167,6 +170,10 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
   ```python
   torch_model_onnx_fpath = os.path.join(data_models_fdir, "{model_id}.onnx")
   ```
+- `data_models_fdir` (`data/models/`) is defined in `cons.py` at line 32 but is **not** included in `root_fdirs` or `sub_fdirs`, so the directory may not exist at runtime. Add it to `sub_fdirs` to ensure it is created alongside other required directories:
+  ```python
+  sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir, data_models_fdir]
+  ```
 
 #### `model/torch_models/export_onnx.py` (new file)
 - Create a dedicated module containing the `export_onnx` function:
@@ -197,17 +204,19 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
       str
           The export status message
       """
+      model.eval()
       dummy_input = torch.randn(1, 3, image_width, image_height)
-      torch.onnx.export(
-          model,
-          dummy_input,
-          output_fpath,
-          export_params=True,
-          opset_version=17,
-          input_names=["input"],
-          output_names=["output"],
-          dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
-      )
+      with torch.no_grad():
+          torch.onnx.export(
+              model,
+              dummy_input,
+              output_fpath,
+              export_params=True,
+              opset_version=17,
+              input_names=["input"],
+              output_names=["output"],
+              dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+          )
       msg = f"Exported ONNX model to {output_fpath}"
       logging.info(msg)
       return msg
@@ -236,7 +245,7 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
 
 **Changes required:**
 
-#### `model/utilities/` (new file `model/utilities/evaluate.py` or inline in `prg_torch_model.py`)
+#### `model/utilities/evaluate.py` (new file)
 - Compute accuracy, precision, recall, and F1 from the test-set predictions:
   ```python
   from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -267,6 +276,30 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
 
 ---
 
+### 5. Execution Script Updates
+
+**Goal:** Ensure the training execution scripts set `MLFLOW_TRACKING_URI` so the local MLflow server is always targeted, regardless of whether the environment variable is already set in the shell.
+
+**Changes required:**
+
+#### `model/exeTorchModel.cmd`
+- Add `SET MLFLOW_TRACKING_URI` before the `uv run` invocations:
+  ```cmd
+  call SET MLFLOW_TRACKING_URI=http://127.0.0.1:5000
+  call SET PARAM_CHECK_GPU=True
+  call uv run python prg_torch_model.py --run_model_training --run_testset_prediction --model_id alexnet_8_pretrained --device_type cuda
+  ```
+
+#### `model/exeTorchModel.sh`
+- Add `export MLFLOW_TRACKING_URI` before the `uv run` invocations:
+  ```sh
+  export MLFLOW_TRACKING_URI=http://127.0.0.1:5000
+  export PARAM_CHECK_GPU=True
+  uv run python prg_torch_model.py --run_model_training --run_testset_prediction --model_id vgg_16_pretrained
+  ```
+
+---
+
 ## File Change Summary
 
 | File | Change Type | Description |
@@ -279,6 +312,8 @@ start /B uv run mlflow server --host 127.0.0.1 --port 5000
 | `model/torch_models/__init__.py` | Modify | Export `export_onnx` from the new module |
 | `model/utilities/evaluate.py` | Create | `compute_eval_metrics` helper using `sklearn` |
 | `model/utilities/__init__.py` | Modify | Export `compute_eval_metrics` from the new module |
+| `model/exeTorchModel.cmd` | Modify | Set `MLFLOW_TRACKING_URI` before invoking the training script |
+| `model/exeTorchModel.sh` | Modify | Export `MLFLOW_TRACKING_URI` before invoking the training script |
 
 ---
 
@@ -361,7 +396,7 @@ Smoke tests exercise the full `prg_torch_model.py` pipeline end-to-end against a
 - Synthesise a small batch of random `(3, 128, 128)` image tensors with binary labels to stand in for real cat/dog images, bypassing file I/O entirely.
 - Run both `--run_model_training` and `--run_testset_prediction` code paths by calling the relevant logic directly (or via `subprocess` invoking `prg_torch_model.py` with `--model_id alexnet_8_pretrained --device_type cpu`).
 
-#### New test file: `model/unittests/test_smoke_mlflow.py`
+#### New test file: `model/smoketests/test_smoke_mlflow.py`
 
 | Test name | Scope | What it verifies |
 |---|---|---|
@@ -383,10 +418,12 @@ Smoke tests exercise the full `prg_torch_model.py` pipeline end-to-end against a
 
 ```cmd
 :: from CatClassifier/model/
-uv run python -m unittest unittests.test_smoke_mlflow
+uv run python -m unittest smoketests.test_smoke_mlflow
 ```
 
 Smoke tests are intentionally excluded from the `python-unittests` CI job in `.github/workflows/dev-pull-requests.yml` because they require more memory and wall-clock time than unit tests. They should be run manually before raising a PR for this issue, and can optionally be added to a separate `smoke-tests` CI job gated on the `main` branch workflow (`.github/workflows/deploy-main-push.yml`).
+
+To prevent `make test` and the CI unittest discovery step (`uv run python -m unittest discover model`) from picking up the smoke tests automatically, place `test_smoke_mlflow.py` in a dedicated `model/smoketests/` directory rather than under `model/unittests/`. The existing discovery targets only traverse `unittests/`, so the smoke tests will remain opt-in. If placed under `unittests/` instead, add a `load_tests` protocol or rename the file to use a non-`test_` prefix to exclude it from auto-discovery.
 
 ---
 
@@ -395,4 +432,6 @@ Smoke tests are intentionally excluded from the `python-unittests` CI job in `.g
 - The MLflow tracking server must be running locally on `http://127.0.0.1:5000` before any training or prediction invocation. The server can be started with `uv run mlflow server --host 127.0.0.1 --port 5000` from the project root. The `mlruns/` directory it creates should be added to `.gitignore`.
 - When `--run_model_training` and `--run_testset_prediction` are called in the same process invocation (as in `exeTorchModel.cmd`), both blocks share a single `mlflow.start_run` context automatically. When they are called in separate processes, pass the `run_id` logged by the first invocation via the `MLFLOW_RUN_ID` environment variable so the second call resumes the same run.
 - `scikit-learn` is already a project dependency (`scikit-learn==1.8.0`), so no additional package is needed for evaluation metrics.
-- The unit test file for the new `export_onnx` module (`test_export_onnx.py`) references `export_onnx` from `model/torch_models/export_onnx.py` directly, not from `save.py`. Update the existing `test_save_load.py` reference in the Unit Tests section accordingly — the `test_save_does_not_produce_onnx_file` guard test remains valid but its import path changes to `from torch_models.export_onnx import export_onnx`.
+- The unit test file for the new `export_onnx` module (`test_export_onnx.py`) references `export_onnx` from `model/torch_models/export_onnx.py` directly. `test_save_load.py` requires no changes — see the Unit Tests section for details.
+- **Docker / `compose.yaml`:** the current `compose.yaml` service definition has no environment variables. When training is run inside the container, `MLFLOW_TRACKING_URI` will default to `http://127.0.0.1:5000`, which resolves to the container's own loopback — not the host's MLflow server. Add an `environment:` block to the `latest` service pointing at the host machine's IP (e.g. `http://host.docker.internal:5000` on Docker Desktop, or the host bridge IP on Linux), or run the MLflow server inside the container itself and expose port 5000. This is a deployment concern rather than a code change and can be addressed separately, but it should not be overlooked when testing training inside Docker.
+- **Known limitations — `api.py` and `classify_image_torch.py`:** both scripts load model weights directly from `cons.torch_model_pt_fpath` on disk and have no awareness of MLflow artefacts or run tracking. This is outside the scope of this ticket but means inference paths do not benefit from model versioning. A follow-up ticket should consider loading models by MLflow run ID or registered model name.
