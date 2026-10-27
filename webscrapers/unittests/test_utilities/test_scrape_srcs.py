@@ -2,7 +2,7 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.join(os.getcwd(), "webscrapers"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import cons
 from utilities import scrape_srcs
