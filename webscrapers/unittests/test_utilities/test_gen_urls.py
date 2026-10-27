@@ -215,7 +215,9 @@ class TestGenUrls(unittest.TestCase):
         """The search term (possibly URL-encoded) should appear in each URL."""
         for url in obs_urls_multi:
             # urllib may encode the space; check for both possibilities
-            self.assertTrue("persian" in url or "persian+cat" in url or "persian%20cat" in url)
+            self.assertTrue(
+                "persian" in url or "persian+cat" in url or "persian%20cat" in url
+            )
 
     # ------------------------------------------------------------------
     # URL ordering tests

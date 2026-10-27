@@ -22,32 +22,32 @@ grey_10x10 = np.arange(100, dtype=np.uint8).reshape((10, 10))
 pt1_wh = (2, 2)
 pt2_wh = (6, 6)
 
-obs_crop_rgb  = crop_image(rgb_10x10,  pt1_wh=pt1_wh, pt2_wh=pt2_wh)
+obs_crop_rgb = crop_image(rgb_10x10, pt1_wh=pt1_wh, pt2_wh=pt2_wh)
 obs_crop_grey = crop_image(grey_10x10, pt1_wh=pt1_wh, pt2_wh=pt2_wh)
 
 # Expected crop: rows [2:6], cols [2:6]
-exp_crop_rgb  = rgb_10x10[2:6, 2:6, :]
+exp_crop_rgb = rgb_10x10[2:6, 2:6, :]
 exp_crop_grey = grey_10x10[2:6, 2:6]
 
 # Non-square crop: different width and height extents
-pt1_ns = (1, 3)   # (w=1, h=3)
-pt2_ns = (4, 8)   # (w=4, h=8)
-obs_crop_nonsquare_rgb  = crop_image(rgb_10x10,  pt1_wh=pt1_ns, pt2_wh=pt2_ns)
+pt1_ns = (1, 3)  # (w=1, h=3)
+pt2_ns = (4, 8)  # (w=4, h=8)
+obs_crop_nonsquare_rgb = crop_image(rgb_10x10, pt1_wh=pt1_ns, pt2_wh=pt2_ns)
 obs_crop_nonsquare_grey = crop_image(grey_10x10, pt1_wh=pt1_ns, pt2_wh=pt2_ns)
 # function: wpts=(h1,h2)=(3,8), hpts=(w1,w2)=(1,4) -> rows [1:4], cols [3:8]
-exp_crop_nonsquare_rgb  = rgb_10x10[1:4, 3:8, :]
+exp_crop_nonsquare_rgb = rgb_10x10[1:4, 3:8, :]
 exp_crop_nonsquare_grey = grey_10x10[1:4, 3:8]
 
 # Single-pixel crop: both points define a 1x1 region
 pt1_sp = (3, 3)
 pt2_sp = (4, 4)
-obs_crop_single_rgb  = crop_image(rgb_10x10,  pt1_wh=pt1_sp, pt2_wh=pt2_sp)
+obs_crop_single_rgb = crop_image(rgb_10x10, pt1_wh=pt1_sp, pt2_wh=pt2_sp)
 obs_crop_single_grey = crop_image(grey_10x10, pt1_wh=pt1_sp, pt2_wh=pt2_sp)
 
 # Full-image crop: points span the entire image
 pt1_full = (0, 0)
 pt2_full = (10, 10)
-obs_crop_full_rgb  = crop_image(rgb_10x10,  pt1_wh=pt1_full, pt2_wh=pt2_full)
+obs_crop_full_rgb = crop_image(rgb_10x10, pt1_wh=pt1_full, pt2_wh=pt2_full)
 obs_crop_full_grey = crop_image(grey_10x10, pt1_wh=pt1_full, pt2_wh=pt2_full)
 
 # Crop with list arguments (not tuples)
@@ -154,9 +154,7 @@ class TestCropImage(unittest.TestCase):
     def test_channel_values_preserved(self):
         """Each channel slice of the crop should equal the raw numpy slice."""
         for c in range(3):
-            np.testing.assert_array_equal(
-                obs_crop_rgb[:, :, c], exp_crop_rgb[:, :, c]
-            )
+            np.testing.assert_array_equal(obs_crop_rgb[:, :, c], exp_crop_rgb[:, :, c])
 
     # ------------------------------------------------------------------
     # dtype preservation

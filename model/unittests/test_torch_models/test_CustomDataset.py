@@ -2,7 +2,6 @@ import os
 import sys
 import unittest
 
-import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
@@ -15,13 +14,16 @@ from torch_models.CustomDataset import CustomDataset
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_df(n, h=32, w=32, c=3, seed=0):
     """Build a minimal DataFrame matching TorchLoadImages output."""
     torch.manual_seed(seed)
     return pd.DataFrame(
         {
-            "image_tensors":    [torch.rand(c, h, w) for _ in range(n)],
-            "category_tensors": [torch.tensor(i % 2, dtype=torch.int64) for i in range(n)],
+            "image_tensors": [torch.rand(c, h, w) for _ in range(n)],
+            "category_tensors": [
+                torch.tensor(i % 2, dtype=torch.int64) for i in range(n)
+            ],
         }
     )
 
@@ -32,22 +34,22 @@ def _make_df(n, h=32, w=32, c=3, seed=0):
 
 image_h, image_w, image_c = 32, 32, 3
 n_samples = 5
-df_5       = _make_df(n_samples)
-df_single  = _make_df(1)
-df_large   = _make_df(20)
+df_5 = _make_df(n_samples)
+df_single = _make_df(1)
+df_large = _make_df(20)
 
 # Float-type category tensors
 df_float_cat = pd.DataFrame(
     {
-        "image_tensors":    [torch.rand(image_c, image_h, image_w)],
+        "image_tensors": [torch.rand(image_c, image_h, image_w)],
         "category_tensors": [torch.tensor(0.0)],
     }
 )
 
-obs_dataset        = CustomDataset(df_5)
+obs_dataset = CustomDataset(df_5)
 obs_dataset_single = CustomDataset(df_single)
-obs_dataset_large  = CustomDataset(df_large)
-obs_dataset_float  = CustomDataset(df_float_cat)
+obs_dataset_large = CustomDataset(df_large)
+obs_dataset_float = CustomDataset(df_float_cat)
 
 
 class TestCustomDataset(unittest.TestCase):
@@ -59,10 +61,10 @@ class TestCustomDataset(unittest.TestCase):
     """
 
     def setUp(self):
-        self.dataset        = obs_dataset
+        self.dataset = obs_dataset
         self.dataset_single = obs_dataset_single
-        self.dataset_large  = obs_dataset_large
-        self.n_samples      = n_samples
+        self.dataset_large = obs_dataset_large
+        self.n_samples = n_samples
 
     # ------------------------------------------------------------------
     # Type tests
@@ -70,6 +72,7 @@ class TestCustomDataset(unittest.TestCase):
 
     def test_type(self):
         from torch.utils.data import Dataset
+
         self.assertIsInstance(self.dataset, Dataset)
 
     # ------------------------------------------------------------------

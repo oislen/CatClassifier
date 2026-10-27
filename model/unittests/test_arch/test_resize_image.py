@@ -22,11 +22,11 @@ rgb_8x8 = np.random.randint(0, 256, (8, 8, 3), dtype=np.uint8)
 # 8x8 single-channel greyscale image (3-D with 1 channel)
 grey_8x8 = np.random.randint(0, 256, (8, 8, 1), dtype=np.uint8)
 
-target_wh = (4, 4)   # resize to 4 wide, 4 tall
+target_wh = (4, 4)  # resize to 4 wide, 4 tall
 
-obs_resized_rgb        = resize_image(rgb_8x8,  reshape_wh=target_wh)
-obs_resized_grey_3dim  = resize_image(grey_8x8, reshape_wh=target_wh, keep_3dim=True)
-obs_resized_grey_2dim  = resize_image(grey_8x8, reshape_wh=target_wh, keep_3dim=False)
+obs_resized_rgb = resize_image(rgb_8x8, reshape_wh=target_wh)
+obs_resized_grey_3dim = resize_image(grey_8x8, reshape_wh=target_wh, keep_3dim=True)
+obs_resized_grey_2dim = resize_image(grey_8x8, reshape_wh=target_wh, keep_3dim=False)
 
 # Upscale test
 obs_upscaled = resize_image(rgb_8x8, reshape_wh=(16, 16))

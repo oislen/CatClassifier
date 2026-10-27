@@ -25,13 +25,15 @@ rgb_array_4x4[:, :, 0] = 100  # set red channel to known value
 grey_array_4x4 = np.zeros((4, 4), dtype=np.uint8)
 grey_array_4x4[0, 0] = 255
 
-pad_shape_wh = (8, 8)   # (width, height) -> target is 8 x 8
+pad_shape_wh = (8, 8)  # (width, height) -> target is 8 x 8
 
-obs_padded_rgb  = pad_image(rgb_array_4x4,  pad_shape_wh=pad_shape_wh)
+obs_padded_rgb = pad_image(rgb_array_4x4, pad_shape_wh=pad_shape_wh)
 obs_padded_grey = pad_image(grey_array_4x4, pad_shape_wh=pad_shape_wh)
 
 # no-op: image already matches target
-obs_padded_exact = pad_image(np.zeros((8, 8, 3), dtype=np.uint8), pad_shape_wh=pad_shape_wh)
+obs_padded_exact = pad_image(
+    np.zeros((8, 8, 3), dtype=np.uint8), pad_shape_wh=pad_shape_wh
+)
 
 # Asymmetric padding: 3-wide x 2-tall image -> 10-wide x 7-tall target
 rgb_3x2 = np.ones((2, 3, 3), dtype=np.uint8) * 50

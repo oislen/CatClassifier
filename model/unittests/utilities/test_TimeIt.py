@@ -12,15 +12,15 @@ from utilities.TimeIt import TimeIt
 # ---------------------------------------------------------------------------
 
 parent_key_1 = "Stage1"
-sub_key_1    = "Load"
+sub_key_1 = "Load"
 parent_key_2 = "Stage2"
-sub_key_2    = None          # sub_key is optional
+sub_key_2 = None  # sub_key is optional
 
 exp_log_keys = ["parent_key", "sub_key", "step_time", "cumulative_time"]
 
 obs_timeit = TimeIt()
 obs_timeit.log_time(parent_key=parent_key_1, sub_key=sub_key_1)
-time.sleep(0.01)             # small sleep so step_time > 0
+time.sleep(0.01)  # small sleep so step_time > 0
 obs_timeit.log_time(parent_key=parent_key_2, sub_key=sub_key_2)
 
 

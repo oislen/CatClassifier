@@ -18,7 +18,7 @@ with unittest.mock.patch("beartype.beartype", new=lambda f, **_kw: f):
 rgb_4x4 = np.zeros((4, 4, 3), dtype=np.uint8)
 rgb_4x4[:, :, 0] = 200  # red
 rgb_4x4[:, :, 1] = 100  # green
-rgb_4x4[:, :, 2] = 50   # blue
+rgb_4x4[:, :, 2] = 50  # blue
 
 # Expected greyscale value (weights used by the function: R*0.2125 + G*0.7154 + B*0.0721)
 # 200*0.2125 + 100*0.7154 + 50*0.0721 = 42.5 + 71.54 + 3.605 = 117.645 -> 117 (uint8 truncation)

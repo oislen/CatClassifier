@@ -8,13 +8,13 @@ import torch.nn as nn
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
-from torch_models.save import save
 from torch_models.load import load
-
+from torch_models.save import save
 
 # ---------------------------------------------------------------------------
 # Minimal model used across all tests
 # ---------------------------------------------------------------------------
+
 
 class _TinyNet(nn.Module):
     """Minimal two-layer network for save/load testing."""
@@ -184,30 +184,24 @@ class TestSaveLoadRoundTrip(unittest.TestCase):
 
     def test_roundtrip_fc1_weight(self):
         model_src = _make_model(seed=7)
-        model_dst = _make_model(seed=99)   # different random init
+        model_dst = _make_model(seed=99)  # different random init
         save(model_src, output_fpath=self.filepath)
         load(model_dst, input_fpath=self.filepath)
-        torch.testing.assert_close(
-            model_dst.fc1.weight.data, model_src.fc1.weight.data
-        )
+        torch.testing.assert_close(model_dst.fc1.weight.data, model_src.fc1.weight.data)
 
     def test_roundtrip_fc2_weight(self):
         model_src = _make_model(seed=7)
         model_dst = _make_model(seed=99)
         save(model_src, output_fpath=self.filepath)
         load(model_dst, input_fpath=self.filepath)
-        torch.testing.assert_close(
-            model_dst.fc2.weight.data, model_src.fc2.weight.data
-        )
+        torch.testing.assert_close(model_dst.fc2.weight.data, model_src.fc2.weight.data)
 
     def test_roundtrip_fc1_bias(self):
         model_src = _make_model(seed=7)
         model_dst = _make_model(seed=99)
         save(model_src, output_fpath=self.filepath)
         load(model_dst, input_fpath=self.filepath)
-        torch.testing.assert_close(
-            model_dst.fc1.bias.data, model_src.fc1.bias.data
-        )
+        torch.testing.assert_close(model_dst.fc1.bias.data, model_src.fc1.bias.data)
 
     def test_roundtrip_predictions_identical(self):
         """After save/load, both models must produce identical output."""

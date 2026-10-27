@@ -1,6 +1,8 @@
 import unittest
 
 from aws.prg_run_ec2_instance import run_ec2_instance
+from aws.utilities.EC2Client import EC2Client
+
 
 class TestRunEC2Instance(unittest.TestCase):
     def test_run_ec2_instance(self):
@@ -14,5 +16,6 @@ class TestRunEC2Instance(unittest.TestCase):
         client = EC2Client()
         self.assertIsInstance(client, EC2Client)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

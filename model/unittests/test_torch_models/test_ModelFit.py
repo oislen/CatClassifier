@@ -10,9 +10,9 @@ from torch_models.ModelFit import ModelFit
 # Fixtures — standard 3-epoch training run
 # ---------------------------------------------------------------------------
 
-exp_loss         = [0.9, 0.7, 0.5]
-exp_accuracy     = [0.55, 0.70, 0.85]
-exp_val_loss     = [1.0, 0.8, 0.6]
+exp_loss = [0.9, 0.7, 0.5]
+exp_accuracy = [0.55, 0.70, 0.85]
+exp_val_loss = [1.0, 0.8, 0.6]
 exp_val_accuracy = [0.50, 0.65, 0.80]
 
 obs_model_fit = ModelFit(
@@ -36,10 +36,10 @@ single_model_fit = ModelFit(
 empty_model_fit = ModelFit(loss=[], accuracy=[], val_loss=[], val_accuracy=[])
 
 # Longer run (10 epochs) for index-access tests
-long_loss     = [1.0 - i * 0.05 for i in range(10)]
+long_loss = [1.0 - i * 0.05 for i in range(10)]
 long_accuracy = [0.5 + i * 0.04 for i in range(10)]
 long_val_loss = [1.1 - i * 0.05 for i in range(10)]
-long_val_acc  = [0.45 + i * 0.04 for i in range(10)]
+long_val_acc = [0.45 + i * 0.04 for i in range(10)]
 long_model_fit = ModelFit(
     loss=long_loss,
     accuracy=long_accuracy,
@@ -116,7 +116,9 @@ class TestModelFit(unittest.TestCase):
         self.assertEqual(len(self.model_fit.history["val_loss"]), len(exp_val_loss))
 
     def test_val_accuracy_length(self):
-        self.assertEqual(len(self.model_fit.history["val_accuracy"]), len(exp_val_accuracy))
+        self.assertEqual(
+            len(self.model_fit.history["val_accuracy"]), len(exp_val_accuracy)
+        )
 
     def test_all_series_same_length(self):
         h = self.model_fit.history
@@ -163,9 +165,9 @@ class TestModelFit(unittest.TestCase):
 
     def test_history_object(self):
         exp_history = {
-            "loss":         exp_loss,
-            "accuracy":     exp_accuracy,
-            "val_loss":     exp_val_loss,
+            "loss": exp_loss,
+            "accuracy": exp_accuracy,
+            "val_loss": exp_val_loss,
             "val_accuracy": exp_val_accuracy,
         }
         self.assertEqual(self.model_fit.history, exp_history)
