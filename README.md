@@ -6,7 +6,7 @@ This repository contains code and configurations for implementing a Convolutiona
 
 Three pretrained PyTorch models are fine-tuned for binary classification: **AlexNet8**, **VGG16**, and **ResNet50**.
 
-A Flask REST API serves predictions from the trained models. The application is containerised with Docker and published to Docker Hub.
+A Flask REST API serves predictions from the trained models. The application is containerised with Docker and published to Docker Hub. [MLflow](https://mlflow.org/) is used for experiment tracking, model versioning, and artefact management.
 
 ![Workflow](doc/catclassifier.jpg)
 
@@ -103,6 +103,16 @@ POST an image to `http://localhost:5000/catclassifier` with the following fields
 
 ### Model Training (local)
 
+Before running training, start the local MLflow tracking server (in a separate terminal):
+
+```bash
+uv run mlflow server --host 127.0.0.1 --port 5000
+```
+
+The MLflow UI is then available at [http://127.0.0.1:5000](http://127.0.0.1:5000).
+
+Run training via the convenience script:
+
 ```cmd
 cd model
 call exeTorchModel.cmd
@@ -120,6 +130,19 @@ uv run python prg_torch_model.py \
 ```
 
 Available `--model_id` values: `alexnet_8_pretrained`, `vgg_16_pretrained`, `resnet_50_pretrained`.
+
+Each training run logs hyperparameters, per-epoch training and validation metrics, and model artefacts (`.pt` weights, `.onnx` export, prediction plots, and submission CSV) to the MLflow tracking server. Test-set evaluation metrics (accuracy, precision, recall, F1) are logged at the end of the prediction step.
+
+To resume an existing run when training and prediction are invoked in separate processes, set `MLFLOW_RUN_ID` to the run ID printed at the start of the first invocation:
+
+```cmd
+:: First call — training only
+uv run python prg_torch_model.py --run_model_training --model_id alexnet_8_pretrained --device_type cuda
+
+:: Second call — prediction only, resuming the same run
+set MLFLOW_RUN_ID=<run_id from first call>
+uv run python prg_torch_model.py --run_testset_prediction --model_id alexnet_8_pretrained --device_type cuda
+```
 
 > Kaggle API credentials (`kaggle.json` in `.creds/`) are required to download training data.
 
@@ -145,6 +168,15 @@ uv run python -m unittest discover ./model/unittests
 uv run python -m unittest discover ./webscrapers/unittests
 ```
 
+### Smoke tests
+
+End-to-end MLflow integration smoke tests are in `model/smoketests/`. They use a file-based MLflow store and synthetic data (no real images or GPU required) and are excluded from normal discovery:
+
+```bash
+cd model
+uv run python -m unittest smoketests.test_smoke_mlflow
+```
+
 ## Linting & Formatting
 
 ```cmd
@@ -167,6 +199,9 @@ Ruff configuration is in `pyproject.toml` (`[tool.ruff]`). Target is Python 3.12
 | `PARAM_NUM_WORKERS` | `0` | DataLoader worker processes |
 | `FLASK_DEBUG` | `""` | Set `1`, `true`, or `yes` to enable Flask debug mode |
 | `TORCH_HOME` | — | Override PyTorch model cache directory |
+| `MLFLOW_TRACKING_URI` | `http://127.0.0.1:5000` | MLflow tracking server URI |
+| `MLFLOW_EXPERIMENT_NAME` | `CatClassifier` | MLflow experiment name |
+| `MLFLOW_RUN_ID` | — | Set to resume an existing MLflow run |
 
 ## CI/CD (GitHub Actions)
 
