@@ -16,14 +16,20 @@ from torch_models.export_onnx import export_onnx
 
 
 class _TinyNet(nn.Module):
-    """Minimal two-layer network for export_onnx testing."""
+    """Minimal network for export_onnx testing.
+
+    Uses AdaptiveAvgPool2d so the forward pass works regardless of the spatial
+    size of the dummy input that export_onnx produces (224×224 minimum).
+    """
 
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(3 * 8 * 8, 16)
+        self.pool = nn.AdaptiveAvgPool2d((4, 4))
+        self.fc1 = nn.Linear(3 * 4 * 4, 16)
         self.fc2 = nn.Linear(16, 2)
 
     def forward(self, x):
+        x = self.pool(x)
         x = x.view(x.size(0), -1)
         return self.fc2(torch.relu(self.fc1(x)))
 
@@ -33,8 +39,8 @@ def _make_model():
     return _TinyNet()
 
 
-IMAGE_WIDTH = 8
-IMAGE_HEIGHT = 8
+IMAGE_WIDTH = 224
+IMAGE_HEIGHT = 224
 NUM_CLASSES = 2
 
 
