@@ -219,6 +219,27 @@ class TestModelFit(unittest.TestCase):
         losses = long_model_fit.history["loss"]
         self.assertTrue(all(losses[i] > losses[i + 1] for i in range(len(losses) - 1)))
 
+    # ------------------------------------------------------------------
+    # MLflow key compatibility test
+    # ------------------------------------------------------------------
+
+    def test_history_metric_keys_are_mlflow_compatible(self):
+        """All ModelFit.history keys must be valid MLflow metric key names.
+
+        MLflow accepts metric keys that are non-empty strings consisting of
+        alphanumeric characters, underscores, hyphens, spaces, and dots only.
+        This test guards against renaming history keys in a way that would
+        silently break mlflow.log_metrics() calls in fit.py.
+        """
+        import re
+
+        valid_pattern = re.compile(r"^[a-zA-Z0-9_\-. ]+$")
+        for key in obs_model_fit.history:
+            self.assertTrue(
+                bool(valid_pattern.match(key)),
+                msg=f"ModelFit history key {key!r} is not a valid MLflow metric key",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
