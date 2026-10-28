@@ -25,6 +25,9 @@ def export_onnx(model, output_fpath: str, image_width: int, image_height: int) -
         The export status message
     """
     model.eval()
+    # ONNX export runs on CPU regardless of training device; move model temporarily
+    original_device = next(model.parameters()).device
+    model.cpu()
     dummy_input = torch.randn(1, 3, image_width, image_height)
     with torch.no_grad():
         torch.onnx.export(
@@ -37,6 +40,7 @@ def export_onnx(model, output_fpath: str, image_width: int, image_height: int) -
             output_names=["output"],
             dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
         )
+    model.to(original_device)
     msg = f"Exported ONNX model to {output_fpath}"
     logging.info(msg)
     return msg
