@@ -1,6 +1,7 @@
 import logging
 import os
 
+import mlflow
 import torch
 from beartype import beartype
 
@@ -106,6 +107,13 @@ def fit(
         train_loss_list.append(train_loss)
         train_acc_list.append(train_acc)
         logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
+        mlflow.log_metrics(
+            {
+                "train_loss": train_loss,
+                "train_acc": train_acc,
+            },
+            step=epoch,
+        )
         # calculate validation loss and accuracy if applicable
         if valid_data_loader is not None:
             valid_loss, valid_acc = validate(
@@ -118,6 +126,13 @@ def fit(
             valid_acc_list.append(valid_acc)
             logging.info(
                 f"Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}"
+            )
+            mlflow.log_metrics(
+                {
+                    "valid_loss": valid_loss,
+                    "valid_acc": valid_acc,
+                },
+                step=epoch,
             )
             # if implementing early stopping
             if early_stopper is not None and early_stopper.early_stop(valid_loss):

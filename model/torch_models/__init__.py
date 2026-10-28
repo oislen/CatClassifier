@@ -3,6 +3,7 @@ from .AlexNet8_pretrained import alexnet_8_pretrained
 from .checkpoints import load_checkpoint, save_checkpoint
 from .CustomDataset import CustomDataset
 from .EarlyStopper import EarlyStopper
+from .export_onnx import export_onnx
 from .fit import fit
 from .LeNet5 import lenet_5
 from .load import load
@@ -21,6 +22,7 @@ __all__ = [
     "save_checkpoint",
     "CustomDataset",
     "EarlyStopper",
+    "export_onnx",
     "fit",
     "lenet_5",
     "load",

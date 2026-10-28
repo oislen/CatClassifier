@@ -26,3 +26,7 @@ __pycache__
 *.keras
 *.pickle
 *.csv
+*.onnx
+
+# mlflow tracking store
+mlruns/
