@@ -317,9 +317,16 @@ if __name__ == "__main__":
             logging.info("Compute and log evaluation metrics to MLflow...")
             # derive ground-truth labels from filenames (cat.N.jpg -> cat, dog.N.jpg -> dog)
             test_df["true_label"] = test_df["filenames"].str.split(".").str[0]
-            eval_metrics = compute_eval_metrics(test_df["true_label"], test_df["category"])
-            mlflow.log_metrics(eval_metrics)
-            logging.info(f"Evaluation metrics: {eval_metrics}")
+            known_classes = set(cons.category_mapper.values())  # {"cat", "dog"}
+            if set(test_df["true_label"].unique()).issubset(known_classes):
+                eval_metrics = compute_eval_metrics(test_df["true_label"], test_df["category"])
+                mlflow.log_metrics(eval_metrics)
+                logging.info(f"Evaluation metrics: {eval_metrics}")
+            else:
+                logging.info(
+                    "Skipping evaluation metrics: test filenames do not contain "
+                    "class labels (Kaggle unlabelled test set detected)."
+                )
 
             logging.info("Log evaluation artefacts to MLflow...")
             mlflow.log_artifact(cons.submission_csv_fpath)
