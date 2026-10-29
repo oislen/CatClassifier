@@ -31,3 +31,4 @@ __pycache__
 # mlflow tracking store
 mlruns/
 mlflow.db
+mlartifacts
