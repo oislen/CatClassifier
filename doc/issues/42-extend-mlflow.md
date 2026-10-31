@@ -331,16 +331,23 @@ mlflow_registered_model_names = {
 
 #### `model/prg_torch_model.py`
 
-After `model.save()` and `export_onnx()` have completed and both artefacts have been logged via `mlflow.log_artifact()`, register the `.pt` model with the Model Registry. Registration runs whenever the training block executes — on both fresh and resumed runs — since a resumed training run represents a genuine new version of the model weights. The only guard needed is that the training block ran (`input_params_dict["run_model_training"]` is `True`), which is already the case because this code sits inside that block. Note that `git_commit` is available here because it is assigned at the start of the `mlflow.start_run` context in Section 2, before this code executes:
+After `model.save()` and `export_onnx()` have completed and both artefacts have been logged via `mlflow.log_artifact()`, register the `.pt` model with the Model Registry. **Important:** `mlflow.log_artifact` stores files as plain run artefacts, not as `LoggedModel` entries — `mlflow.register_model` with a `runs:/` URI requires a `LoggedModel` and will raise `MlflowException`. Use `MlflowClient.create_model_version` with the artefact store URI resolved via `mlflow.get_artifact_uri()` instead:
 
 ```python
 logging.info("Registering model with MLflow Model Registry...")
-registered_name = cons.mlflow_registered_model_names[model_id]  # use model_id, not model.model_id
-# artifact_path must match the path used in mlflow.log_artifact
+registered_name = cons.mlflow_registered_model_names[model_id]
+client = mlflow.tracking.MlflowClient()
 artifact_path = os.path.basename(pt_fpath)
-model_version = mlflow.register_model(
-    model_uri=f"runs:/{run.info.run_id}/{artifact_path}",
+artifact_store_uri = mlflow.get_artifact_uri(artifact_path)
+# ensure the registered model exists before creating a version
+try:
+    client.get_registered_model(registered_name)
+except mlflow.exceptions.MlflowException:
+    client.create_registered_model(registered_name)
+model_version = client.create_model_version(
     name=registered_name,
+    source=artifact_store_uri,
+    run_id=run.info.run_id,
     tags={
         "architecture": model_id,
         "git_commit": git_commit,

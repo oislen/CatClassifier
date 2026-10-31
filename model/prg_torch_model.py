@@ -293,10 +293,21 @@ if __name__ == "__main__":
 
                 logging.info("Registering model with MLflow Model Registry...")
                 registered_name = cons.mlflow_registered_model_names[model_id]
+                # mlflow.log_artifact stores files as plain run artefacts, not LoggedModels,
+                # so register_model with a runs:/ URI will not find them.
+                # Use MlflowClient.create_model_version with the resolved artefact store URI instead.
+                client = mlflow.tracking.MlflowClient()
                 artifact_path = os.path.basename(pt_fpath)
-                model_version = mlflow.register_model(
-                    model_uri=f"runs:/{run.info.run_id}/{artifact_path}",
+                artifact_store_uri = mlflow.get_artifact_uri(artifact_path)
+                # ensure the registered model exists before creating a version
+                try:
+                    client.get_registered_model(registered_name)
+                except mlflow.exceptions.MlflowException:
+                    client.create_registered_model(registered_name)
+                model_version = client.create_model_version(
                     name=registered_name,
+                    source=artifact_store_uri,
+                    run_id=run.info.run_id,
                     tags={
                         "architecture": model_id,
                         "git_commit": git_commit,

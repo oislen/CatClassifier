@@ -218,9 +218,16 @@ class _SmokeBase(unittest.TestCase):
                 # --- model registry ---
                 registered_name = f"SmokeTest-{MODEL_ID}"
                 artifact_path = os.path.basename(pt_path)
-                model_version = mlflow.register_model(
-                    model_uri=f"runs:/{run_id}/{artifact_path}",
+                artifact_store_uri = mlflow.get_artifact_uri(artifact_path)
+                client = mlflow.tracking.MlflowClient()
+                try:
+                    client.get_registered_model(registered_name)
+                except mlflow.exceptions.MlflowException:
+                    client.create_registered_model(registered_name)
+                model_version = client.create_model_version(
                     name=registered_name,
+                    source=artifact_store_uri,
+                    run_id=run_id,
                     tags={"architecture": MODEL_ID, "git_commit": git_commit, "device": "cpu"},
                 )
 
