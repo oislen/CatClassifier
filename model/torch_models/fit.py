@@ -80,80 +80,84 @@ def fit(
         )
         logging.info(f"Read checkpoints from: {checkpoint_filepath}")
     for epoch in range(start_epoch, end_epoch):
-        t_loss, t_corr = 0.0, 0.0
-        model.train()
-        for i, (images, labels) in enumerate(train_dataloader):
-            # load images and labels to device
-            images = images.to(device)
-            labels = labels.to(device)
-            # forward pass
-            preds = model.forward(images)
-            loss = criterion(preds, labels)
-            if scheduler is not None:
-                scheduler.step(loss)
-            # backward and optimise
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            # calculate metrics
-            t_loss += loss.item() * images.size(0)
-            t_corr += torch.sum(preds.argmax(1) == labels)
-            logging.info(
-                f"Epoch [{epoch}/{num_epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}"
-            )
-        # update training loss and accuracy
-        train_loss = t_loss / len(train_dataloader.dataset)
-        train_acc = t_corr.item() / len(train_dataloader.dataset)
-        train_loss_list.append(train_loss)
-        train_acc_list.append(train_acc)
-        logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
-        mlflow.log_metrics(
-            {
-                "train_loss": train_loss,
-                "train_acc": train_acc,
-            },
-            step=epoch,
-        )
-        # calculate validation loss and accuracy if applicable
-        if valid_data_loader is not None:
-            valid_loss, valid_acc = validate(
-                model=model,
-                device=device,
-                dataloader=valid_data_loader,
-                criterion=criterion,
-            )
-            valid_loss_list.append(valid_loss)
-            valid_acc_list.append(valid_acc)
-            logging.info(
-                f"Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}"
-            )
+        with mlflow.start_span(name=f"epoch_{epoch}", span_type="TASK") as epoch_span:
+            epoch_span.set_inputs({"epoch": epoch, "num_epochs": num_epochs})
+            t_loss, t_corr = 0.0, 0.0
+            model.train()
+            for i, (images, labels) in enumerate(train_dataloader):
+                # load images and labels to device
+                images = images.to(device)
+                labels = labels.to(device)
+                # forward pass
+                preds = model.forward(images)
+                loss = criterion(preds, labels)
+                if scheduler is not None:
+                    scheduler.step(loss)
+                # backward and optimise
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                # calculate metrics
+                t_loss += loss.item() * images.size(0)
+                t_corr += torch.sum(preds.argmax(1) == labels)
+                logging.info(
+                    f"Epoch [{epoch}/{num_epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}"
+                )
+            # update training loss and accuracy
+            train_loss = t_loss / len(train_dataloader.dataset)
+            train_acc = t_corr.item() / len(train_dataloader.dataset)
+            train_loss_list.append(train_loss)
+            train_acc_list.append(train_acc)
+            logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
             mlflow.log_metrics(
                 {
-                    "valid_loss": valid_loss,
-                    "valid_acc": valid_acc,
+                    "train_loss": train_loss,
+                    "train_acc": train_acc,
                 },
                 step=epoch,
             )
-            # if implementing early stopping
-            if early_stopper is not None and early_stopper.early_stop(valid_loss):
-                logging.info(
-                    f"Applying early stopping criteria at validation loss: {valid_loss}"
+            # set span outputs before any early-stopping break
+            epoch_span.set_outputs({"train_loss": train_loss, "train_acc": train_acc})
+            # calculate validation loss and accuracy if applicable
+            if valid_data_loader is not None:
+                valid_loss, valid_acc = validate(
+                    model=model,
+                    device=device,
+                    dataloader=valid_data_loader,
+                    criterion=criterion,
                 )
-                break
-        # writing model checkpoints
-        if checkpoints_dir is not None:
-            checkpoints_filename = f"checkpoint_{model.model_id}_epoch_{epoch}.pt"
-            checkpoint_filepath = os.path.join(checkpoints_dir, checkpoints_filename)
-            checkpoint = {
-                "state_dict": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "train_loss_list": train_loss_list,
-                "train_acc_list": train_acc_list,
-                "valid_loss_list": valid_loss_list,
-                "valid_acc_list": valid_acc_list,
-            }
-            save_checkpoint(state=checkpoint, filepath=checkpoint_filepath)
-            logging.info(f"Wrote checkpoints to: {checkpoint_filepath}")
+                valid_loss_list.append(valid_loss)
+                valid_acc_list.append(valid_acc)
+                logging.info(
+                    f"Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}"
+                )
+                mlflow.log_metrics(
+                    {
+                        "valid_loss": valid_loss,
+                        "valid_acc": valid_acc,
+                    },
+                    step=epoch,
+                )
+                # if implementing early stopping
+                if early_stopper is not None and early_stopper.early_stop(valid_loss):
+                    logging.info(
+                        f"Applying early stopping criteria at validation loss: {valid_loss}"
+                    )
+                    break
+            # writing model checkpoints
+            if checkpoints_dir is not None:
+                checkpoints_filename = f"checkpoint_{model.model_id}_epoch_{epoch}.pt"
+                checkpoint_filepath = os.path.join(checkpoints_dir, checkpoints_filename)
+                checkpoint = {
+                    "state_dict": model.state_dict(),
+                    "optimizer": optimizer.state_dict(),
+                    "train_loss_list": train_loss_list,
+                    "train_acc_list": train_acc_list,
+                    "valid_loss_list": valid_loss_list,
+                    "valid_acc_list": valid_acc_list,
+                }
+                save_checkpoint(state=checkpoint, filepath=checkpoint_filepath)
+                logging.info(f"Wrote checkpoints to: {checkpoint_filepath}")
 
     # create model fit object
     model_fit = ModelFit(

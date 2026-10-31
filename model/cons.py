@@ -42,6 +42,13 @@ utilities_fdir = os.path.join(dataprep_fdir, "utilities")
 mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 mlflow_experiment_name = os.environ.get("MLFLOW_EXPERIMENT_NAME", "CatClassifier")
 
+# MLflow Model Registry — registered model names per architecture
+mlflow_registered_model_names = {
+    "alexnet_8_pretrained": "CatClassifier-AlexNet8",
+    "vgg_16_pretrained": "CatClassifier-VGG16",
+    "resnet_50_pretrained": "CatClassifier-ResNet50",
+}
+
 # set file paths
 train_data_pickle_fpath = os.path.join(data_archive_fdir, "train_data.pickle")
 test_data_pickle_fpath = os.path.join(data_archive_fdir, "test_data.pickle")
