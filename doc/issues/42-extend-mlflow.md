@@ -115,7 +115,7 @@ A `cons.py` mapping ties model IDs to their registered names, keeping `prg_torch
 ## Scope
 
 1. Add `psutil` to `pyproject.toml` (only — `pynvml` is a transitive MLflow dependency)
-2. Log run tags in `prg_torch_model.py`
+2. Log run tags in `prg_torch_model.py` (extract git SHA logic to `model/utilities/git_utils.py` — see Section 2)
 3. Enable system metrics logging in `prg_torch_model.py`
 4. Instrument `prg_torch_model.py` with a root trace wrapping the entire run
 5. Instrument key pipeline stages with child spans:
@@ -149,7 +149,9 @@ Add only `psutil` to the `dependencies` list:
 
 ### 2. Run tags — `model/prg_torch_model.py`
 
-Log tags immediately after `mlflow.start_run()` opens the run context. Tags are safe to set on both fresh and resumed runs.
+Log tags immediately after `mlflow.start_run()` opens the run context, before opening the root span. The required ordering inside the run context is: (1) set tags, (2) open root span, (3) open stage spans. Tags are safe to set at any point inside `start_run` but placing them first makes the code self-documenting.
+
+Extract the git commit SHA derivation into `model/utilities/git_utils.py` so it can be unit-tested independently (see Testing section). Import it at the top of `prg_torch_model.py` and call it inside the run context:
 
 ```python
 import subprocess  # platform is already imported in prg_torch_model.py
@@ -157,14 +159,8 @@ import subprocess  # platform is already imported in prg_torch_model.py
 with mlflow.start_run(run_id=mlflow_run_id, run_name=model_id) as run:
     logging.info(f"MLflow run_id: {run.info.run_id}")
 
-    # Derive git commit SHA (empty string if not in a git repo)
-    try:
-        git_commit = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
-            stderr=subprocess.DEVNULL,
-        ).decode().strip()
-    except Exception:
-        git_commit = ""
+    # (1) Set tags — must come before the root span opens
+    git_commit = get_git_commit_sha()  # from model/utilities/git_utils.py
 
     mlflow.set_tags({
         "architecture": model_id,
@@ -312,7 +308,9 @@ for epoch in range(start_epoch, end_epoch):
         })
 ```
 
-> **Note:** Do not pass span context into `DataLoader` worker threads. The per-epoch span must only wrap code that runs in the main process thread (the epoch loop body after the dataloader iteration is complete).
+> **Note on early stopping:** if `early_stopper.early_stop(valid_loss)` fires and breaks the loop, the `mlflow.start_span` context manager exits cleanly — MLflow records the span as complete with whatever outputs were set. `epoch_span.set_outputs` must be placed after `train_loss` and `train_acc` are computed (after the inner DataLoader loop) but before the early-stopper check, so it is always called regardless of whether the epoch completes normally or triggers early stopping.
+
+> **Note on DataLoader workers:** `mlflow.start_span` does not propagate context across threads. By default `PARAM_NUM_WORKERS=0` in `cons.py`, so the DataLoader runs entirely in the main thread and span propagation is not an issue. If `PARAM_NUM_WORKERS` is set to a value greater than 0, the worker threads will not carry the span context — this is acceptable since the per-epoch span only wraps the epoch-level aggregation logic, not the individual batch fetches inside the workers.
 
 ---
 
@@ -380,12 +378,12 @@ client.set_registered_model_alias(
 |---|---|---|
 | `pyproject.toml` | Modify | Add `psutil` dependency only (`pynvml` is a transitive dependency of MLflow) |
 | `model/cons.py` | Modify | Add `mlflow_registered_model_names` mapping |
-| `model/prg_torch_model.py` | Modify | Add `import subprocess`; log run tags; enable system metrics; add root `CHAIN` span and per-stage `TASK`/`TOOL` child spans; log diagnostic and training curve plot artefacts; register model with Model Registry |
+| `model/prg_torch_model.py` | Modify | Add `import subprocess`; import `get_git_commit_sha`; log run tags; enable system metrics; add root `CHAIN` span and per-stage `TASK`/`TOOL` child spans; log diagnostic and training curve plot artefacts; register model with Model Registry |
 | `model/torch_models/fit.py` | Modify | Add per-epoch `TASK` child span |
-| `model/utilities/git_utils.py` | Create *(recommended)* | Extract `get_git_commit_sha()` helper from `prg_torch_model.py` to enable unit testing |
-| `model/utilities/__init__.py` | Modify *(if above)* | Export `get_git_commit_sha` |
+| `model/utilities/git_utils.py` | Create | `get_git_commit_sha()` helper — git SHA derivation extracted from `prg_torch_model.py` for unit testability |
+| `model/utilities/__init__.py` | Modify | Export `get_git_commit_sha` |
 | `model/unittests/utilities/test_cons_mlflow.py` | Create | Unit tests for `cons.mlflow_registered_model_names` |
-| `model/unittests/utilities/test_git_commit.py` | Create *(if extracted)* | Unit tests for `get_git_commit_sha()` using `unittest.mock.patch` |
+| `model/unittests/utilities/test_git_commit.py` | Create | Unit tests for `get_git_commit_sha()` using `unittest.mock.patch` |
 | `model/unittests/utilities/test_plot_model.py` | Create | Unit tests verifying `plot_model_fit` writes `model_accuracy.png` and `model_loss.png` |
 | `model/smoketests/test_smoke_mlflow.py` | Modify | Add 7 new smoke tests for tags, traces, system metrics, artefacts, and Model Registry |
 
@@ -449,7 +447,7 @@ Covers the new MLflow constants added to `model/cons.py` — specifically `mlflo
 
 #### New test file: `model/unittests/utilities/test_git_commit.py`
 
-The `subprocess` git commit derivation is new logic added to `prg_torch_model.py`. It is worth extracting into a helper function in `model/utilities/` (e.g. `get_git_commit_sha()`) so it can be unit-tested with `unittest.mock.patch`. If kept inline in `prg_torch_model.py`, these tests are not feasible — extraction is recommended.
+The git commit SHA derivation is extracted into `model/utilities/git_utils.py` as `get_git_commit_sha()`. These tests use `unittest.mock.patch` to simulate different `subprocess` outcomes without requiring a real git repository.
 
 | Test name | What it verifies |
 |---|---|
@@ -459,9 +457,9 @@ The `subprocess` git commit derivation is new logic added to `prg_torch_model.py
 | `test_returns_empty_string_on_file_not_found` | When `git` is not installed (`FileNotFoundError`), the function returns `""` |
 | `test_sha_has_no_leading_trailing_whitespace` | The returned string has no leading or trailing whitespace |
 
-> If `get_git_commit_sha()` is extracted to `model/utilities/git_utils.py`, add it to `model/utilities/__init__.py` and list `model/utilities/git_utils.py` as a new `Create` entry in the File Change Summary.
+> Use `unittest.mock.patch("utilities.git_utils.subprocess.check_output")` to control the subprocess behaviour in each test.
 
-#### Updates to existing test file: `model/unittests/utilities/test_plot_model.py` (new file)
+#### New test file: `model/unittests/utilities/test_plot_model.py`
 
 `plot_model_fit` in `model/utilities/plot_model.py` writes `model_accuracy.png` and `model_loss.png` to the specified output directory. The plan's `mlflow.log_artifact` calls depend on these exact filenames. A regression test guards against a rename breaking the artefact logging silently.
 
@@ -486,12 +484,12 @@ The `subprocess` git commit derivation is new logic added to `prg_torch_model.py
 | `test_smoke_mlflow_root_span_present` | Traces | The trace contains a root span whose name starts with `"pipeline:"` |
 | `test_smoke_mlflow_task_spans_present` | Traces | The trace contains at least one child span of type `"TASK"` |
 | `test_smoke_mlflow_tool_span_present` | Traces | The trace contains at least one child span of type `"TOOL"` (covers `model_serialisation`) |
-| `test_smoke_mlflow_span_count` | Traces | The trace contains at least 8 spans (1 root + 7 stage spans: `data_loading`, `data_split`, `model_init`, `model_fit`, `model_serialisation`, `testset_prediction`, `evaluation`) excluding per-epoch children |
+| `test_smoke_mlflow_span_count` | Traces | The trace contains at least 8 spans (1 root + 7 stage spans: `data_loading`, `data_split`, `model_init`, `model_fit`, `model_serialisation`, `testset_prediction`, `evaluation`) excluding per-epoch children. **Note:** the smoke test's `_run_pipeline` method must be updated to create the same span structure explicitly using `mlflow.start_span` — it currently calls `fit_fn` directly and does not invoke the `prg_torch_model.py` span-wrapping code. Without this update the span count assertion will fail. |
 | `test_smoke_mlflow_data_loading_span_has_outputs` | Traces | The `data_loading` span has a non-empty `outputs` dict |
 | `test_smoke_mlflow_model_fit_span_has_outputs` | Traces | The `model_fit` span has a non-empty `outputs` dict containing `final_train_loss` |
 | `test_smoke_system_metrics_logged` | System metrics | The run's metric keys include at least one system metric (e.g. `system/cpu_utilization_percentage`) |
 | `test_smoke_diagnostic_plots_logged` | Artefacts | The run's artefacts include `random_image.jpg` and `generator_plot.jpg`. **Note:** the smoke test's synthetic pipeline does not invoke `plot_image` or `plot_generator`, so these files will not be created on disk. The smoke test must create synthetic placeholder image files at `cons.torch_random_image_fpath` and `cons.torch_generator_plot_fpath` in `setUpClass` before logging, or assert that `mlflow.log_artifact` was called with those paths using `unittest.mock.patch`. |
-| `test_smoke_training_curve_plots_logged` | Artefacts | The run's artefacts include `model_accuracy.png` and `model_loss.png` |
+| `test_smoke_training_curve_plots_logged` | Artefacts | The run's artefacts include `model_accuracy.png` and `model_loss.png`. **Note:** the smoke test's synthetic pipeline does not call `plot_model_fit()`, so these files will not be created on disk. The smoke test must create synthetic placeholder `.png` files at the expected paths in `setUpClass` before logging, or assert that `mlflow.log_artifact` was called with those paths using `unittest.mock.patch` — the same approach required for `test_smoke_diagnostic_plots_logged`. |
 | `test_smoke_model_registered` | Model Registry | A registered model exists in the tracking store whose name matches `cons.mlflow_registered_model_names[model_id]` |
 | `test_smoke_model_version_linked_to_run` | Model Registry | The registered model version's `run_id` matches the run ID of the pipeline execution |
 | `test_smoke_model_version_has_tags` | Model Registry | The registered model version has at least one tag (`architecture`) set |
