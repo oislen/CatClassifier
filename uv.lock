@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-10-21T21:24:03.2531851Z"
+exclude-newer = "2026-10-24T21:26:58.4891848Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
@@ -324,6 +324,7 @@ dependencies = [
     { name = "opencv-python" },
     { name = "pandas" },
     { name = "pillow" },
+    { name = "psutil" },
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "torch" },
@@ -350,6 +351,7 @@ requires-dist = [
     { name = "opencv-python", specifier = "==4.11.0.86" },
     { name = "pandas", specifier = "==3.0.1" },
     { name = "pillow", specifier = "==13.0.0" },
+    { name = "psutil", specifier = "==7.2.2" },
     { name = "scikit-learn", specifier = "==1.8.0" },
     { name = "seaborn", specifier = "==0.13.2" },
     { name = "torch", specifier = "==2.8.0", index = "https://download.pytorch.org/whl/cu129" },
