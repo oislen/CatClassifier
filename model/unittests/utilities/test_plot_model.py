@@ -59,7 +59,9 @@ class TestPlotModelFit(unittest.TestCase):
         """
         plot_model_fit(_model_fit, output_fdir=self.tmp_dir, show_plot=False)
         png_files = glob.glob(os.path.join(self.tmp_dir, "*.png"))
-        self.assertEqual(len(png_files), 2, msg=f"Expected 2 .png files, found: {png_files}")
+        self.assertEqual(
+            len(png_files), 2, msg=f"Expected 2 .png files, found: {png_files}"
+        )
 
     # ------------------------------------------------------------------
     # No-output tests

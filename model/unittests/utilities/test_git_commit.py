@@ -27,14 +27,18 @@ class TestGetGitCommitSha(unittest.TestCase):
     def test_returns_short_sha_in_git_repo(self):
         """When git returns a valid SHA, the function returns it stripped."""
         mock_sha = b"a3f9c12\n"
-        with patch("utilities.git_utils.subprocess.check_output", return_value=mock_sha):
+        with patch(
+            "utilities.git_utils.subprocess.check_output", return_value=mock_sha
+        ):
             result = get_git_commit_sha()
         self.assertEqual(result, "a3f9c12")
 
     def test_sha_has_no_leading_trailing_whitespace(self):
         """Output must be stripped of newlines and spaces."""
         mock_sha = b"  abc1234  \n"
-        with patch("utilities.git_utils.subprocess.check_output", return_value=mock_sha):
+        with patch(
+            "utilities.git_utils.subprocess.check_output", return_value=mock_sha
+        ):
             result = get_git_commit_sha()
         self.assertEqual(result, result.strip())
 

@@ -50,8 +50,7 @@ def _get_latest_model_version(model_id: str) -> str:
 
 # pre-cache all registered model versions at startup — avoids per-request Registry queries
 _MODEL_VERSIONS = {
-    mid: _get_latest_model_version(mid)
-    for mid in cons.mlflow_registered_model_names
+    mid: _get_latest_model_version(mid) for mid in cons.mlflow_registered_model_names
 }
 
 # ---------------------------------------------------------------------------
@@ -97,10 +96,14 @@ def classify_image(
         with mlflow.start_span(name="model_load", span_type="TASK") as span:
             logging.info("Load fitted torch model from disk...")
             span.set_inputs({"model_id": model_id, "device_type": device_type})
-            span.set_attributes({
-                "registered_model_name": cons.mlflow_registered_model_names.get(model_id, ""),
-                "model_version": _MODEL_VERSIONS.get(model_id, "unknown"),
-            })
+            span.set_attributes(
+                {
+                    "registered_model_name": cons.mlflow_registered_model_names.get(
+                        model_id, ""
+                    ),
+                    "model_version": _MODEL_VERSIONS.get(model_id, "unknown"),
+                }
+            )
             model.load(input_fpath=cons.torch_model_pt_fpath.format(model_id=model_id))
             time_logger.log_time(parent_key="ModelSerialisation", sub_key="Load")
             span.set_outputs({"loaded": True})
@@ -108,10 +111,12 @@ def classify_image(
         # --- image loading span ---
         with mlflow.start_span(name="image_loading", span_type="TASK") as span:
             logging.info("Generate test dataset...")
-            span.set_inputs({
-                "image_filepath": image_filepath,
-                "original_filename": original_filename,
-            })
+            span.set_inputs(
+                {
+                    "image_filepath": image_filepath,
+                    "original_filename": original_filename,
+                }
+            )
             torch_load_images = TorchLoadImages(
                 torch_transforms=torch_transforms, n_workers=None
             )
@@ -120,9 +125,9 @@ def classify_image(
             )
             logging.info(f"test_df.shape: {test_df.shape}")
             time_logger.log_time(parent_key="DataPrep", sub_key="TrainDataLoad")
-            span.set_outputs({
-                "ndims": int(test_df["ndims"].values[0]) if len(test_df) > 0 else -1
-            })
+            span.set_outputs(
+                {"ndims": int(test_df["ndims"].values[0]) if len(test_df) > 0 else -1}
+            )
 
         # --- dataloader span ---
         with mlflow.start_span(name="dataloader_creation", span_type="TASK") as span:
@@ -147,18 +152,24 @@ def classify_image(
             predict = model.predict(test_loader, device)
             category = np.argmax(predict, axis=-1)
             test_df["category_id"] = category
-            test_df["category_name"] = test_df["category_id"].replace(cons.category_mapper)
-            test_df["probability"] = test_df["category_id"].apply(lambda x: predict[0][x])
+            test_df["category_name"] = test_df["category_id"].replace(
+                cons.category_mapper
+            )
+            test_df["probability"] = test_df["category_id"].apply(
+                lambda x: predict[0][x]
+            )
             test_df = test_df.reset_index()
             # flush data from memory
             del test_dataset
             del test_loader
             time_logger.log_time(parent_key="TestSet", sub_key="ModelPredictions")
-            span.set_outputs({
-                "category_id": int(category[0]),
-                "category_name": str(test_df["category_name"].values[0]),
-                "probability": float(test_df["probability"].values[0]),
-            })
+            span.set_outputs(
+                {
+                    "category_id": int(category[0]),
+                    "category_name": str(test_df["category_name"].values[0]),
+                    "probability": float(test_df["probability"].values[0]),
+                }
+            )
 
     except Exception as exc:
         logging.exception(f"classify_image failed: {exc}")
@@ -213,13 +224,15 @@ def endpoint():
 
     # open root span — all remaining logic (including model_id validation) runs inside
     with mlflow.start_span(name="api_request", span_type="CHAIN") as root_span:
-        root_span.set_inputs({
-            "model_id": model_id,
-            "device_type": device_type,
-            "image_filename": safe_filename,
-            "git_commit": _GIT_COMMIT,
-            "request_id": request.headers.get("X-Request-ID", "none"),
-        })
+        root_span.set_inputs(
+            {
+                "model_id": model_id,
+                "device_type": device_type,
+                "image_filename": safe_filename,
+                "git_commit": _GIT_COMMIT,
+                "request_id": request.headers.get("X-Request-ID", "none"),
+            }
+        )
 
         if model_id not in model_dict:
             root_span.set_outputs({"status_code": 400, "error": "invalid model_id"})
@@ -250,7 +263,9 @@ def endpoint():
             )
         except Exception as exc:
             root_span.set_outputs({"status_code": 500, "error": str(exc)})
-            return jsonify({"error": "Internal classification error", "detail": str(exc)}), 500
+            return jsonify(
+                {"error": "Internal classification error", "detail": str(exc)}
+            ), 500
 
         # include the full result dict alongside status code for rich trace output
         root_span.set_outputs({"status_code": 200, **classification_result})

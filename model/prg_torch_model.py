@@ -1,7 +1,6 @@
 import logging
 import os
 import platform
-import subprocess
 
 import mlflow
 import numpy as np
@@ -99,29 +98,38 @@ if __name__ == "__main__":
 
         # (1) Set run-level tags — must come before the root span opens
         git_commit = get_git_commit_sha()
-        mlflow.set_tags({
-            "architecture": model_id,
-            "device": device_type,
-            "fast_run": str(cons.FAST_RUN),
-            "platform": platform.system(),
-            "hostname": platform.node(),
-            "git_commit": git_commit,
-            "run_training": str(input_params_dict["run_model_training"]),
-            "run_prediction": str(input_params_dict["run_testset_prediction"]),
-        })
+        mlflow.set_tags(
+            {
+                "architecture": model_id,
+                "device": device_type,
+                "fast_run": str(cons.FAST_RUN),
+                "platform": platform.system(),
+                "hostname": platform.node(),
+                "git_commit": git_commit,
+                "run_training": str(input_params_dict["run_model_training"]),
+                "run_prediction": str(input_params_dict["run_testset_prediction"]),
+            }
+        )
 
         # (2) Open root pipeline span — all stage spans are nested inside this
-        with mlflow.start_span(name=f"pipeline:{model_id}", span_type="CHAIN") as root_span:
+        with mlflow.start_span(
+            name=f"pipeline:{model_id}", span_type="CHAIN"
+        ) as root_span:
             root_span.set_inputs({"model_id": model_id, "device_type": device_type})
 
             if input_params_dict["run_model_training"]:
                 # --- data loading span ---
                 with mlflow.start_span(name="data_loading", span_type="TASK") as span:
                     logging.info("Generating dataframe of images...")
-                    span.set_inputs({"sample_size": 20000, "train_fdir": cons.train_fdir})
+                    span.set_inputs(
+                        {"sample_size": 20000, "train_fdir": cons.train_fdir}
+                    )
                     np.random.seed(random_state)
                     image_filepaths = np.array(
-                        [os.path.join(cons.train_fdir, x) for x in os.listdir(cons.train_fdir)]
+                        [
+                            os.path.join(cons.train_fdir, x)
+                            for x in os.listdir(cons.train_fdir)
+                        ]
                     )
                     np.random.shuffle(image_filepaths)
                     sample_size = 20000
@@ -161,19 +169,27 @@ if __name__ == "__main__":
                 # --- data split span ---
                 with mlflow.start_span(name="data_split", span_type="TASK") as span:
                     logging.info("Split into training, validation and test dataset...")
-                    span.set_inputs({"total_samples": df.shape[0], "validation_frac": 0.05})
-                    validate_df = df.sample(frac=0.05, random_state=random_state, replace=False)
+                    span.set_inputs(
+                        {"total_samples": df.shape[0], "validation_frac": 0.05}
+                    )
+                    validate_df = df.sample(
+                        frac=0.05, random_state=random_state, replace=False
+                    )
                     train_df = df[~df.index.isin(validate_df.index)]
                     train_df = train_df.reset_index(drop=True)
                     validate_df = validate_df.reset_index(drop=True)
                     logging.info(f"train_df.shape: {train_df.shape}")
                     logging.info(f"validate_df.shape: {validate_df.shape}")
-                    time_logger.log_time(parent_key="DataPrep", sub_key="TrainValidationSplit")
+                    time_logger.log_time(
+                        parent_key="DataPrep", sub_key="TrainValidationSplit"
+                    )
                     # set_outputs before del statements below
-                    span.set_outputs({
-                        "train_shape": list(train_df.shape),
-                        "validate_shape": list(validate_df.shape),
-                    })
+                    span.set_outputs(
+                        {
+                            "train_shape": list(train_df.shape),
+                            "validate_shape": list(validate_df.shape),
+                        }
+                    )
 
                 logging.info("Creating training and validation data loaders...")
                 total_train = train_df.shape[0]
@@ -208,12 +224,16 @@ if __name__ == "__main__":
                 # --- model init span ---
                 with mlflow.start_span(name="model_init", span_type="TASK") as span:
                     logging.info("Initiate torch model...")
-                    span.set_inputs({"model_id": model_id, "learning_rate": cons.learning_rate})
+                    span.set_inputs(
+                        {"model_id": model_id, "learning_rate": cons.learning_rate}
+                    )
                     if device == "cuda":
                         model = nn.DataParallel(model)
                     model = model.to(device)
                     criterion = nn.CrossEntropyLoss()
-                    optimizer = torch.optim.SGD(model.parameters(), lr=cons.learning_rate)
+                    optimizer = torch.optim.SGD(
+                        model.parameters(), lr=cons.learning_rate
+                    )
                     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
                         optimizer,
                         mode="min",
@@ -223,26 +243,32 @@ if __name__ == "__main__":
                         threshold_mode="abs",
                     )
                     early_stopper = EarlyStopper(patience=3, min_delta=0.3)
-                    time_logger.log_time(parent_key="Modelling", sub_key="InitiateTorchModel")
+                    time_logger.log_time(
+                        parent_key="Modelling", sub_key="InitiateTorchModel"
+                    )
                     span.set_outputs({"device": str(device)})
 
                 # --- model fit span ---
                 with mlflow.start_span(name="model_fit", span_type="TASK") as span:
                     logging.info("Fit torch model...")
                     num_epochs = cons.min_epochs if cons.FAST_RUN else cons.max_epochs
-                    span.set_inputs({"num_epochs": num_epochs, "batch_size": cons.batch_size})
+                    span.set_inputs(
+                        {"num_epochs": num_epochs, "batch_size": cons.batch_size}
+                    )
                     # log hyperparameters on fresh runs only (params are immutable in MLflow)
                     if mlflow_run_id is None:
-                        mlflow.log_params({
-                            "model_id": model_id,
-                            "num_epochs": num_epochs,
-                            "batch_size": cons.batch_size,
-                            "learning_rate": cons.learning_rate,
-                            "image_width": cons.IMAGE_WIDTH,
-                            "image_height": cons.IMAGE_HEIGHT,
-                            "random_state": random_state,
-                            "device_type": device_type,
-                        })
+                        mlflow.log_params(
+                            {
+                                "model_id": model_id,
+                                "num_epochs": num_epochs,
+                                "batch_size": cons.batch_size,
+                                "learning_rate": cons.learning_rate,
+                                "image_width": cons.IMAGE_WIDTH,
+                                "image_height": cons.IMAGE_HEIGHT,
+                                "random_state": random_state,
+                                "device_type": device_type,
+                            }
+                        )
                     model.fit(
                         device=device,
                         criterion=criterion,
@@ -258,7 +284,9 @@ if __name__ == "__main__":
                     del train_loader
                     del validation_loader
                     time_logger.log_time(parent_key="Modelling", sub_key="Fit")
-                    mlflow.log_metric("training_time_seconds", time_logger.cumulative_time)
+                    mlflow.log_metric(
+                        "training_time_seconds", time_logger.cumulative_time
+                    )
 
                     logging.info("Plot model fit results...")
                     plot_model_fit(
@@ -269,21 +297,33 @@ if __name__ == "__main__":
                     time_logger.log_time(parent_key="Plots", sub_key="ModelFit")
 
                     # log training curve plots as artefacts
-                    mlflow.log_artifact(os.path.join(cons.torch_report_fdir, "model_accuracy.png"))
-                    mlflow.log_artifact(os.path.join(cons.torch_report_fdir, "model_loss.png"))
-                    span.set_outputs({"final_train_loss": model.model_fit.history["loss"][-1]})
+                    mlflow.log_artifact(
+                        os.path.join(cons.torch_report_fdir, "model_accuracy.png")
+                    )
+                    mlflow.log_artifact(
+                        os.path.join(cons.torch_report_fdir, "model_loss.png")
+                    )
+                    span.set_outputs(
+                        {"final_train_loss": model.model_fit.history["loss"][-1]}
+                    )
 
                 # --- model serialisation span ---
-                with mlflow.start_span(name="model_serialisation", span_type="TOOL") as span:
+                with mlflow.start_span(
+                    name="model_serialisation", span_type="TOOL"
+                ) as span:
                     logging.info("Save fitted torch model to disk...")
                     pt_fpath = cons.torch_model_pt_fpath.format(model_id=model_id)
                     model.save(output_fpath=pt_fpath)
-                    time_logger.log_time(parent_key="ModelSerialisation", sub_key="Write")
+                    time_logger.log_time(
+                        parent_key="ModelSerialisation", sub_key="Write"
+                    )
 
                     logging.info("Export fitted torch model to ONNX...")
                     onnx_fpath = cons.torch_model_onnx_fpath.format(model_id=model_id)
                     export_onnx(model, onnx_fpath, cons.IMAGE_WIDTH, cons.IMAGE_HEIGHT)
-                    time_logger.log_time(parent_key="ModelSerialisation", sub_key="OnnxExport")
+                    time_logger.log_time(
+                        parent_key="ModelSerialisation", sub_key="OnnxExport"
+                    )
 
                     logging.info("Log model artefacts to MLflow...")
                     mlflow.log_artifact(pt_fpath)
@@ -320,12 +360,16 @@ if __name__ == "__main__":
 
             if input_params_dict["run_testset_prediction"]:
                 # --- testset prediction span ---
-                with mlflow.start_span(name="testset_prediction", span_type="TASK") as span:
+                with mlflow.start_span(
+                    name="testset_prediction", span_type="TASK"
+                ) as span:
                     logging.info("Load fitted torch model from disk...")
                     model.load(
                         input_fpath=cons.torch_model_pt_fpath.format(model_id=model_id)
                     )
-                    time_logger.log_time(parent_key="ModelSerialisation", sub_key="Load")
+                    time_logger.log_time(
+                        parent_key="ModelSerialisation", sub_key="Load"
+                    )
                     span.set_inputs({"test_fdir": cons.test_fdir})
 
                     logging.info("Generate test dataset...")
@@ -335,7 +379,8 @@ if __name__ == "__main__":
                     test_df = pd.DataFrame.from_records(
                         torch_load_images.load_images(
                             filepaths=[
-                                os.path.join(cons.test_fdir, x) for x in os.listdir(cons.test_fdir)
+                                os.path.join(cons.test_fdir, x)
+                                for x in os.listdir(cons.test_fdir)
                             ]
                         )
                     )
@@ -357,24 +402,36 @@ if __name__ == "__main__":
                     logging.info("Generate test set predictions...")
                     predict = model.predict(test_loader, device)
                     test_df["category"] = np.argmax(predict, axis=-1)
-                    test_df["category"] = test_df["category"].replace(cons.category_mapper)
+                    test_df["category"] = test_df["category"].replace(
+                        cons.category_mapper
+                    )
                     del test_dataset
                     del test_loader
-                    time_logger.log_time(parent_key="TestSet", sub_key="ModelPredictions")
+                    time_logger.log_time(
+                        parent_key="TestSet", sub_key="ModelPredictions"
+                    )
 
                     logging.info("Plot example test set predictions...")
                     plot_preds(
-                        data=test_df, output_fpath=cons.torch_pred_images_fpath, show_plot=False
+                        data=test_df,
+                        output_fpath=cons.torch_pred_images_fpath,
+                        show_plot=False,
                     )
-                    time_logger.log_time(parent_key="Plots", sub_key="TestSetPredictions")
+                    time_logger.log_time(
+                        parent_key="Plots", sub_key="TestSetPredictions"
+                    )
                     span.set_outputs({"test_df_shape": list(test_df.shape)})
 
                 # --- evaluation span ---
                 with mlflow.start_span(name="evaluation", span_type="TASK") as span:
                     logging.info("Generate a sample submission file for kaggle...")
                     submission_df = test_df.copy()
-                    submission_df["id"] = submission_df["filenames"].str.split(".").str[0]
-                    submission_df["label"] = submission_df["category"].replace(cons.category_mapper)
+                    submission_df["id"] = (
+                        submission_df["filenames"].str.split(".").str[0]
+                    )
+                    submission_df["label"] = submission_df["category"].replace(
+                        cons.category_mapper
+                    )
                     submission_df.to_csv(cons.submission_csv_fpath, index=False)
                     time_logger.log_time(parent_key="TestSet", sub_key="SubmissionFile")
 
@@ -382,9 +439,13 @@ if __name__ == "__main__":
                     test_df["true_label"] = test_df["filenames"].str.split(".").str[0]
                     known_classes = set(cons.category_mapper.values())  # {"cat", "dog"}
                     span.set_inputs({"known_classes": list(known_classes)})
-                    metrics_available = set(test_df["true_label"].unique()).issubset(known_classes)
+                    metrics_available = set(test_df["true_label"].unique()).issubset(
+                        known_classes
+                    )
                     if metrics_available:
-                        eval_metrics = compute_eval_metrics(test_df["true_label"], test_df["category"])
+                        eval_metrics = compute_eval_metrics(
+                            test_df["true_label"], test_df["category"]
+                        )
                         mlflow.log_metrics(eval_metrics)
                         logging.info(f"Evaluation metrics: {eval_metrics}")
                     else:
@@ -393,7 +454,9 @@ if __name__ == "__main__":
                             "Skipping evaluation metrics: test filenames do not contain "
                             "class labels (Kaggle unlabelled test set detected)."
                         )
-                    span.set_outputs(eval_metrics if metrics_available else {"skipped": True})
+                    span.set_outputs(
+                        eval_metrics if metrics_available else {"skipped": True}
+                    )
 
                     logging.info("Log evaluation artefacts to MLflow...")
                     mlflow.log_artifact(cons.submission_csv_fpath)

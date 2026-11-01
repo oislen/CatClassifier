@@ -20,6 +20,7 @@ class TestGetLatestModelVersion(unittest.TestCase):
 
     def _call(self, model_id):
         import api
+
         return api._get_latest_model_version(model_id)
 
     # ------------------------------------------------------------------
@@ -42,6 +43,7 @@ class TestGetLatestModelVersion(unittest.TestCase):
         mock_rm.latest_versions = [mock_version]
 
         import api
+
         with patch.object(api._client, "get_registered_model", return_value=mock_rm):
             result = self._call("alexnet_8_pretrained")
         self.assertEqual(result, "3")
@@ -53,6 +55,7 @@ class TestGetLatestModelVersion(unittest.TestCase):
     def test_returns_unknown_when_model_not_found(self):
         """MlflowException from get_registered_model must return 'unknown'."""
         import api
+
         with patch.object(
             api._client,
             "get_registered_model",
@@ -67,6 +70,7 @@ class TestGetLatestModelVersion(unittest.TestCase):
         mock_rm.latest_versions = []
 
         import api
+
         with patch.object(api._client, "get_registered_model", return_value=mock_rm):
             result = self._call("alexnet_8_pretrained")
         self.assertEqual(result, "unknown")

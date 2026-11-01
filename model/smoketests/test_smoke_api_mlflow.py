@@ -10,15 +10,12 @@ Run manually from CatClassifier/model/:
 
 import io
 import os
-import platform
 import shutil
 import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import MagicMock, patch
-
-import numpy as np
+from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -61,6 +58,7 @@ class _ApiSmokeBase(unittest.TestCase):
 
         # patch model.load on all models in model_dict so no .pt file is needed
         import api
+
         for model_obj in api.model_dict.values():
             model_obj.load = MagicMock(return_value=None)
 
@@ -103,27 +101,19 @@ class _ApiSmokeBase(unittest.TestCase):
 
 
 class TestSmokeApiTraces(_ApiSmokeBase):
-
     def test_smoke_api_trace_created(self):
         traces = self._get_traces()
         self.assertGreater(len(traces), 0, "No traces found after API request")
 
     def test_smoke_api_root_span_name(self):
         traces = self._get_traces()
-        found = any(
-            any(s.name == "api_request" for s in t.data.spans)
-            for t in traces
-        )
+        found = any(any(s.name == "api_request" for s in t.data.spans) for t in traces)
         self.assertTrue(found, "No span named 'api_request' found in traces")
 
     def test_smoke_api_child_spans_present(self):
         traces = self._get_traces()
         expected = {"model_load", "image_loading", "dataloader_creation", "prediction"}
-        found_names = {
-            s.name
-            for t in traces
-            for s in t.data.spans
-        }
+        found_names = {s.name for t in traces for s in t.data.spans}
         missing = expected - found_names
         self.assertFalse(missing, f"Missing child spans: {missing}")
 
@@ -135,7 +125,8 @@ class TestSmokeApiTraces(_ApiSmokeBase):
         )
         self.assertIsNotNone(span, "prediction span not found")
         self.assertIn(
-            "category_name", span.outputs,
+            "category_name",
+            span.outputs,
             msg=f"category_name not in prediction span outputs: {span.outputs}",
         )
 
@@ -148,7 +139,8 @@ class TestSmokeApiTraces(_ApiSmokeBase):
         self.assertIsNotNone(span, "api_request span not found")
         for key in ("model_id", "image_filename", "request_id"):
             self.assertIn(
-                key, span.inputs,
+                key,
+                span.inputs,
                 msg=f"Key '{key}' not found in api_request span inputs: {span.inputs}",
             )
 
@@ -161,13 +153,13 @@ class TestSmokeApiTraces(_ApiSmokeBase):
         self.assertIsNotNone(span, "api_request span not found")
         for key in ("status_code", "category_name", "probability"):
             self.assertIn(
-                key, span.outputs,
+                key,
+                span.outputs,
                 msg=f"Key '{key}' not found in api_request span outputs: {span.outputs}",
             )
 
 
 class TestSmokeApiErrorPath(_ApiSmokeBase):
-
     def test_smoke_api_error_request_traced(self):
         """
         A POST with an invalid model_id should:
@@ -187,7 +179,8 @@ class TestSmokeApiErrorPath(_ApiSmokeBase):
 
         after_traces = self._get_traces()
         self.assertGreater(
-            len(after_traces), before_count,
+            len(after_traces),
+            before_count,
             "No new trace recorded for the error request",
         )
 
@@ -203,7 +196,8 @@ class TestSmokeApiErrorPath(_ApiSmokeBase):
         )
         self.assertIsNotNone(error_span, "No api_request span found for error request")
         self.assertEqual(
-            error_span.outputs.get("status_code"), 400,
+            error_span.outputs.get("status_code"),
+            400,
             msg=f"Expected status_code 400 in outputs, got: {error_span.outputs}",
         )
 

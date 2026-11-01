@@ -108,7 +108,9 @@ def fit(
             train_acc = t_corr.item() / len(train_dataloader.dataset)
             train_loss_list.append(train_loss)
             train_acc_list.append(train_acc)
-            logging.info(f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}")
+            logging.info(
+                f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_acc:.4f}"
+            )
             mlflow.log_metrics(
                 {
                     "train_loss": train_loss,
@@ -147,7 +149,9 @@ def fit(
             # writing model checkpoints
             if checkpoints_dir is not None:
                 checkpoints_filename = f"checkpoint_{model.model_id}_epoch_{epoch}.pt"
-                checkpoint_filepath = os.path.join(checkpoints_dir, checkpoints_filename)
+                checkpoint_filepath = os.path.join(
+                    checkpoints_dir, checkpoints_filename
+                )
                 checkpoint = {
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict(),

@@ -19,7 +19,9 @@ def compute_eval_metrics(y_true, y_pred) -> dict:
     """
     return {
         "test_accuracy": accuracy_score(y_true, y_pred),
-        "test_precision": precision_score(y_true, y_pred, average="binary", pos_label="dog"),
+        "test_precision": precision_score(
+            y_true, y_pred, average="binary", pos_label="dog"
+        ),
         "test_recall": recall_score(y_true, y_pred, average="binary", pos_label="dog"),
         "test_f1": f1_score(y_true, y_pred, average="binary", pos_label="dog"),
     }

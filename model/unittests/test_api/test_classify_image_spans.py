@@ -8,7 +8,7 @@ requiring a running MLflow server or real model weights.
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -44,14 +44,18 @@ class TestClassifyImageSpans(unittest.TestCase):
         import pandas as pd
 
         # build a minimal test_df that classify_image expects
-        fake_df = pd.DataFrame([{
-            "filepaths": "/tmp/test.jpg",
-            "filenames": "test.jpg",
-            "images": None,
-            "image_tensors": None,
-            "ndims": 3,
-            "torch_transform_error": False,
-        }])
+        fake_df = pd.DataFrame(
+            [
+                {
+                    "filepaths": "/tmp/test.jpg",
+                    "filenames": "test.jpg",
+                    "images": None,
+                    "image_tensors": None,
+                    "ndims": 3,
+                    "torch_transform_error": False,
+                }
+            ]
+        )
 
         fake_predict = np.array([[0.3, 0.7]])
 
@@ -71,10 +75,13 @@ class TestClassifyImageSpans(unittest.TestCase):
                         with patch("api.model_dict") as mock_model_dict:
                             mock_model = MagicMock()
                             mock_model.predict.return_value = fake_predict
-                            mock_model_dict.__getitem__ = MagicMock(return_value=mock_model)
+                            mock_model_dict.__getitem__ = MagicMock(
+                                return_value=mock_model
+                            )
                             mock_model.to.return_value = mock_model
 
                             import api
+
                             api.classify_image(
                                 image_filepath="/tmp/test.jpg",
                                 model_id="alexnet_8_pretrained",
@@ -115,14 +122,18 @@ class TestClassifyImageSpans(unittest.TestCase):
         import numpy as np
         import pandas as pd
 
-        fake_df = pd.DataFrame([{
-            "filepaths": "/tmp/test.jpg",
-            "filenames": "test.jpg",
-            "images": None,
-            "image_tensors": None,
-            "ndims": 3,
-            "torch_transform_error": False,
-        }])
+        fake_df = pd.DataFrame(
+            [
+                {
+                    "filepaths": "/tmp/test.jpg",
+                    "filenames": "test.jpg",
+                    "images": None,
+                    "image_tensors": None,
+                    "ndims": 3,
+                    "torch_transform_error": False,
+                }
+            ]
+        )
         fake_predict = np.array([[0.3, 0.7]])
 
         captured_inputs = {}
@@ -154,9 +165,12 @@ class TestClassifyImageSpans(unittest.TestCase):
                         with patch("api.model_dict") as mock_model_dict:
                             mock_model = MagicMock()
                             mock_model.predict.return_value = fake_predict
-                            mock_model_dict.__getitem__ = MagicMock(return_value=mock_model)
+                            mock_model_dict.__getitem__ = MagicMock(
+                                return_value=mock_model
+                            )
                             mock_model.to.return_value = mock_model
                             import api
+
                             api.classify_image(
                                 image_filepath="/tmp/test.jpg",
                                 model_id="alexnet_8_pretrained",
@@ -165,7 +179,8 @@ class TestClassifyImageSpans(unittest.TestCase):
                             )
 
         self.assertIn(
-            "original_filename", captured_inputs,
+            "original_filename",
+            captured_inputs,
             msg=f"original_filename not found in image_loading span inputs: {captured_inputs}",
         )
 

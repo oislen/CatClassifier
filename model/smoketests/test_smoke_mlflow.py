@@ -18,7 +18,6 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -30,7 +29,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import cons
 import mlflow
-from torch_models import EarlyStopper, ModelFit, export_onnx
+from torch_models import export_onnx
 from torch_models.fit import fit as fit_fn
 from utilities.evaluate import compute_eval_metrics
 from utilities.git_utils import get_git_commit_sha
@@ -59,12 +58,30 @@ class _SmallNet(nn.Module):
     def forward(self, x):
         return self.fc(x.view(x.size(0), -1))
 
-    def fit(self, device, criterion, optimizer, train_dataloader, num_epochs=1,
-            scheduler=None, valid_data_loader=None, early_stopper=None,
-            checkpoints_dir=None, load_epoch_checkpoint=None):
+    def fit(
+        self,
+        device,
+        criterion,
+        optimizer,
+        train_dataloader,
+        num_epochs=1,
+        scheduler=None,
+        valid_data_loader=None,
+        early_stopper=None,
+        checkpoints_dir=None,
+        load_epoch_checkpoint=None,
+    ):
         self, self.model_fit = fit_fn(
-            self, device, criterion, optimizer, train_dataloader, num_epochs,
-            scheduler, valid_data_loader, early_stopper, checkpoints_dir,
+            self,
+            device,
+            criterion,
+            optimizer,
+            train_dataloader,
+            num_epochs,
+            scheduler,
+            valid_data_loader,
+            early_stopper,
+            checkpoints_dir,
             load_epoch_checkpoint,
         )
 
@@ -146,42 +163,52 @@ class _SmokeBase(unittest.TestCase):
             run_id = run.info.run_id
 
             # (1) Tags — before root span
-            mlflow.set_tags({
-                "architecture": MODEL_ID,
-                "device": "cpu",
-                "fast_run": str(cons.FAST_RUN),
-                "platform": platform.system(),
-                "hostname": platform.node(),
-                "git_commit": git_commit,
-                "run_training": "True",
-                "run_prediction": "True",
-            })
+            mlflow.set_tags(
+                {
+                    "architecture": MODEL_ID,
+                    "device": "cpu",
+                    "fast_run": str(cons.FAST_RUN),
+                    "platform": platform.system(),
+                    "hostname": platform.node(),
+                    "git_commit": git_commit,
+                    "run_training": "True",
+                    "run_prediction": "True",
+                }
+            )
 
             # (2) Root pipeline span
-            with mlflow.start_span(name=f"pipeline:{MODEL_ID}", span_type="CHAIN") as root_span:
+            with mlflow.start_span(
+                name=f"pipeline:{MODEL_ID}", span_type="CHAIN"
+            ) as root_span:
                 root_span.set_inputs({"model_id": MODEL_ID, "device_type": "cpu"})
 
-                mlflow.log_params({
-                    "model_id": MODEL_ID,
-                    "num_epochs": 1,
-                    "batch_size": BATCH_SIZE,
-                    "learning_rate": 0.01,
-                    "image_width": IMAGE_WIDTH,
-                    "image_height": IMAGE_HEIGHT,
-                    "random_state": 42,
-                    "device_type": "cpu",
-                })
+                mlflow.log_params(
+                    {
+                        "model_id": MODEL_ID,
+                        "num_epochs": 1,
+                        "batch_size": BATCH_SIZE,
+                        "learning_rate": 0.01,
+                        "image_width": IMAGE_WIDTH,
+                        "image_height": IMAGE_HEIGHT,
+                        "random_state": 42,
+                        "device_type": "cpu",
+                    }
+                )
 
                 # --- data loading span ---
                 with mlflow.start_span(name="data_loading", span_type="TASK") as span:
-                    span.set_inputs({"sample_size": NUM_SAMPLES, "train_fdir": "synthetic"})
+                    span.set_inputs(
+                        {"sample_size": NUM_SAMPLES, "train_fdir": "synthetic"}
+                    )
                     mlflow.log_artifact(os.path.join(cls._tmpdir, "random_image.jpg"))
                     mlflow.log_artifact(os.path.join(cls._tmpdir, "generator_plot.jpg"))
                     span.set_outputs({"df_shape": [NUM_SAMPLES, 3]})
 
                 # --- data split span ---
                 with mlflow.start_span(name="data_split", span_type="TASK") as span:
-                    span.set_inputs({"total_samples": NUM_SAMPLES, "validation_frac": 0.05})
+                    span.set_inputs(
+                        {"total_samples": NUM_SAMPLES, "validation_frac": 0.05}
+                    )
                     span.set_outputs({"train_shape": [15, 3], "validate_shape": [1, 3]})
 
                 # --- model init span ---
@@ -202,12 +229,16 @@ class _SmokeBase(unittest.TestCase):
                     )
                     mlflow.log_artifact(os.path.join(cls._tmpdir, "model_accuracy.png"))
                     mlflow.log_artifact(os.path.join(cls._tmpdir, "model_loss.png"))
-                    span.set_outputs({"final_train_loss": model.model_fit.history["loss"][-1]})
+                    span.set_outputs(
+                        {"final_train_loss": model.model_fit.history["loss"][-1]}
+                    )
 
                 # --- model serialisation span ---
                 pt_path = os.path.join(cls._tmpdir, f"{MODEL_ID}.pt")
                 onnx_path = os.path.join(cls._tmpdir, f"{MODEL_ID}.onnx")
-                with mlflow.start_span(name="model_serialisation", span_type="TOOL") as span:
+                with mlflow.start_span(
+                    name="model_serialisation", span_type="TOOL"
+                ) as span:
                     span.set_inputs({"pt_fpath": pt_path, "onnx_fpath": onnx_path})
                     model.save(pt_path)
                     export_onnx(model, onnx_path, IMAGE_WIDTH, IMAGE_HEIGHT)
@@ -228,7 +259,11 @@ class _SmokeBase(unittest.TestCase):
                     name=registered_name,
                     source=artifact_store_uri,
                     run_id=run_id,
-                    tags={"architecture": MODEL_ID, "git_commit": git_commit, "device": "cpu"},
+                    tags={
+                        "architecture": MODEL_ID,
+                        "git_commit": git_commit,
+                        "device": "cpu",
+                    },
                 )
 
                 # --- testset prediction span ---
@@ -236,9 +271,13 @@ class _SmokeBase(unittest.TestCase):
                 predict_out = model.predict(test_loader, device)
                 categories = np.argmax(predict_out, axis=-1)
                 pred_labels = ["dog" if c == 1 else "cat" for c in categories]
-                true_labels = ["dog" if i % 2 == 1 else "cat" for i in range(len(pred_labels))]
+                true_labels = [
+                    "dog" if i % 2 == 1 else "cat" for i in range(len(pred_labels))
+                ]
 
-                with mlflow.start_span(name="testset_prediction", span_type="TASK") as span:
+                with mlflow.start_span(
+                    name="testset_prediction", span_type="TASK"
+                ) as span:
                     span.set_inputs({"test_fdir": "synthetic"})
                     span.set_outputs({"test_df_shape": [NUM_SAMPLES, 3]})
 
@@ -250,7 +289,9 @@ class _SmokeBase(unittest.TestCase):
                     mlflow.log_metrics(eval_metrics)
 
                     csv_path = os.path.join(cls._tmpdir, "submission.csv")
-                    pd.DataFrame({"id": range(NUM_SAMPLES), "label": pred_labels}).to_csv(csv_path, index=False)
+                    pd.DataFrame(
+                        {"id": range(NUM_SAMPLES), "label": pred_labels}
+                    ).to_csv(csv_path, index=False)
                     mlflow.log_artifact(csv_path)
                     mlflow.log_artifact(os.path.join(cls._tmpdir, "pred_images.jpg"))
                     span.set_outputs(eval_metrics)
@@ -275,7 +316,6 @@ class _SmokeBase(unittest.TestCase):
 
 
 class TestSmokeTracking(_SmokeBase):
-
     def test_smoke_mlflow_experiment_created(self):
         exp = mlflow.get_experiment_by_name(cons.mlflow_experiment_name)
         self.assertIsNotNone(exp)
@@ -297,11 +337,18 @@ class TestSmokeTracking(_SmokeBase):
 
 
 class TestSmokeTags(_SmokeBase):
-
     def test_smoke_mlflow_tags_logged(self):
         run = self._get_run()
-        expected = {"architecture", "device", "fast_run", "platform",
-                    "hostname", "git_commit", "run_training", "run_prediction"}
+        expected = {
+            "architecture",
+            "device",
+            "fast_run",
+            "platform",
+            "hostname",
+            "git_commit",
+            "run_training",
+            "run_prediction",
+        }
         self.assertTrue(
             expected.issubset(run.data.tags.keys()),
             msg=f"Missing tags: {expected - run.data.tags.keys()}",
@@ -309,7 +356,9 @@ class TestSmokeTags(_SmokeBase):
 
     def test_smoke_mlflow_architecture_tag_matches_model_id(self):
         run = self._get_run()
-        self.assertEqual(run.data.tags.get("architecture"), run.data.params.get("model_id"))
+        self.assertEqual(
+            run.data.tags.get("architecture"), run.data.params.get("model_id")
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -318,12 +367,13 @@ class TestSmokeTags(_SmokeBase):
 
 
 class TestSmokeTraces(_SmokeBase):
-
     def _get_traces(self):
         client = mlflow.tracking.MlflowClient()
-        return client.search_traces(experiment_ids=[
-            mlflow.get_experiment_by_name(cons.mlflow_experiment_name).experiment_id
-        ])
+        return client.search_traces(
+            experiment_ids=[
+                mlflow.get_experiment_by_name(cons.mlflow_experiment_name).experiment_id
+            ]
+        )
 
     def test_smoke_mlflow_trace_created(self):
         traces = self._get_traces()
@@ -331,28 +381,20 @@ class TestSmokeTraces(_SmokeBase):
 
     def test_smoke_mlflow_root_span_present(self):
         traces = self._get_traces()
-        root_names = [t.info.request_metadata.get("mlflow.traceInputs", "") for t in traces]
         # Check via span data — root span name starts with "pipeline:"
         found = any(
-            any(s.name.startswith("pipeline:") for s in t.data.spans)
-            for t in traces
+            any(s.name.startswith("pipeline:") for s in t.data.spans) for t in traces
         )
         self.assertTrue(found, "No root span with name starting 'pipeline:' found")
 
     def test_smoke_mlflow_task_spans_present(self):
         traces = self._get_traces()
-        found = any(
-            any(s.span_type == "TASK" for s in t.data.spans)
-            for t in traces
-        )
+        found = any(any(s.span_type == "TASK" for s in t.data.spans) for t in traces)
         self.assertTrue(found, "No TASK spans found in traces")
 
     def test_smoke_mlflow_tool_span_present(self):
         traces = self._get_traces()
-        found = any(
-            any(s.span_type == "TOOL" for s in t.data.spans)
-            for t in traces
-        )
+        found = any(any(s.span_type == "TOOL" for s in t.data.spans) for t in traces)
         self.assertTrue(found, "No TOOL spans found in traces")
 
     def test_smoke_mlflow_span_count(self):
@@ -379,7 +421,8 @@ class TestSmokeTraces(_SmokeBase):
         )
         self.assertIsNotNone(span, "model_fit span not found")
         self.assertIn(
-            "final_train_loss", span.outputs,
+            "final_train_loss",
+            span.outputs,
             msg=f"model_fit span outputs: {span.outputs}",
         )
 
@@ -390,12 +433,12 @@ class TestSmokeTraces(_SmokeBase):
 
 
 class TestSmokeSystemMetrics(_SmokeBase):
-
     def test_smoke_system_metrics_logged(self):
         run = self._get_run()
         system_keys = [k for k in run.data.metrics if k.startswith("system/")]
         self.assertGreater(
-            len(system_keys), 0,
+            len(system_keys),
+            0,
             msg=f"No system/* metrics found. All metric keys: {list(run.data.metrics.keys())}",
         )
 
@@ -406,20 +449,27 @@ class TestSmokeSystemMetrics(_SmokeBase):
 
 
 class TestSmokeArtefacts(_SmokeBase):
-
     def test_smoke_diagnostic_plots_logged(self):
         artefacts = self._list_artefacts()
-        self.assertTrue(any("random_image.jpg" in a for a in artefacts),
-                        msg=f"random_image.jpg not found: {artefacts}")
-        self.assertTrue(any("generator_plot.jpg" in a for a in artefacts),
-                        msg=f"generator_plot.jpg not found: {artefacts}")
+        self.assertTrue(
+            any("random_image.jpg" in a for a in artefacts),
+            msg=f"random_image.jpg not found: {artefacts}",
+        )
+        self.assertTrue(
+            any("generator_plot.jpg" in a for a in artefacts),
+            msg=f"generator_plot.jpg not found: {artefacts}",
+        )
 
     def test_smoke_training_curve_plots_logged(self):
         artefacts = self._list_artefacts()
-        self.assertTrue(any("model_accuracy.png" in a for a in artefacts),
-                        msg=f"model_accuracy.png not found: {artefacts}")
-        self.assertTrue(any("model_loss.png" in a for a in artefacts),
-                        msg=f"model_loss.png not found: {artefacts}")
+        self.assertTrue(
+            any("model_accuracy.png" in a for a in artefacts),
+            msg=f"model_accuracy.png not found: {artefacts}",
+        )
+        self.assertTrue(
+            any("model_loss.png" in a for a in artefacts),
+            msg=f"model_loss.png not found: {artefacts}",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -428,11 +478,18 @@ class TestSmokeArtefacts(_SmokeBase):
 
 
 class TestSmokeLogging(_SmokeBase):
-
     def test_smoke_mlflow_params_logged(self):
         run = self._get_run()
-        expected = {"model_id", "num_epochs", "batch_size", "learning_rate",
-                    "image_width", "image_height", "random_state", "device_type"}
+        expected = {
+            "model_id",
+            "num_epochs",
+            "batch_size",
+            "learning_rate",
+            "image_width",
+            "image_height",
+            "random_state",
+            "device_type",
+        }
         self.assertTrue(expected.issubset(run.data.params.keys()))
 
     def test_smoke_mlflow_train_loss_logged(self):
@@ -462,7 +519,6 @@ class TestSmokeLogging(_SmokeBase):
 
 
 class TestSmokeEvaluation(_SmokeBase):
-
     def test_smoke_mlflow_eval_metrics_logged(self):
         run = self._get_run()
         for key in ("test_accuracy", "test_precision", "test_recall", "test_f1"):
@@ -482,7 +538,6 @@ class TestSmokeEvaluation(_SmokeBase):
 
 
 class TestSmokeSerialization(_SmokeBase):
-
     def test_smoke_mlflow_pt_artefact_present(self):
         artefacts = self._list_artefacts()
         self.assertTrue(
@@ -518,7 +573,6 @@ class TestSmokeSerialization(_SmokeBase):
 
 
 class TestSmokeModelRegistry(_SmokeBase):
-
     def test_smoke_model_registered(self):
         client = mlflow.tracking.MlflowClient()
         try:

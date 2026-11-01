@@ -56,7 +56,9 @@ class TestMlflowRegisteredModelNames(unittest.TestCase):
     def test_registered_model_names_no_spaces(self):
         """MLflow rejects names with leading or trailing spaces."""
         for v in self.names.values():
-            self.assertEqual(v, v.strip(), msg=f"Name {v!r} has leading/trailing whitespace")
+            self.assertEqual(
+                v, v.strip(), msg=f"Name {v!r} has leading/trailing whitespace"
+            )
 
     # ------------------------------------------------------------------
     # Exact value tests
