@@ -31,9 +31,6 @@ RUN ls -R /home/${user}/CatClassifier/data
 # set working directory
 WORKDIR /home/${user}/CatClassifier
 
-# make data directory
-#RUN mkdir -p /home/${user}/CatClassifier/data
-#RUN mkdir -p /home/${user}/CatClassifier/data/checkpoints
 
 # install required python packages
 COPY --from=ghcr.io/astral-sh/uv@sha256:68224c7eb575bc13e4723f8831331db68555125fac3939fdde78cdb6000667ad /uv /uvx /bin/
