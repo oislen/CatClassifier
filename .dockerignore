@@ -32,3 +32,8 @@ __pycache__
 # allow specific torch files from model sub-directory
 **/*.pt
 !data/models/*.pt
+
+# mlflow tracking store
+mlruns/
+mlflow.db
+mlartifacts

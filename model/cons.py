@@ -38,12 +38,24 @@ checkpoints_fdir = os.path.join(data_fdir, "checkpoints")
 arch_fdir = os.path.join(model_fdir, "arch")
 utilities_fdir = os.path.join(dataprep_fdir, "utilities")
 
+# set mlflow constants
+mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
+mlflow_experiment_name = os.environ.get("MLFLOW_EXPERIMENT_NAME", "CatClassifier")
+
+# MLflow Model Registry — registered model names per architecture
+mlflow_registered_model_names = {
+    "alexnet_8_pretrained": "CatClassifier-AlexNet8",
+    "vgg_16_pretrained": "CatClassifier-VGG16",
+    "resnet_50_pretrained": "CatClassifier-ResNet50",
+}
+
 # set file paths
 train_data_pickle_fpath = os.path.join(data_archive_fdir, "train_data.pickle")
 test_data_pickle_fpath = os.path.join(data_archive_fdir, "test_data.pickle")
 model_fit_pickle_fpath = os.path.join(data_archive_fdir, "model_fit.pickle")
 keras_model_pickle_fpath = os.path.join(data_archive_fdir, "keras_model.keras")
 torch_model_pt_fpath = os.path.join(data_models_fdir, "{model_id}.pt")
+torch_model_onnx_fpath = os.path.join(data_models_fdir, "{model_id}.onnx")
 test_preds_pickle_fpath = os.path.join(data_archive_fdir, "test_preds.pickle")
 submission_csv_fpath = os.path.join(data_fdir, "submission.csv")
 keras_random_image_fpath = os.path.join(keras_report_fdir, "random_image.jpg")
@@ -67,7 +79,7 @@ root_fdirs = [
     train_fdir,
     webscrapers_fdir,
 ]
-sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir]
+sub_fdirs = [checkpoints_fdir, arch_fdir, utilities_fdir, data_models_fdir]
 
 # append directories to path
 for fdir in root_fdirs + sub_fdirs:
