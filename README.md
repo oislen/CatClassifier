@@ -93,10 +93,10 @@ Equivalent long-form:
 
 ```bash
 cd model
-uv run flask --app api.py run --debug --host 0.0.0.0 --port 5000
+uv run flask --app api.py run --debug --host 0.0.0.0 --port 5001
 ```
 
-POST an image to `http://localhost:5000/catclassifier` with the following fields:
+POST an image to `http://localhost:5001/catclassifier` with the following fields:
 - `image` — image file
 - `model_id` *(optional)* — `alexnet_8_pretrained`, `vgg_16_pretrained`, or `resnet_50_pretrained`
 - `device_type` *(optional)* — `cpu` or `cuda`
