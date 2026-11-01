@@ -179,6 +179,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
         with:
+          context: .
           push: true
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ needs.release-please.outputs.tag_name }}
