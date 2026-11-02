@@ -10,6 +10,15 @@ ENV PYTHON_VERSION=${PYTHON_VERSION}
 
 # install required software and programmes for development environment
 RUN apt-get update
+# patch OS packages with HIGH/CRITICAL Trivy findings
+RUN apt-get install -y --only-upgrade \
+    gzip \
+    libpcre2-8-0 \
+    libsqlite3-0 \
+    libssl3t64 \
+    openssl \
+    openssl-provider-legacy \
+    perl-base
 RUN apt-get install -y apt-utils vim curl wget unzip tree htop adduser
 # install trivy image vulnerability patches
 #RUN apt-get install -y imagemagick=8:7.1.1.43+dfsg1-1+deb13u5
