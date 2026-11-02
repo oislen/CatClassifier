@@ -24,7 +24,9 @@ _torch_transforms = transforms.Compose(
 
 def _make_jpeg(path: str, mode: str = "RGB", size: tuple = (10, 10)) -> str:
     """Create a minimal synthetic JPEG at *path* and return the path."""
-    Image.new(mode, size, color=(128, 64, 32) if mode == "RGB" else 128).save(path, format="JPEG")
+    Image.new(mode, size, color=(128, 64, 32) if mode == "RGB" else 128).save(
+        path, format="JPEG"
+    )
     return path
 
 

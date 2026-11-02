@@ -3,7 +3,10 @@ import os
 import platform
 
 import matplotlib
-matplotlib.use("Agg")  # non-interactive backend — avoids Tkinter thread errors with ProcessPoolExecutor workers
+
+matplotlib.use(
+    "Agg"
+)  # non-interactive backend — avoids Tkinter thread errors with ProcessPoolExecutor workers
 
 import mlflow
 import numpy as np
@@ -138,7 +141,8 @@ if __name__ == "__main__":
                     np.random.shuffle(image_filepaths)
                     sample_size = 20000
                     torch_load_images = TorchLoadImages(
-                        torch_transforms=torch_transforms, n_workers=cons.num_workers if cons.num_workers > 0 else None
+                        torch_transforms=torch_transforms,
+                        n_workers=cons.num_workers if cons.num_workers > 0 else None,
                     )
                     df = pd.DataFrame.from_records(
                         torch_load_images.load_images(image_filepaths[0:sample_size])
@@ -380,7 +384,8 @@ if __name__ == "__main__":
 
                     logging.info("Generate test dataset...")
                     torch_load_images = TorchLoadImages(
-                        torch_transforms=torch_transforms, n_workers=cons.num_workers if cons.num_workers > 0 else None
+                        torch_transforms=torch_transforms,
+                        n_workers=cons.num_workers if cons.num_workers > 0 else None,
                     )
                     test_df = pd.DataFrame.from_records(
                         torch_load_images.load_images(
