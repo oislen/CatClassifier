@@ -1,19 +1,39 @@
-# named volume 'E' is marked as "external" (used by service 'latest'), so either remove "external" from volume definition or it needs to be created using: docker volume create E
-# named volume 'E' is marked as "external" (used by service 'latest'), so either remove "external" from volume definition or it needs to be created using: docker volume create E
-name: <your project name>
+name: cat-classifier
 services:
-    latest:
-        container_name: cc
+
+    mlflow:
+        container_name: mlf
+        image: oislen/cat-classifier:latest
+        entrypoint: ["uv", "run", "mlflow", "server"]
+        command: ["--host", "0.0.0.0", "--port", "5000"]
+        environment:
+            - MLFLOW_SERVER_ALLOWED_HOSTS=*
         shm_size: 512m
         ports:
-            - 8888:8888
+            - "5000:5000"
         volumes:
-            - E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds
-            - E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report
-        stdin_open: true
-        tty: true
-        image: oislen:cat-classifier/latest
+            - mlruns:/home/user/CatClassifier/mlruns
+        restart: unless-stopped
+
+    flask:
+        container_name: flk
+        image: oislen/cat-classifier:latest
+        shm_size: 512m
+        ports:
+            - "5001:5000"
+        environment:
+            - PARAM_CHECK_GPU=True
+            - MLFLOW_TRACKING_URI=http://mlflow:5000
+        depends_on:
+            - mlflow
+        restart: unless-stopped
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities: [gpu]
+
 volumes:
-    E:
-        external: true
-        name: E
+    mlruns:
