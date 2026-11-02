@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/oislen/CatClassifier/compare/v0.3.2...v0.3.3) (2026-11-02)
+
+
+### Bug Fixes
+
+* **#44:** incremented kaggle model version ([#49](https://github.com/oislen/CatClassifier/issues/49)) ([89087a2](https://github.com/oislen/CatClassifier/commit/89087a2e3259b4b5fa5745054e66d73466582dba))
+
 ## [0.3.2](https://github.com/oislen/CatClassifier/compare/v0.3.1...v0.3.2) (2026-11-02)
 
 
