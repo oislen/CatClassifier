@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/oislen/CatClassifier/compare/v0.3.1...v0.3.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **#44:** image patches ([#47](https://github.com/oislen/CatClassifier/issues/47)) ([d01eefc](https://github.com/oislen/CatClassifier/commit/d01eefcc8be63d7749c575372d5660ccf82f3d6e))
+
 ## [0.3.1](https://github.com/oislen/CatClassifier/compare/v0.3.0...v0.3.1) (2026-11-02)
 
 
