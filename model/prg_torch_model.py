@@ -2,9 +2,16 @@ import logging
 import os
 import platform
 
+import matplotlib
+
+matplotlib.use(
+    "Agg"
+)  # non-interactive backend — avoids Tkinter thread errors with ProcessPoolExecutor workers
+
 import mlflow
 import numpy as np
 import pandas as pd
+from PIL import Image
 
 # set huggingface hub directory
 huggingface_hub_dir = "E:\\huggingface"
@@ -134,7 +141,8 @@ if __name__ == "__main__":
                     np.random.shuffle(image_filepaths)
                     sample_size = 20000
                     torch_load_images = TorchLoadImages(
-                        torch_transforms=torch_transforms, n_workers=None
+                        torch_transforms=torch_transforms,
+                        n_workers=cons.num_workers if cons.num_workers > 0 else None,
                     )
                     df = pd.DataFrame.from_records(
                         torch_load_images.load_images(image_filepaths[0:sample_size])
@@ -145,8 +153,10 @@ if __name__ == "__main__":
                     time_logger.log_time(parent_key="DataPrep", sub_key="TrainDataLoad")
 
                     logging.info("Plot sample image...")
+                    sample_image_fpath = df["filepaths"].values[1]
+                    sample_image_array = np.asarray(Image.open(sample_image_fpath))
                     plot_image(
-                        df["images"].values[1],
+                        sample_image_array,
                         output_fpath=cons.torch_random_image_fpath,
                         show_plot=False,
                     )
@@ -199,7 +209,7 @@ if __name__ == "__main__":
                     train_dataset,
                     batch_size=cons.batch_size,
                     shuffle=True,
-                    num_workers=cons.num_workers,
+                    num_workers=0,
                     pin_memory=True,
                     collate_fn=CustomDataset.collate_fn,
                 )
@@ -208,7 +218,7 @@ if __name__ == "__main__":
                     validation_dataset,
                     batch_size=cons.batch_size,
                     shuffle=True,
-                    num_workers=cons.num_workers,
+                    num_workers=0,
                     pin_memory=True,
                     collate_fn=CustomDataset.collate_fn,
                 )
@@ -374,7 +384,8 @@ if __name__ == "__main__":
 
                     logging.info("Generate test dataset...")
                     torch_load_images = TorchLoadImages(
-                        torch_transforms=torch_transforms, n_workers=None
+                        torch_transforms=torch_transforms,
+                        n_workers=cons.num_workers if cons.num_workers > 0 else None,
                     )
                     test_df = pd.DataFrame.from_records(
                         torch_load_images.load_images(
@@ -393,7 +404,7 @@ if __name__ == "__main__":
                         test_dataset,
                         batch_size=cons.batch_size,
                         shuffle=False,
-                        num_workers=cons.num_workers,
+                        num_workers=0,
                         pin_memory=True,
                         collate_fn=CustomDataset.collate_fn,
                     )
