@@ -1,7 +1,7 @@
 import os
 import re
+from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
-from multiprocessing import Pool
 
 import numpy as np
 import pandas as pd
@@ -53,36 +53,27 @@ class TorchLoadImages:
         except Exception as e:
             image_tensor = None
             torch_transform_error = str(e)
-        image_array = np.asarray(image)
+        n_dims = len(np.asarray(image).shape)
         image.close()
-        n_dims = len(image_array.shape)
-        # create an output record
+        # create an output record — raw pixel array is not stored to reduce memory usage
         record = {
             "filepaths": filepath,
             "filenames": file_name,
             "source": file_source,
             "categoryname": label_name,
             "category": label,
-            "images": image_array,
             "ndims": n_dims,
             "category_tensors": label_tensor,
             "image_tensors": image_tensor,
             "torch_transform_error": torch_transform_error,
         }
-        # close open image
         return record
-
-    def multi_process(self, func, args):
-        """ """
-        pool = Pool(self.n_workers)
-        results = pool.map(func, args)
-        pool.close()
-        return results
 
     def load_images(self, filepaths):
         """ """
-        if self.n_workers is None:
+        if self.n_workers is None or self.n_workers <= 1:
             records = [self.load_image(filepath) for filepath in filepaths]
         else:
-            records = self.multi_process(self.load_image, filepaths)
+            with ProcessPoolExecutor(max_workers=self.n_workers) as executor:
+                records = list(executor.map(self.load_image, filepaths))
         return records
