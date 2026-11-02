@@ -48,7 +48,33 @@ The container starts the Flask API automatically on port 5000.
 
 ## Running the Application
 
-### Docker
+### Docker Compose (recommended)
+
+The `compose.yaml` file defines two services that work together:
+
+| Service | Container | Port | Description |
+|---|---|---|---|
+| `mlflow` | `mlf` | `5000` | MLflow tracking server |
+| `flask` | `flk` | `5001` | Flask REST API |
+
+Start both services:
+
+```bash
+docker compose up
+```
+
+- MLflow UI: [http://localhost:5000](http://localhost:5000)
+- Flask API: [http://localhost:5001/catclassifier](http://localhost:5001/catclassifier)
+
+MLflow run data is persisted to a named Docker volume (`mlruns`) so experiment history survives container restarts.
+
+Stop and remove containers:
+
+```bash
+docker compose down
+```
+
+### Docker (standalone)
 
 The latest version of the Cat Classifier app is available as a [Docker](https://www.docker.com/) image on Docker Hub:
 
@@ -63,21 +89,23 @@ docker pull oislen/cat-classifier:latest
 #### Flask REST API
 
 ```bash
-docker run --name cc --gpus all --publish 5000:5000 \
-  --env PARAM_CHECK_GPU=True oislen/cat-classifier:latest
+docker run --name flk --gpus all --publish 5001:5000 --env PARAM_CHECK_GPU=True --env MLFLOW_TRACKING_URI=http://host.docker.internal:5000 oislen/cat-classifier:latest
 ```
 
-An exported Postman POST request example is available at:
-* `doc/CatClassifier.postman_collection.json`
+> `MLFLOW_TRACKING_URI` must point at a running MLflow server. On Docker Desktop (Windows/Mac), `host.docker.internal` resolves to the host machine. On Linux, use the host bridge IP (typically `172.17.0.1`) or run MLflow inside Docker Compose instead.
+
+#### MLflow Tracking Server
+
+```bash
+docker run --name mlf --shm-size=512m --entrypoint uv --publish 5000:5000 --env MLFLOW_SERVER_ALLOWED_HOSTS='*' oislen/cat-classifier:latest run mlflow server --host 0.0.0.0 --port 5000
+```
+
+> `MLFLOW_SERVER_ALLOWED_HOSTS=*` disables DNS rebinding protection. This is appropriate for local development only. Do not use `*` in a publicly accessible deployment.
 
 #### Jupyter Lab Session
 
 ```bash
-docker run --name cc --shm-size=512m --entrypoint uv \
-  --publish 8888:8888 --gpus all --env PARAM_CHECK_GPU=True \
-  -it oislen/cat-classifier:latest \
-  run jupyter lab --ip=0.0.0.0 --allow-root \
-  --IdentityProvider.token='' --ServerApp.password=''
+docker run --name cc --shm-size=512m --entrypoint uv --publish 8888:8888 --gpus all --env PARAM_CHECK_GPU=True -it oislen/cat-classifier:latest run jupyter lab --ip=0.0.0.0 --allow-root --IdentityProvider.token='' --ServerApp.password=''
 ```
 
 Navigate to [http://127.0.0.1:8888/lab](http://127.0.0.1:8888/lab) once the session is running.
@@ -101,6 +129,9 @@ POST an image to `http://localhost:5001/catclassifier` with the following fields
 - `model_id` *(optional)* — `alexnet_8_pretrained`, `vgg_16_pretrained`, or `resnet_50_pretrained`
 - `device_type` *(optional)* — `cpu` or `cuda`
 
+An exported Postman POST request example is available at:
+* `doc/CatClassifier.postman_collection.json`
+
 ### Model Training (local)
 
 Before running training, start the local MLflow tracking server (in a separate terminal):
@@ -122,16 +153,14 @@ Equivalent long-form:
 
 ```bash
 cd model
-uv run python prg_torch_model.py \
-  --run_model_training \
-  --run_testset_prediction \
-  --model_id alexnet_8_pretrained \
-  --device_type cuda
+export MLFLOW_TRACKING_URI=http://127.0.0.1:5000
+export PARAM_NUM_WORKERS=4
+uv run python prg_torch_model.py --run_model_training --run_testset_prediction --model_id alexnet_8_pretrained --device_type cuda
 ```
 
 Available `--model_id` values: `alexnet_8_pretrained`, `vgg_16_pretrained`, `resnet_50_pretrained`.
 
-Each training run logs hyperparameters, per-epoch training and validation metrics, and model artefacts (`.pt` weights, `.onnx` export, prediction plots, and submission CSV) to the MLflow tracking server. Test-set evaluation metrics (accuracy, precision, recall, F1) are logged at the end of the prediction step.
+Each training run logs hyperparameters, per-epoch training and validation metrics, and model artefacts (`.pt` weights, `.onnx` export, prediction plots, and submission CSV) to the MLflow tracking server. Test-set evaluation metrics (accuracy, precision, recall, F1) are logged at the end of the prediction step. Inference traces from the Flask API are also logged to MLflow per request.
 
 To resume an existing run when training and prediction are invoked in separate processes, set `MLFLOW_RUN_ID` to the run ID printed at the start of the first invocation:
 
@@ -196,12 +225,13 @@ Ruff configuration is in `pyproject.toml` (`[tool.ruff]`). Target is Python 3.12
 | Variable | Default | Description |
 |---|---|---|
 | `PARAM_CHECK_GPU` | `False` | Set `True` to enable CUDA if available |
-| `PARAM_NUM_WORKERS` | `0` | DataLoader worker processes |
+| `PARAM_NUM_WORKERS` | `0` | Number of parallel workers for `TorchLoadImages` upfront data loading. Set to a positive integer (e.g. `4`) to parallelise loading of the training and test sets. Has no effect on `DataLoader` batch-serving workers or on the single-image API inference path. |
 | `FLASK_DEBUG` | `""` | Set `1`, `true`, or `yes` to enable Flask debug mode |
 | `TORCH_HOME` | — | Override PyTorch model cache directory |
 | `MLFLOW_TRACKING_URI` | `http://127.0.0.1:5000` | MLflow tracking server URI |
 | `MLFLOW_EXPERIMENT_NAME` | `CatClassifier` | MLflow experiment name |
 | `MLFLOW_RUN_ID` | — | Set to resume an existing MLflow run |
+| `MLFLOW_SERVER_ALLOWED_HOSTS` | *(localhost only)* | Comma-separated list of hosts the MLflow server will accept requests from. Set to `*` to allow all hosts (local development only). |
 
 ## CI/CD (GitHub Actions)
 
