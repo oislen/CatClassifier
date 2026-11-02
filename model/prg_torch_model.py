@@ -2,6 +2,9 @@ import logging
 import os
 import platform
 
+import matplotlib
+matplotlib.use("Agg")  # non-interactive backend — avoids Tkinter thread errors with ProcessPoolExecutor workers
+
 import mlflow
 import numpy as np
 import pandas as pd
