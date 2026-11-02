@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/oislen/CatClassifier/compare/v0.3.0...v0.3.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **#44:** torch slowness ([#45](https://github.com/oislen/CatClassifier/issues/45)) ([597ae2e](https://github.com/oislen/CatClassifier/commit/597ae2edfff9786a39903556b8b84de259f97c35))
+
 ## [0.3.0](https://github.com/oislen/CatClassifier/compare/v0.2.0...v0.3.0) (2026-11-01)
 
 
