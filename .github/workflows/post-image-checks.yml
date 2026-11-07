@@ -3,6 +3,7 @@ permissions:
   contents: read
 
 on:
+  # zizmor: ignore[dangerous-triggers]
   workflow_run:
     workflows: ["Deployment Workflow"]
     types:
