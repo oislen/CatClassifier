@@ -9,6 +9,7 @@ on:
 jobs:
 
   ruff-linter:
+    name: Ruff Linter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,6 +23,7 @@ jobs:
 
 
   sonarqube-scan:
+    name: Sonarqube Scan
     runs-on: self-hosted
     steps:
       - name: Checkout code
@@ -56,6 +58,7 @@ jobs:
           sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
 
   python-unittests:
+    name: Python Unittests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -82,6 +85,7 @@ jobs:
         uv run python -m unittest discover ./model/unittests
 
   trivy-fs-scan:
+    name: Trivy File System Scan
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -119,8 +123,20 @@ jobs:
         with:
           advanced-security: false
 
+  actionlint:
+    name: Lint GitHub Actions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Run actionlint
+        uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca
+
   release-please:
-    needs: [trivy-fs-scan, python-unittests, ruff-linter]
+    name: Release Please
+    needs: [trivy-fs-scan, python-unittests, ruff-linter, zizmor-scan]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -137,6 +153,7 @@ jobs:
           release-type: python
 
   dockerhub-image-push:
+    name: Dockerhub Image Push
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
     runs-on: ubuntu-latest
@@ -185,30 +202,3 @@ jobs:
             ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ needs.release-please.outputs.tag_name }}
             ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:latest
 
-  trivy-image-scan:
-    needs: [release-please, dockerhub-image-push]
-    if: ${{ needs.release-please.outputs.release_created }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        persist-credentials: false
-    - name: Run Trivy vulnerability scanner to show all vulnerabilities
-      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-      with:
-        image-ref: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ needs.release-please.outputs.tag_name }}
-        format: 'table'
-        exit-code: '0'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-    - name: Fail build on High or Critical vulnerabilities
-      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-      with:
-        image-ref: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ needs.release-please.outputs.tag_name }}
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
