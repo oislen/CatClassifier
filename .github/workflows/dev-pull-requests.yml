@@ -130,8 +130,8 @@ jobs:
           echo "Selected Python version: $PYTHON_VER"
 
   python-unittests:
-    needs: read-python-version
     name: Python Unittests
+    needs: read-python-version
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
