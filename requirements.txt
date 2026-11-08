@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cu129
+--extra-index-url https://download.pytorch.org/whl/cu130
 #pillow==12.1.1
 #requests==2.32.4
 beautifulsoup4==4.13.3
@@ -19,5 +19,5 @@ boto3==1.36.13
 #idna==3.7
 #setuptools==78.1.1
 Flask==3.0.2
-torch==2.8.0
-torchvision==0.23.0
+torch==2.13.0
+torchvision==0.28.0
