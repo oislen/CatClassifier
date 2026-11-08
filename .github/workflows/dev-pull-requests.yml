@@ -114,13 +114,29 @@ jobs:
         severity: 'HIGH,CRITICAL'
         exit-code: '1'
 
+  read-python-version:
+    runs-on: ubuntu-latest
+    outputs:
+      python-version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Read version from .python-version
+        id: set-version
+        run: |
+          PYTHON_VER=$(cat .python-version | tr -d '[:space:]')
+          echo "version=$PYTHON_VER" >> "$GITHUB_OUTPUT"
+          echo "Selected Python version: $PYTHON_VER"
+
   python-unittests:
+    needs: read-python-version
     name: Python Unittests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13.11"]
+        python-version: ["${{ needs.read-python-version.outputs.python-version }}"]
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
