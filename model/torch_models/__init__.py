@@ -5,6 +5,7 @@ from .CustomDataset import CustomDataset
 from .EarlyStopper import EarlyStopper
 from .export_onnx import export_onnx
 from .fit import fit
+from .import_onnx import import_onnx
 from .LeNet5 import lenet_5
 from .load import load
 from .ModelFit import ModelFit
@@ -24,6 +25,7 @@ __all__ = [
     "EarlyStopper",
     "export_onnx",
     "fit",
+    "import_onnx",
     "lenet_5",
     "load",
     "ModelFit",
