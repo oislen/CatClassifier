@@ -14,6 +14,7 @@ concurrency:
 jobs:
 
   validate-pr-title:
+    name: Validate Pull Request Title
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -37,6 +38,7 @@ jobs:
             revert
 
   ruff-linter:
+    name: Ruff Linter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -49,6 +51,7 @@ jobs:
           version: "0.15.15"
 
   sonarqube-scan:
+    name: Sonarqube Scan
     runs-on: self-hosted
     steps:
       - name: Checkout code
@@ -89,6 +92,7 @@ jobs:
           sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
 
   trivy-fs-scan:
+    name: Trivy File System Scan
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -110,18 +114,35 @@ jobs:
         severity: 'HIGH,CRITICAL'
         exit-code: '1'
 
+  read-python-version:
+    runs-on: ubuntu-latest
+    outputs:
+      python-version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Read version from .python-version
+        id: set-version
+        run: |
+          PYTHON_VER=$(cat .python-version | tr -d '[:space:]')
+          echo "version=$PYTHON_VER" >> "$GITHUB_OUTPUT"
+          echo "Selected Python version: $PYTHON_VER"
+
   python-unittests:
+    name: Python Unittests
+    needs: read-python-version
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13.11"]
+        python-version: ["${{ needs.read-python-version.outputs.python-version }}"]
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
     - name: Set environment variable
-      run: echo "GITHUB_ACTIONS_UNITTEST_FLAG=1" >> $GITHUB_ENV
+      run: echo "GITHUB_ACTIONS_UNITTEST_FLAG=1" >> "$GITHUB_ENV"
     - name: Install uv
       uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
     - name: Set up Python ${{ matrix.python-version }}
@@ -151,3 +172,14 @@ jobs:
         uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e
         with:
           advanced-security: false
+
+  actionlint:
+    name: Lint GitHub Actions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Run actionlint
+        uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca
