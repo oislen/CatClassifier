@@ -170,13 +170,13 @@ jobs:
 
   dockerhub-image-push:
     name: Dockerhub Image Push
-    needs: release-please
+    needs: [read-python-version, release-please]
     if: ${{ needs.release-please.outputs.release_created }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13.11"]
+        python-version: ["${{ needs.read-python-version.outputs.python-version }}"]
     env:
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
       KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
