@@ -11,8 +11,35 @@ on:
 
 jobs:
 
+  check-push-occurred:
+    name: Check if Image Was Pushed
+    runs-on: ubuntu-latest
+    outputs:
+      pushed: ${{ steps.verify-push.outputs.pushed }}
+    steps:
+      - name: Verify Dockerhub Image Push job success
+        id: verify-push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          REPO="${{ github.repository }}"
+          echo "Checking jobs for workflow run ID: $RUN_ID in repo: $REPO"
+          # Query GitHub API for the jobs in the triggering workflow run
+          JOBS_JSON="$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs" --paginate)"
+          # Find the conclusion of the 'Dockerhub Image Push' job
+          CONCLUSION="$(echo "$JOBS_JSON" | jq -r '.jobs[] | select(.name == "Dockerhub Image Push") | .conclusion // "skipped"')"
+          echo "Dockerhub Image Push job conclusion: $CONCLUSION"
+          if [ "$CONCLUSION" == "success" ]; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+          fi
+
   trivy-image-scan:
     name: Trivy Image Scan
+    needs: check-push-occurred
+    if: needs.check-push-occurred.outputs.pushed == 'true'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
