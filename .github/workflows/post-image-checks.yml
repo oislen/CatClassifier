@@ -31,9 +31,9 @@ jobs:
           CONCLUSION="$(echo "$JOBS_JSON" | jq -r '.jobs[] | select(.name == "Dockerhub Image Push") | .conclusion // "skipped"')"
           echo "Dockerhub Image Push job conclusion: $CONCLUSION"
           if [ "$CONCLUSION" == "success" ]; then
-            echo "pushed=true" >> $GITHUB_OUTPUT
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "pushed=false" >> $GITHUB_OUTPUT
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
           fi
 
   trivy-image-scan:
