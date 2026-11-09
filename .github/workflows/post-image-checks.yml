@@ -26,9 +26,9 @@ jobs:
           REPO="${{ github.repository }}"
           echo "Checking jobs for workflow run ID: $RUN_ID in repo: $REPO"
           # Query GitHub API for the jobs in the triggering workflow run
-          JOBS_JSON=$(gh api repos/$REPO/actions/runs/$RUN_ID/jobs --paginate)
+          JOBS_JSON="$(gh api repos/$REPO/actions/runs/$RUN_ID/jobs --paginate)"
           # Find the conclusion of the 'Dockerhub Image Push' job
-          CONCLUSION=$(echo "$JOBS_JSON" | jq -r '.jobs[] | select(.name == "Dockerhub Image Push") | .conclusion // "skipped"')
+          CONCLUSION="$(echo "$JOBS_JSON" | jq -r '.jobs[] | select(.name == "Dockerhub Image Push") | .conclusion // "skipped"')"
           echo "Dockerhub Image Push job conclusion: $CONCLUSION"
           if [ "$CONCLUSION" == "success" ]; then
             echo "pushed=true" >> $GITHUB_OUTPUT
