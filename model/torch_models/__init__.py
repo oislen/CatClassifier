@@ -1,5 +1,6 @@
 from .AlexNet8 import alexnet_8
 from .AlexNet8_pretrained import alexnet_8_pretrained
+from .BaseModel import base_model
 from .checkpoints import load_checkpoint, save_checkpoint
 from .CustomDataset import CustomDataset
 from .EarlyStopper import EarlyStopper
@@ -19,6 +20,7 @@ from .VGG16_pretrained import vgg_16_pretrained
 __all__ = [
     "alexnet_8",
     "alexnet_8_pretrained",
+    "base_model",
     "load_checkpoint",
     "save_checkpoint",
     "CustomDataset",
