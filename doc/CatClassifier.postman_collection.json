@@ -59,8 +59,41 @@
       "request": {
         "method": "POST",
         "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "model_id",
+              "value": "alexnet_8_pretrained",
+              "description": "Model to use",
+              "type": "text",
+              "uuid": "1bc1ddec-9b4d-4ef6-9231-d019c1c519cf"
+            },
+            {
+              "key": "device_type",
+              "value": "cuda",
+              "description": "To run using cpu or cuda",
+              "type": "text",
+              "uuid": "7022196e-f391-4348-ad1c-362350ed5b6c"
+            },
+            {
+              "key": "run_model_training",
+              "value": "true",
+              "description": "To run model training",
+              "type": "text",
+              "uuid": "082735dd-45bf-4b7e-a9d7-44e4f61a5021"
+            },
+            {
+              "key": "run_testset_prediction",
+              "value": "true",
+              "description": "To run test set predictions",
+              "type": "text",
+              "uuid": "598e10a6-6bfc-458b-b815-d0c6f3892148"
+            }
+          ]
+        },
         "url": {
-          "raw": "http://127.0.0.1:5001/catclassifier?model_id=alexnet_8_pretrained&device_type=cuda&run_model_training=true&run_testset_prediction=true",
+          "raw": "http://127.0.0.1:5001/catclassifier",
           "protocol": "http",
           "host": [
             "127",
@@ -71,30 +104,6 @@
           "port": "5001",
           "path": [
             "catclassifier"
-          ],
-          "query": [
-            {
-              "key": "model_id",
-              "value": "alexnet_8_pretrained",
-              "description": "Model to use"
-            },
-            {
-              "key": "device_type",
-              "value": "cuda",
-              "description": "To run using cpu or cuda"
-            },
-            {
-              "key": "run_model_training",
-              "value": "true",
-              "description": "To run model training",
-              "type": "text"
-            },
-            {
-              "key": "run_testset_prediction",
-              "value": "true",
-              "description": "To run test set predictions",
-              "type": "text"
-            }
           ]
         }
       },
