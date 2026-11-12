@@ -217,12 +217,12 @@ def endpoint():
 
     # extract parameters from the request
     image_file = request.files.get("image", None)
-    model_id = request.args.get("model_id", list(model_dict.keys())[1])
-    device_type = request.args.get("device_type", cons.device_type)
+    model_id = request.form.get("model_id", list(model_dict.keys())[1])
+    device_type = request.form.get("device_type", cons.device_type)
     safe_filename = secure_filename(image_file.filename) if image_file is not None else ""
     # optional flags for running model training or test set prediction
-    run_model_training = request.args.get("run_model_training", "False").lower() == "true"
-    run_testset_prediction = request.args.get("run_testset_prediction", "False").lower() == "true"
+    run_model_training = request.form.get("run_model_training", "False").lower() == "true"
+    run_testset_prediction = request.form.get("run_testset_prediction", "False").lower() == "true"
 
     #if safe_filename == "":
     #    return jsonify({"error": "No file selected for uploading"}), 400
