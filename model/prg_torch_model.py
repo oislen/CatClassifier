@@ -46,6 +46,11 @@ from model.utilities import (
     plot_preds,
 )
 
+# set up logging
+lgr = logging.getLogger()
+lgr.setLevel(logging.INFO)
+time_logger = TimeIt()
+
 # initialise model dict
 model_dict = {
     "alexnet_8_pretrained": alexnet_8_pretrained(num_classes=2),
@@ -70,17 +75,29 @@ torch_transforms = transforms.Compose(
     ]
 )
 
-if __name__ == "__main__":
-    # set up logging
-    lgr = logging.getLogger()
-    lgr.setLevel(logging.INFO)
-    time_logger = TimeIt()
+def train_torch_model(input_params_dict: dict) -> None:
+    """
+    Train a torch model and log results to MLflow.
+    1. Load and preprocess training data
+    2. Split into training and validation datasets
+    3. Fit model to training data
+    4. Save fitted model to disk and log to MLflow
+    5. Generate predictions on test dataset and log to MLflow
+    6. Compute evaluation metrics and log to MLflow
 
-    logging.info("Parsing command line arguments...")
-    # handle input parameters
-    input_params_dict = commandline_interface()
-    logging.info(input_params_dict)
-    time_logger.log_time(parent_key="Initialisation", sub_key="CommandlineArguments")
+    Parameters
+    ----------
+    input_params_dict : dict
+        Dictionary of input parameters, including:
+        - model_id: str, identifier for the model architecture
+        - device_type: str, device type for training (e.g., 'cpu', 'cuda')
+        - run_model_training: bool, whether to run model training
+        - run_testset_prediction: bool, whether to run test set prediction
+
+    Returns
+    -------
+    None
+    """
 
     # set model architecture
     model_id = input_params_dict["model_id"]
@@ -202,8 +219,8 @@ if __name__ == "__main__":
                     )
 
                 logging.info("Creating training and validation data loaders...")
-                total_train = train_df.shape[0]
-                total_validate = validate_df.shape[0]
+                #total_train = train_df.shape[0]
+                #total_validate = validate_df.shape[0]
                 train_dataset = CustomDataset(train_df)
                 train_loader = DataLoader(
                     train_dataset,
@@ -477,3 +494,14 @@ if __name__ == "__main__":
                     del submission_df
 
             root_span.set_outputs({"status": "complete"})
+
+
+if __name__ == "__main__":
+
+    logging.info("Parsing command line arguments...")
+    # handle input parameters
+    input_params_dict = commandline_interface()
+    logging.info(input_params_dict)
+    time_logger.log_time(parent_key="Initialisation", sub_key="CommandlineArguments")
+    # run the main function
+    train_torch_model(input_params_dict=input_params_dict)
