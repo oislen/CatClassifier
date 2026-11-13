@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import threading
 
 import cons
 import mlflow
@@ -8,7 +9,6 @@ import numpy as np
 import pandas as pd
 import torch
 from flask import Flask, jsonify, request
-from prg_torch_model import model_dict, torch_transforms
 from torch.utils.data import DataLoader
 from werkzeug.utils import secure_filename
 
@@ -139,7 +139,7 @@ def classify_image(
                 test_dataset,
                 batch_size=cons.batch_size,
                 shuffle=False,
-                num_workers=cons.num_workers,
+                num_workers=0,
                 pin_memory=True,
                 collate_fn=CustomDataset.collate_fn,
             )
@@ -238,6 +238,8 @@ def endpoint():
                 "request_id": request.headers.get("X-Request-ID", "none"),
                 "run_model_training": run_model_training,
                 "run_testset_prediction": run_testset_prediction,
+                "registered_model_name": cons.mlflow_registered_model_names.get(model_id, ""),
+                "model_version": _MODEL_VERSIONS.get(model_id, "unknown"),
             }
         )
 
@@ -287,16 +289,19 @@ def endpoint():
             }
             # Run model training or test set prediction if requested
             try:
-                train_torch_model(input_params_dict=input_params_dict)
+                logging.info("Starting model training or test set prediction in a separate thread")
+                # Start a new thread to run the training or prediction function
+                train_thread = threading.Thread(target=train_torch_model, args=(input_params_dict,))
+                train_thread.start()
                 classification_result = {
-                    "message": "Model training or test set prediction completed successfully."
+                    "message": "Model training or test set prediction initiated successfully."
                 }
                 root_span.set_outputs({"status_code": 200, **classification_result})
             except Exception as exc:
                 logging.exception(f"Model training/prediction failed: {exc}")
                 root_span.set_outputs({"status_code": 500, "error": str(exc)})
                 return jsonify(
-                    {"error": "Internal training/prediction error", "detail": str(exc)}
+                    {"error": "Internal training/prediction initiation error", "detail": str(exc)}
                 ), 500
 
     return jsonify(classification_result), 200
