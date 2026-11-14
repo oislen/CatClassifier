@@ -7,7 +7,7 @@
   },
   "item": [
     {
-      "name": "/catclassifier Classify",
+      "name": "/catclassifier/image",
       "request": {
         "method": "POST",
         "header": [],
@@ -38,7 +38,7 @@
           ]
         },
         "url": {
-          "raw": "http://127.0.0.1:5001/catclassifier",
+          "raw": "http://127.0.0.1:5001/catclassifier/image",
           "protocol": "http",
           "host": [
             "127",
@@ -48,14 +48,15 @@
           ],
           "port": "5001",
           "path": [
-            "catclassifier"
+            "catclassifier",
+            "image"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "/catclassifier Train",
+      "name": "/catclassifier/train",
       "request": {
         "method": "POST",
         "header": [],
@@ -93,7 +94,7 @@
           ]
         },
         "url": {
-          "raw": "http://127.0.0.1:5001/catclassifier",
+          "raw": "http://127.0.0.1:5001/catclassifier/train",
           "protocol": "http",
           "host": [
             "127",
@@ -103,7 +104,8 @@
           ],
           "port": "5001",
           "path": [
-            "catclassifier"
+            "catclassifier",
+            "train"
           ]
         }
       },
