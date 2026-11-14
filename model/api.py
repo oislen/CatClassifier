@@ -195,8 +195,8 @@ def classify_image(
     return response
 
 
-@app.route("/catclassifier", methods=["POST"])
-def endpoint():
+@app.route("/catclassifier/image", methods=["POST"])
+def image_endpoint():
     """
     API endpoint that accepts a POST request with an image file.
     Runs the image through the classification pipeline and returns the result.
@@ -209,23 +209,22 @@ def endpoint():
     -------
     JSON response containing the classification result or an error message.
     """
-    logging.info("Received POST request at /catclassifier endpoint")
+    logging.info("Received POST request at /catclassifier/image endpoint")
     # early exits before the span — no image data yet
-    #if "image" not in request.files:
-    #    return jsonify({"error": "No 'image' part in the request"}), 400
-    #logging.info("Image file found in the request")
+    if "image" not in request.files:
+        return jsonify({"error": "No 'image' part in the request"}), 400
+    logging.info("Image file found in the request")
 
     # extract parameters from the request
     image_file = request.files.get("image", None)
     model_id = request.form.get("model_id", list(model_dict.keys())[1])
     device_type = request.form.get("device_type", cons.device_type)
-    safe_filename = secure_filename(image_file.filename) if image_file is not None else ""
-    # optional flags for running model training or test set prediction
-    run_model_training = request.form.get("run_model_training", "False").lower() == "true"
-    run_testset_prediction = request.form.get("run_testset_prediction", "False").lower() == "true"
+    safe_filename = (
+        secure_filename(image_file.filename) if image_file is not None else ""
+    )
 
-    #if safe_filename == "":
-    #    return jsonify({"error": "No file selected for uploading"}), 400
+    if safe_filename == "":
+        return jsonify({"error": "No file selected for uploading"}), 400
 
     # open root span — all remaining logic (including model_id validation) runs inside
     with mlflow.start_span(name="api_request", span_type="CHAIN") as root_span:
@@ -236,9 +235,9 @@ def endpoint():
                 "image_filename": safe_filename,
                 "git_commit": _GIT_COMMIT,
                 "request_id": request.headers.get("X-Request-ID", "none"),
-                "run_model_training": run_model_training,
-                "run_testset_prediction": run_testset_prediction,
-                "registered_model_name": cons.mlflow_registered_model_names.get(model_id, ""),
+                "registered_model_name": cons.mlflow_registered_model_names.get(
+                    model_id, ""
+                ),
                 "model_version": _MODEL_VERSIONS.get(model_id, "unknown"),
             }
         )
@@ -254,55 +253,120 @@ def endpoint():
                 400,
             )
 
-        if not (run_model_training or run_testset_prediction) and image_file is not None:
+        logging.info("Processing the uploaded image")
+        api_filepath = os.path.join(cons.api_fdir, safe_filename)
+        # create api file directory if not exists
+        if not os.path.exists(cons.api_fdir):
+            os.makedirs(os.path.dirname(api_filepath))
+        # save the file uploaded to the api directory
+        image_file.save(api_filepath)
+        logging.info("Classifying the image using the model")
+        try:
+            classification_result = classify_image(
+                image_filepath=api_filepath,
+                model_id=model_id,
+                device_type=device_type,
+                original_filename=safe_filename,
+            )
+        except Exception as exc:
+            root_span.set_outputs({"status_code": 500, "error": str(exc)})
+            return (
+                jsonify({"error": "Internal classification error", "detail": str(exc)}),
+                500,
+            )
 
-            logging.info("Processing the uploaded image")
-            api_filepath = os.path.join(cons.api_fdir, safe_filename)
-            # create api file directory if not exists
-            if not os.path.exists(cons.api_fdir):
-                os.makedirs(os.path.dirname(api_filepath))
-            # save the file uploaded to the api directory
-            image_file.save(api_filepath)
-            logging.info("Classifying the image using the model")
-            try:
-                classification_result = classify_image(
-                    image_filepath=api_filepath,
-                    model_id=model_id,
-                    device_type=device_type,
-                    original_filename=safe_filename,
-                )
-            except Exception as exc:
-                root_span.set_outputs({"status_code": 500, "error": str(exc)})
-                return jsonify(
-                    {"error": "Internal classification error", "detail": str(exc)}
-                ), 500
+        # include the full result dict alongside status code for rich trace output
+        root_span.set_outputs({"status_code": 200, **classification_result})
 
-            # include the full result dict alongside status code for rich trace output
-            root_span.set_outputs({"status_code": 200, **classification_result})
-        else:
-            # set up input parameters for model training or test set prediction
-            input_params_dict={
+    return jsonify(classification_result), 200
+
+
+@app.route("/catclassifier/train", methods=["POST"])
+def train_endpoint():
+    """
+    API endpoint that accepts a POST request to initiate model training or test set prediction.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    JSON response indicating the initiation of model training or test set prediction, or an error message.
+    """
+    logging.info("Received POST request at /catclassifier/train endpoint")
+
+    # extract parameters from the request
+    model_id = request.form.get("model_id", list(model_dict.keys())[1])
+    device_type = request.form.get("device_type", cons.device_type)
+    run_model_training = (
+        request.form.get("run_model_training", "False").lower() == "true"
+    )
+    run_testset_prediction = (
+        request.form.get("run_testset_prediction", "False").lower() == "true"
+    )
+
+    # open root span — all remaining logic (including model_id validation) runs inside
+    with mlflow.start_span(name="api_request", span_type="CHAIN") as root_span:
+        root_span.set_inputs(
+            {
                 "model_id": model_id,
                 "device_type": device_type,
+                "git_commit": _GIT_COMMIT,
+                "request_id": request.headers.get("X-Request-ID", "none"),
                 "run_model_training": run_model_training,
                 "run_testset_prediction": run_testset_prediction,
+                "registered_model_name": cons.mlflow_registered_model_names.get(
+                    model_id, ""
+                ),
+                "model_version": _MODEL_VERSIONS.get(model_id, "unknown"),
             }
-            # Run model training or test set prediction if requested
-            try:
-                logging.info("Starting model training or test set prediction in a separate thread")
-                # Start a new thread to run the training or prediction function
-                train_thread = threading.Thread(target=train_torch_model, args=(input_params_dict,))
-                train_thread.start()
-                classification_result = {
-                    "message": "Model training or test set prediction initiated successfully."
-                }
-                root_span.set_outputs({"status_code": 200, **classification_result})
-            except Exception as exc:
-                logging.exception(f"Model training/prediction failed: {exc}")
-                root_span.set_outputs({"status_code": 500, "error": str(exc)})
-                return jsonify(
-                    {"error": "Internal training/prediction initiation error", "detail": str(exc)}
-                ), 500
+        )
+
+        if model_id not in model_dict:
+            root_span.set_outputs({"status_code": 400, "error": "invalid model_id"})
+            return (
+                jsonify(
+                    {
+                        "error": f"Invalid model_id. Available model_ids: {list(model_dict.keys())}"
+                    }
+                ),
+                400,
+            )
+
+        # set up input parameters for model training or test set prediction
+        input_params_dict = {
+            "model_id": model_id,
+            "device_type": device_type,
+            "run_model_training": run_model_training,
+            "run_testset_prediction": run_testset_prediction,
+        }
+        # Run model training or test set prediction if requested
+        try:
+            logging.info(
+                "Starting model training or test set prediction in a separate thread"
+            )
+            # Start a new thread to run the training or prediction function
+            train_thread = threading.Thread(
+                target=train_torch_model, args=(input_params_dict,)
+            )
+            train_thread.start()
+            classification_result = {
+                "message": "Model training or test set prediction initiated successfully."
+            }
+            root_span.set_outputs({"status_code": 200, **classification_result})
+        except Exception as exc:
+            logging.exception(f"Model training/prediction failed: {exc}")
+            root_span.set_outputs({"status_code": 500, "error": str(exc)})
+            return (
+                jsonify(
+                    {
+                        "error": "Internal training/prediction initiation error",
+                        "detail": str(exc),
+                    }
+                ),
+                500,
+            )
 
     return jsonify(classification_result), 200
 
