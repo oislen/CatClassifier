@@ -1,5 +1,5 @@
 """
-Unit tests for classify_image() span instrumentation in model/api.py.
+Unit tests for classify_image() span instrumentation in api/utilities/classify_image.py.
 
 Tests use unittest.mock to capture mlflow.start_span calls without
 requiring a running MLflow server or real model weights.
@@ -26,6 +26,9 @@ def _make_span_mock(name, **kwargs):
     span.__enter__ = MagicMock(return_value=span)
     span.__exit__ = MagicMock(return_value=False)
     return span
+
+
+_MODULE = "api.utilities.classify_image"
 
 
 class TestClassifyImageSpans(unittest.TestCase):
@@ -59,20 +62,20 @@ class TestClassifyImageSpans(unittest.TestCase):
 
         fake_predict = np.array([[0.3, 0.7]])
 
-        with patch("api.mlflow.start_span", side_effect=_make_span_mock):
-            with patch("api.TorchLoadImages") as mock_loader_cls:
+        with patch(f"{_MODULE}.mlflow.start_span", side_effect=_make_span_mock):
+            with patch(f"{_MODULE}.TorchLoadImages") as mock_loader_cls:
                 mock_loader = MagicMock()
                 mock_loader.load_images.return_value = fake_df.to_dict(orient="records")
                 mock_loader_cls.return_value = mock_loader
 
-                with patch("api.CustomDataset"):
-                    with patch("api.DataLoader") as mock_dl_cls:
+                with patch(f"{_MODULE}.CustomDataset"):
+                    with patch(f"{_MODULE}.DataLoader") as mock_dl_cls:
                         mock_dl = MagicMock()
                         mock_dl.__len__ = MagicMock(return_value=1)
                         mock_dl.__iter__ = MagicMock(return_value=iter([]))
                         mock_dl_cls.return_value = mock_dl
 
-                        with patch("api.model_dict") as mock_model_dict:
+                        with patch(f"{_MODULE}.model_dict") as mock_model_dict:
                             mock_model = MagicMock()
                             mock_model.predict.return_value = fake_predict
                             mock_model_dict.__getitem__ = MagicMock(
@@ -80,13 +83,14 @@ class TestClassifyImageSpans(unittest.TestCase):
                             )
                             mock_model.to.return_value = mock_model
 
-                            import api
+                            from api.utilities.classify_image import classify_image
 
-                            api.classify_image(
+                            classify_image(
                                 image_filepath="/tmp/test.jpg",
                                 model_id="alexnet_8_pretrained",
                                 device_type="cpu",
                                 original_filename="test.jpg",
+                                model_versions={},
                             )
 
         return list(_OPENED_SPANS)
@@ -152,30 +156,32 @@ class TestClassifyImageSpans(unittest.TestCase):
             span.__exit__ = MagicMock(return_value=False)
             return span
 
-        with patch("api.mlflow.start_span", side_effect=span_side_effect):
-            with patch("api.TorchLoadImages") as mock_loader_cls:
+        with patch(f"{_MODULE}.mlflow.start_span", side_effect=span_side_effect):
+            with patch(f"{_MODULE}.TorchLoadImages") as mock_loader_cls:
                 mock_loader = MagicMock()
                 mock_loader.load_images.return_value = fake_df.to_dict(orient="records")
                 mock_loader_cls.return_value = mock_loader
-                with patch("api.CustomDataset"):
-                    with patch("api.DataLoader") as mock_dl_cls:
+                with patch(f"{_MODULE}.CustomDataset"):
+                    with patch(f"{_MODULE}.DataLoader") as mock_dl_cls:
                         mock_dl = MagicMock()
                         mock_dl.__len__ = MagicMock(return_value=1)
                         mock_dl_cls.return_value = mock_dl
-                        with patch("api.model_dict") as mock_model_dict:
+                        with patch(f"{_MODULE}.model_dict") as mock_model_dict:
                             mock_model = MagicMock()
                             mock_model.predict.return_value = fake_predict
                             mock_model_dict.__getitem__ = MagicMock(
                                 return_value=mock_model
                             )
                             mock_model.to.return_value = mock_model
-                            import api
 
-                            api.classify_image(
+                            from api.utilities.classify_image import classify_image
+
+                            classify_image(
                                 image_filepath="/tmp/test.jpg",
                                 model_id="alexnet_8_pretrained",
                                 device_type="cpu",
                                 original_filename="uploaded.jpg",
+                                model_versions={},
                             )
 
         self.assertIn(
