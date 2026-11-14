@@ -1,0 +1,1 @@
+call uv run python -m unittest discover unittests
