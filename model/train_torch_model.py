@@ -75,6 +75,7 @@ torch_transforms = transforms.Compose(
     ]
 )
 
+
 def train_torch_model(input_params_dict: dict) -> None:
     """
     Train a torch model and log results to MLflow.
@@ -219,8 +220,8 @@ def train_torch_model(input_params_dict: dict) -> None:
                     )
 
                 logging.info("Creating training and validation data loaders...")
-                #total_train = train_df.shape[0]
-                #total_validate = validate_df.shape[0]
+                # total_train = train_df.shape[0]
+                # total_validate = validate_df.shape[0]
                 train_dataset = CustomDataset(train_df)
                 train_loader = DataLoader(
                     train_dataset,
@@ -497,7 +498,6 @@ def train_torch_model(input_params_dict: dict) -> None:
 
 
 if __name__ == "__main__":
-
     logging.info("Parsing command line arguments...")
     # handle input parameters
     input_params_dict = commandline_interface()

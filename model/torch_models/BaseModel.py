@@ -14,7 +14,6 @@ from .validate import validate as validate_module
 
 
 class base_model(nn.Module):
-
     @beartype
     def fit(
         self,
