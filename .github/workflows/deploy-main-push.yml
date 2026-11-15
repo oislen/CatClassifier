@@ -99,6 +99,7 @@ jobs:
       run: |
         uv run python -m unittest discover ./webscrapers/unittests
         uv run python -m unittest discover ./model/unittests
+        uv run python -m unittest discover ./api/unittests
 
   trivy-fs-scan:
     name: Trivy File System Scan
