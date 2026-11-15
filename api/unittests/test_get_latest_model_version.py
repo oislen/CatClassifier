@@ -11,7 +11,14 @@ import mlflow
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-import api.endpoints as api
+# ---------------------------------------------------------------------------
+# Import api.endpoints with MLflow network calls suppressed.
+# endpoints.py runs mlflow.set_tracking_uri / mlflow.set_experiment at module
+# level, which tries to reach a live server.  Patch both before the first
+# import so no network connection is attempted.
+# ---------------------------------------------------------------------------
+with patch("mlflow.set_tracking_uri"), patch("mlflow.set_experiment"):
+    import api.endpoints as api
 
 
 class TestGetLatestModelVersion(unittest.TestCase):
