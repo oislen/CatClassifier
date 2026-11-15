@@ -130,10 +130,12 @@ def image_endpoint():
                 time_logger=time_logger,
                 model_versions=_MODEL_VERSIONS,
             )
-        except Exception as exc:
-            root_span.set_outputs({"status_code": 500, "error": str(exc)})
+        except Exception:
+            root_span.set_outputs(
+                {"status_code": 500, "error": "internal_classification_error"}
+            )
             return (
-                jsonify({"error": "Internal classification error", "detail": str(exc)}),
+                jsonify(jsonify({"error": "Internal classification error"})),
                 500,
             )
 
@@ -219,14 +221,14 @@ def train_endpoint():
             root_span.set_outputs({"status_code": 200, **classification_result})
         except Exception as exc:
             logging.exception(f"Model training/prediction failed: {exc}")
-            root_span.set_outputs({"status_code": 500, "error": str(exc)})
+            root_span.set_outputs(
+                {
+                    "status_code": 500,
+                    "error": "Internal training/prediction initiation error",
+                }
+            )
             return (
-                jsonify(
-                    {
-                        "error": "Internal training/prediction initiation error",
-                        "detail": str(exc),
-                    }
-                ),
+                jsonify({"error": "Internal training/prediction initiation error"}),
                 500,
             )
 
