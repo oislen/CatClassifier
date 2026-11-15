@@ -156,6 +156,7 @@ jobs:
       run: |
         uv run python -m unittest discover ./webscrapers/unittests
         uv run python -m unittest discover ./model/unittests
+        uv run python -m unittest discover ./api/unittests
 
   zizmor-scan:
     name: Zizmor CI/CD Security Check

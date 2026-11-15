@@ -92,7 +92,7 @@ def fit(
                 preds = model.forward(images)
                 loss = criterion(preds, labels)
                 if scheduler is not None:
-                    scheduler.step(loss)
+                    scheduler.step(loss.item())
                 # backward and optimise
                 optimizer.zero_grad()
                 loss.backward()
@@ -131,7 +131,7 @@ def fit(
                 valid_loss_list.append(valid_loss)
                 valid_acc_list.append(valid_acc)
                 logging.info(
-                    f"Valid Loss: {loss.item():.4f}, Valid Accuracy: {valid_acc:.4f}"
+                    f"Valid Loss: {valid_loss:.4f}, Valid Accuracy: {valid_acc:.4f}"
                 )
                 mlflow.log_metrics(
                     {
