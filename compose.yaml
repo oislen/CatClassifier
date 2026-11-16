@@ -49,9 +49,6 @@ services:
         shm_size: 512m
         ports:
             - "8888:8888"
-        volumes:
-            - E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds
-            - E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report
         environment:
             - PARAM_CHECK_GPU=True
         networks:
