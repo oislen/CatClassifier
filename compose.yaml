@@ -3,16 +3,19 @@ services:
 
     mlflow:
         container_name: mlf
-        image: oislen/cat-classifier:latest
-        entrypoint: ["uv", "run", "mlflow", "server"]
-        command: ["--host", "0.0.0.0", "--port", "5000"]
+        image: ghcr.io/mlflow/mlflow@sha256:2cc40b3208991940d824d04f339833a0b69507569012aa5ec545690608602fc0
+        entrypoint: ["mlflow", "server"]
+        command: [
+            "--host", "0.0.0.0",
+            "--port", "5000",
+            "--backend-store-uri", "sqlite:////mlflow/mlflow.db",
+            "--default-artifact-root", "/mlflow/artifacts"
+        ]
         environment:
             - MLFLOW_SERVER_ALLOWED_HOSTS=*
         shm_size: 512m
         ports:
             - "5000:5000"
-        volumes:
-            - mlruns:/home/user/CatClassifier/mlruns
         networks:
             - cat-net
         restart: unless-stopped
