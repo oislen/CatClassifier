@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/oislen/CatClassifier/compare/v0.3.3...v0.4.0) (2026-11-16)
+
+
+### Features
+
+* **#59:** updated docker compose ([#60](https://github.com/oislen/CatClassifier/issues/60)) ([62cafbc](https://github.com/oislen/CatClassifier/commit/62cafbcc6445ccff8e34da06d9dc437046622cd9))
+* **56:** enhancements to api model interface ([#57](https://github.com/oislen/CatClassifier/issues/57)) ([1467f18](https://github.com/oislen/CatClassifier/commit/1467f18746ae654c977b53ea8ccb47097d43aa6d))
+
 ## [0.3.3](https://github.com/oislen/CatClassifier/compare/v0.3.2...v0.3.3) (2026-11-02)
 
 
