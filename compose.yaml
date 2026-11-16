@@ -13,6 +13,8 @@ services:
             - "5000:5000"
         volumes:
             - mlruns:/home/user/CatClassifier/mlruns
+        networks:
+            - cat-net
         restart: unless-stopped
 
     flask:
@@ -26,6 +28,31 @@ services:
             - MLFLOW_TRACKING_URI=http://mlflow:5000
         depends_on:
             - mlflow
+        networks:
+            - cat-net
+        restart: unless-stopped
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities: [gpu]
+
+    jupyter:
+        container_name: jpy
+        image: oislen/cat-classifier:latest
+        entrypoint: ["uv", "run", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+        shm_size: 512m
+        ports:
+            - "8888:8888"
+        volumes:
+            - E:\GitHub\CatClassifier\.creds:/home/ubuntu/CatClassifier/.creds
+            - E:\GitHub\CatClassifier\report:/home/ubuntu/CatClassifier/report
+        environment:
+            - PARAM_CHECK_GPU=True
+        networks:
+            - cat-net
         restart: unless-stopped
         deploy:
             resources:
@@ -37,3 +64,7 @@ services:
 
 volumes:
     mlruns:
+
+networks:
+    cat-net:
+        driver: bridge
