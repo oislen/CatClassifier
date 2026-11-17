@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/oislen/CatClassifier/compare/v0.4.0...v0.4.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* **#59:** workflow and compose fixes ([#61](https://github.com/oislen/CatClassifier/issues/61)) ([1d1636a](https://github.com/oislen/CatClassifier/commit/1d1636a663183f385245fd050ae108bd6693119d))
+
 ## [0.4.0](https://github.com/oislen/CatClassifier/compare/v0.3.3...v0.4.0) (2026-11-16)
 
 
