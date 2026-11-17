@@ -29,6 +29,10 @@ services:
         environment:
             - PARAM_CHECK_GPU=True
             - MLFLOW_TRACKING_URI=http://mlflow:5000
+        volumes:
+            - E:\GitHub\CatClassifier\.creds:/home/user/CatClassifier/.creds
+            - E:\GitHub\CatClassifier\report:/home/user/CatClassifier/report
+            - E:\GitHub\CatClassifier\data:/home/user/CatClassifier/data
         depends_on:
             - mlflow
         networks:
@@ -54,6 +58,10 @@ services:
         networks:
             - cat-net
         restart: unless-stopped
+        volumes:
+            - E:\GitHub\CatClassifier\.creds:/home/user/CatClassifier/.creds
+            - E:\GitHub\CatClassifier\report:/home/user/CatClassifier/report
+            - E:\GitHub\CatClassifier\data:/home/user/CatClassifier/data
         deploy:
             resources:
                 reservations:
