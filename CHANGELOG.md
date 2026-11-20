@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/oislen/CatClassifier/compare/v0.4.1...v0.4.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* **#59:** updated jq check  ([#63](https://github.com/oislen/CatClassifier/issues/63)) ([d0ae831](https://github.com/oislen/CatClassifier/commit/d0ae831d88b4735878e16d9c89aa006ccc61c707))
+
 ## [0.4.1](https://github.com/oislen/CatClassifier/compare/v0.4.0...v0.4.1) (2026-11-17)
 
 
