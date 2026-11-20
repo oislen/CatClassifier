@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/oislen/CatClassifier/compare/v0.4.2...v0.4.3) (2026-11-20)
+
+
+### Bug Fixes
+
+* **#59:** apply environment fix for trivy image vulnerability ([#65](https://github.com/oislen/CatClassifier/issues/65)) ([23c70a1](https://github.com/oislen/CatClassifier/commit/23c70a1cd7d2590dc7dc69f9e7b091724457d35c))
+
 ## [0.4.2](https://github.com/oislen/CatClassifier/compare/v0.4.1...v0.4.2) (2026-11-17)
 
 
