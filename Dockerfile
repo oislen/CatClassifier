@@ -11,7 +11,7 @@ ENV PYTHON_VERSION=${PYTHON_VERSION}
 # install required software and programmes for development environment
 RUN apt-get update
 # patch OS packages with HIGH/CRITICAL Trivy findings
-RUN apt-get install -y --only-upgrade \
+RUN apt-get install -y --only-upgrade zlib1g=1:1.3.dfsg+really1.3.1-1+deb13u1 \
     gzip \
     libpcre2-8-0 \
     libsqlite3-0 \

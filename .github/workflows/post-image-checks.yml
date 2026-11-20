@@ -13,7 +13,7 @@ jobs:
 
   check-push-occurred:
     name: Check if Image Was Pushed
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       pushed: ${{ steps.verify-push.outputs.pushed }}
     steps:
@@ -40,7 +40,7 @@ jobs:
     name: Trivy Image Scan
     needs: check-push-occurred
     if: needs.check-push-occurred.outputs.pushed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

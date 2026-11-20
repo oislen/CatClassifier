@@ -10,7 +10,7 @@ jobs:
 
   ruff-linter:
     name: Ruff Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -58,7 +58,7 @@ jobs:
           sonar-scanner.bat -D"sonar.projectKey=%SONAR_PROJECT_KEY%" -D"sonar.sources=." -D"sonar.host.url=%SONAR_HOST_URL%" -D"sonar.token=%SONAR_TOKEN%"
 
   read-python-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       python-version: ${{ steps.set-version.outputs.version }}
     steps:
@@ -75,7 +75,7 @@ jobs:
   python-unittests:
     name: Python Unittests
     needs: read-python-version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +103,7 @@ jobs:
 
   trivy-fs-scan:
     name: Trivy File System Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -126,7 +126,7 @@ jobs:
 
   zizmor-scan:
     name: Zizmor CI/CD Security Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       security-events: write
@@ -142,7 +142,7 @@ jobs:
 
   actionlint:
     name: Lint GitHub Actions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -154,7 +154,7 @@ jobs:
   release-please:
     name: Release Please
     needs: [trivy-fs-scan, python-unittests, ruff-linter, zizmor-scan]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
       pull-requests: write
@@ -173,7 +173,7 @@ jobs:
     name: Dockerhub Image Push
     needs: [read-python-version, release-please]
     if: ${{ needs.release-please.outputs.release_created }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
