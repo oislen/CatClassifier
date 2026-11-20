@@ -15,7 +15,7 @@ jobs:
 
   validate-pr-title:
     name: Validate Pull Request Title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   ruff-linter:
     name: Ruff Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -93,7 +93,7 @@ jobs:
 
   trivy-fs-scan:
     name: Trivy File System Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -115,7 +115,7 @@ jobs:
         exit-code: '1'
 
   read-python-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       python-version: ${{ steps.set-version.outputs.version }}
     steps:
@@ -132,7 +132,7 @@ jobs:
   python-unittests:
     name: Python Unittests
     needs: read-python-version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -160,7 +160,7 @@ jobs:
 
   zizmor-scan:
     name: Zizmor CI/CD Security Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       security-events: write
@@ -176,7 +176,7 @@ jobs:
 
   actionlint:
     name: Lint GitHub Actions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
